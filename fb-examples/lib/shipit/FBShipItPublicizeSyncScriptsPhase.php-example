@@ -82,6 +82,7 @@ final class FBShipItPublicizeSyncScriptsPhase extends ShipItPhase {
         Str\slice($file, 0, Str\length($export_root)) === $export_root,
         'file %s is not inside %s',
         $file,
+        /* HH_FIXME[4110] %s expects a string */
         $export_root,
       );
       $dest_file = $dest_root.Str\slice($file, Str\length($export_root));
