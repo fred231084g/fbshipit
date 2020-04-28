@@ -15,13 +15,7 @@ namespace Facebook\ShipIt;
 abstract class ShellTest extends \Facebook\HackTest\HackTest { // @oss-enable
 // @oss-disable: abstract class ShellTest extends \HackTest {
 
-  public async function setUp(): Awaitable<void> {} // @oss-enable
   public async function tearDownAsync(): Awaitable<void> {} // @oss-enable
-
-  <<__Override>> // @oss-enable
-  public async function beforeEachTestAsync(): Awaitable<void> { // @oss-enable
-    await $this->setUp(); // @oss-enable
-  } // @oss-enable
 
   <<__Override>> // @oss-enable
   public async function afterEachTestAsync(): Awaitable<void> { // @oss-enable

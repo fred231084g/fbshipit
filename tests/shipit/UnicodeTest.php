@@ -24,7 +24,7 @@ final class UnicodeTest extends ShellTest {
   private ?string $ctype;
 
   <<__Override>>
-  public async function setUp(): Awaitable<void> {
+  public async function beforeEachTestAsync(): Awaitable<void> {
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     $ctype = \getenv('LC_CTYPE');

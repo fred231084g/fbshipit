@@ -19,7 +19,7 @@ final class SyncTrackingTest extends ShellTest {
   private ?ShipItTempDir $tempDir;
 
   <<__Override>>
-  public async function setUp(): Awaitable<void> {
+  public async function beforeEachTestAsync(): Awaitable<void> {
     $this->tempDir = new ShipItTempDir('git-sync-test');
     $path = $this->tempDir->getPath();
 
