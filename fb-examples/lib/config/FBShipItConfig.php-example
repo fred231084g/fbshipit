@@ -45,7 +45,7 @@ abstract class FBShipItConfig {
 
   private function __construct() {}
 
-  public static function getInstance(): this {
+  protected static function getInstance(): this {
     return new static();
   }
 
