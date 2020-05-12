@@ -17,6 +17,7 @@ use type Facebook\ShipIt\{
   FBShipItConfig,
   ShipItPhaseRunner,
   FBSourceBranchConfig,
+  IFBShipItArgumentParser,
 };
 
 final class FBImportItBranchResolutionPhase
@@ -35,10 +36,12 @@ final class FBImportItBranchResolutionPhase
   public static function getRunner(
     FBShipItConfig $config_object,
     FBSourceBranchConfig $branch_config,
+    ?IFBShipItArgumentParser $argument_parser = null,
   ): ShipItPhaseRunner {
     return new ShipItPhaseRunner(
       $config_object->getImportBaseConfig($branch_config),
       $config_object->getImportPhases($branch_config),
+      $argument_parser,
     );
   }
 

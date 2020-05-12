@@ -15,10 +15,15 @@ namespace Facebook\ShipIt;
 use namespace HH\Lib\{Str, Math, Dict, C, Vec};
 
 class ShipItPhaseRunner {
+  protected IFBShipItArgumentParser $argumentParser;
+
   public function __construct(
     protected ShipItBaseConfig $config,
     protected vec<ShipItPhase> $phases,
-  ) {}
+    ?IFBShipItArgumentParser $argumentParser = null,
+  ) {
+    $this->argumentParser = $argumentParser ?? new FBShipItCLIArgumentParser();
+  }
 
   public function run(): void {
     $this->parseCLIArguments();
@@ -131,7 +136,7 @@ class ShipItPhaseRunner {
     ];
   }
 
-  final protected function getCLIArguments(): vec<ShipItCLIArgument> {
+  final public function getCLIArguments(): vec<ShipItCLIArgument> {
     $args = $this->getBasicCLIArguments();
     foreach ($this->phases as $phase) {
       $args = Vec\concat($args, $phase->getCLIArguments());
@@ -234,14 +239,7 @@ class ShipItPhaseRunner {
 
   protected function parseCLIArguments(): void {
     $config = $this->getCLIArguments();
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $raw_opts = \getopt(
-      Vec\map($config, $opt ==> Shapes::idx($opt, 'short_name', ''))
-        |> Str\join($$, ''),
-      Vec\map($config, $opt ==> $opt['long_name']),
-    )
-      |> dict($$);
+    $raw_opts = $this->argumentParser->parseArgs($config);
     if (C\contains_key($raw_opts, 'h') || C\contains_key($raw_opts, 'help')) {
       self::printHelp($config);
       exit(0);

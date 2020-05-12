@@ -28,6 +28,7 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
     private FBShipItConfig $configObject,
     protected ?string $externalBranch = null,
     private ?string $repoMetadataFile = null,
+    private ?IFBShipItArgumentParser $argumentParser = null,
   ) {}
 
   <<__Override>>
@@ -69,10 +70,12 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
   public static function getRunner(
     FBShipItConfig $config_object,
     FBSourceBranchConfig $branch_config,
+    ?IFBShipItArgumentParser $argument_parser = null,
   ): ShipItPhaseRunner {
     return new ShipItPhaseRunner(
       $config_object->getBaseConfig($branch_config),
       $config_object->getPhases($branch_config),
+      $argument_parser,
     );
   }
 
@@ -144,7 +147,11 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
         $branch_config['internal'],
         $branch_config['external'],
       );
-      $runner = static::getRunner($config_object, $branch_config);
+      $runner = static::getRunner(
+        $config_object,
+        $branch_config,
+        $this->argumentParser,
+      );
       $runner->run();
     }
   }

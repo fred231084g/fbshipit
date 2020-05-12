@@ -31,6 +31,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     private FBShipItCLIAction $action,
     private ?FBShipItConfig $configObject = null,
     private ?string $externalBranch = null,
+    ?IFBShipItArgumentParser $argumentParser = null,
   ) {
     $config = /* HH_IGNORE_ERROR[2049] __PHPStdLib */
       /* HH_IGNORE_ERROR[4107] __PHPStdLib */
@@ -38,15 +39,21 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     if ($configObject !== null) {
       parent::__construct(
         $config,
-        self::getPhases($action, $configObject, $externalBranch),
+        self::getPhases(
+          $action,
+          $configObject,
+          $externalBranch,
+          $this->argumentParser,
+        ),
+        $argumentParser,
       );
     } else {
-      parent::__construct($config, vec[]);
+      parent::__construct($config, vec[], $argumentParser);
     }
   }
 
   <<__Override>>
-  protected function getBasicCLIArguments(): vec<ShipItCLIArgument> {
+  public function getBasicCLIArguments(): vec<ShipItCLIArgument> {
     return vec[
       shape(
         'short_name' => 'h',
@@ -94,6 +101,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
             $this->action,
             $config_object,
             $this->externalBranch,
+            $this->argumentParser,
           );
           return true;
         },
@@ -105,15 +113,26 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     FBShipItCLIAction $action,
     FBShipItConfig $config_object,
     ?string $external_branch,
+    ?IFBShipItArgumentParser $argument_parser,
   ): vec<ShipItPhase> {
     switch ($action) {
       case FBShipItCLIAction::SHIP_IT:
         return vec[
-          new FBShipItBranchResolutionPhase($config_object, $external_branch),
+          new FBShipItBranchResolutionPhase(
+            $config_object,
+            $external_branch,
+            null,
+            $argument_parser,
+          ),
         ];
       case FBShipItCLIAction::IMPORT_IT:
         return vec[
-          new FBImportItBranchResolutionPhase($config_object, $external_branch),
+          new FBImportItBranchResolutionPhase(
+            $config_object,
+            $external_branch,
+            null,
+            $argument_parser,
+          ),
         ];
     }
   }
@@ -165,23 +184,10 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     return $match;
   }
 
-  private static function getRawOpts(
-    vec<ShipItCLIArgument> $config,
-  ): dict<string, mixed> {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    return \getopt(
-      Vec\map($config, $opt ==> Shapes::idx($opt, 'short_name', ''))
-        |> Str\join($$, ''),
-      Vec\map($config, $opt ==> $opt['long_name']),
-    )
-      |> dict($$);
-  }
-
   <<__Override>>
   protected function parseCLIArguments(): void {
     $config = $this->getCLIArguments();
-    $raw_opts = self::getRawOpts($config);
+    $raw_opts = $this->argumentParser->parseArgs($config);
     $this->parseOptions($config, $raw_opts);
     $non_project_config_names = Keyset\map(
       $config,
@@ -193,11 +199,12 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
         !C\contains($non_project_config_names, $cli_arg['long_name']),
     );
     if (!C\is_empty($project_config)) {
-      $this->parseOptions($project_config, self::getRawOpts($project_config));
+      $this->parseOptions(
+        $project_config,
+        $this->argumentParser->parseArgs($project_config),
+      );
     }
-    if (
-      C\contains_key($raw_opts, 'h') || C\contains_key($raw_opts, 'help')
-    ) {
+    if (C\contains_key($raw_opts, 'h') || C\contains_key($raw_opts, 'help')) {
       // hacky coupling with FBShipItBranchResolutionPhase
       // render the project's help message
       if ($this->configObject !== null) {
