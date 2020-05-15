@@ -289,7 +289,7 @@ abstract class FBShipItConfig {
     );
   }
 
-  public function getPhases(
+  final public function getPhases(
     FBSourceBranchConfig $branch_config,
   ): vec<ShipItPhase> {
     $static_config = $this->getStaticConfig();
