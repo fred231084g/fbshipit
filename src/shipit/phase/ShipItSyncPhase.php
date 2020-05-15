@@ -43,7 +43,7 @@ final class ShipItSyncPhase extends ShipItPhase {
     return vec[
       shape(
         'long_name' => 'skip-sync-commits',
-        'description' => "Don't copy any commits. Handy for testing.\n",
+        'description' => "Don't copy any commits. Handy for testing.",
         'write' => $_ ==> $this->skip(),
       ),
       shape(
