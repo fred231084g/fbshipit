@@ -31,7 +31,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     private FBShipItCLIAction $action,
     private ?FBShipItConfig $configObject = null,
     private ?string $externalBranch = null,
-    ?IFBShipItArgumentParser $argumentParser = null,
+    ?IShipItArgumentParser $argumentParser = null,
   ) {
     $config = /* HH_IGNORE_ERROR[2049] __PHPStdLib */
       /* HH_IGNORE_ERROR[4107] __PHPStdLib */
@@ -113,7 +113,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     FBShipItCLIAction $action,
     FBShipItConfig $config_object,
     ?string $external_branch,
-    ?IFBShipItArgumentParser $argument_parser,
+    ?IShipItArgumentParser $argument_parser,
   ): vec<ShipItPhase> {
     switch ($action) {
       case FBShipItCLIAction::SHIP_IT:

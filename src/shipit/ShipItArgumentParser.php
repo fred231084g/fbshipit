@@ -10,13 +10,13 @@ namespace Facebook\ShipIt;
 
 use namespace HH\Lib\{Vec, Str};
 
-interface IFBShipItArgumentParser {
+interface IShipItArgumentParser {
   public function parseArgs(
     vec<ShipItCLIArgument> $config,
   ): dict<string, mixed>;
 }
 
-final class FBShipItCLIArgumentParser implements IFBShipItArgumentParser {
+final class ShipItCLIArgumentParser implements IShipItArgumentParser {
   public function parseArgs(
     vec<ShipItCLIArgument> $config,
   ): dict<string, mixed> {

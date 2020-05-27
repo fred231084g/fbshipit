@@ -15,14 +15,14 @@ namespace Facebook\ShipIt;
 use namespace HH\Lib\{Str, Math, Dict, C, Vec};
 
 class ShipItPhaseRunner {
-  protected IFBShipItArgumentParser $argumentParser;
+  protected IShipItArgumentParser $argumentParser;
 
   public function __construct(
     protected ShipItBaseConfig $config,
     protected vec<ShipItPhase> $phases,
-    ?IFBShipItArgumentParser $argumentParser = null,
+    ?IShipItArgumentParser $argumentParser = null,
   ) {
-    $this->argumentParser = $argumentParser ?? new FBShipItCLIArgumentParser();
+    $this->argumentParser = $argumentParser ?? new ShipItCLIArgumentParser();
   }
 
   public function run(): void {

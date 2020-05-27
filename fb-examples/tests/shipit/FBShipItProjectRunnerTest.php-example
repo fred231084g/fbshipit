@@ -23,7 +23,7 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
     FBShipItCLIAction $action,
     FBShipItConfig $config_object,
     ?string $external_branch = null,
-    ?IFBShipItArgumentParser $argument_parser = null,
+    ?IShipItArgumentParser $argument_parser = null,
   ): vec<ShipItPhase> {
     return FBShipItProjectRunner::getPhases(
       $action,
