@@ -25,9 +25,8 @@ type ShipItGitHubCredentials = shape(
 abstract class ShipItGitHubUtils {
   /** Fetch information on a user that has permission to write to a project.
    *
-   * For example, for most projects on github.com/facebook/, it will return
-   * information on a random facebook-github-bot user - though for
-   * github.com/facebook/hhvm/ it wil return hhvm-bot.
+   * For example, for projects on github.com/facebook/, it will return
+   * information on facebook-github-bot user
    *
    * This is used by ::initializeRepo().
    */
