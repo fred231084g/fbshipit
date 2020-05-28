@@ -75,8 +75,9 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
         'description' =>
           'Read configerator configs directly from the given folder',
         'write' => $configerator_dir ==> {
-          print(
-            '--- Reading configerator configs from '.$configerator_dir."\n"
+          ShipItLogger::out(
+            "--- Reading configerator configs from %s\n",
+            $configerator_dir,
           );
           $this->configeratorDir = $configerator_dir;
           return true;
@@ -89,12 +90,10 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
         'write' => $x ==> {
           $config_object = $this->lookupConfigClass($x);
           $static_config = $config_object->getStaticConfig();
-          print(
-            '--- Running for '.
-            $static_config['githubOrg'].
-            '/'.
-            $static_config['githubProject'].
-            "\n"
+          ShipItLogger::out(
+            "--- Running for %s/%s\n",
+            $static_config['githubOrg'],
+            $static_config['githubProject'],
           );
           $this->configObject = $config_object;
           $this->phases = self::getPhases(

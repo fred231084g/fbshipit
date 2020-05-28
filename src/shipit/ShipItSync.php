@@ -98,7 +98,7 @@ final class ShipItSync {
   public function run(): void {
     $changesets = $this->getFilteredChangesets();
     if (C\is_empty($changesets)) {
-      print("  No new commits to sync.\n");
+      ShipItLogger::out("  No new commits to sync.\n");
       $this->maybeLogStats(vec[], vec[]);
       return;
     }

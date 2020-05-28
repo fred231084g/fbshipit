@@ -80,9 +80,7 @@ final class ShipItSaveConfigPhase extends ShipItPhase {
       $this->outputFile,
       \json_encode($this->renderConfig($config), \JSON_PRETTY_PRINT),
     );
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    \printf("Finished phase: %s\n", $this->getReadableName());
+    ShipItLogger::out("Finished phase: %s\n", $this->getReadableName());
     exit(0);
   }
 }

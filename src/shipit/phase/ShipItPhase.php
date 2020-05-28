@@ -56,14 +56,10 @@ abstract class ShipItPhase {
     }
 
     if ($this->isSkipped()) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      \printf("Skipping phase: %s\n", $this->getReadableName());
+      ShipItLogger::out("Skipping phase: %s\n", $this->getReadableName());
       return;
     }
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    \printf(
+    ShipItLogger::out(
       "Starting phase%s: %s\n",
       /* HH_IGNORE_ERROR[2049] __PHPStdLib */
       /* HH_IGNORE_ERROR[4107] __PHPStdLib */
@@ -71,9 +67,7 @@ abstract class ShipItPhase {
       $this->getReadableName(),
     );
     $this->runImpl($config);
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    \printf(
+    ShipItLogger::out(
       "Finished phase%s: %s\n",
       /* HH_IGNORE_ERROR[2049] __PHPStdLib */
       /* HH_IGNORE_ERROR[4107] __PHPStdLib */

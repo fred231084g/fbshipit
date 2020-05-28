@@ -43,7 +43,7 @@ trait FBShipItCLITrait {
   final public static function cliForBinary(
     classname<IShipItConfig> $config_class,
   ): void {
-    print('--- Starting '.$config_class."\n");
+    ShipItLogger::out("--- Starting %s\n", $config_class);
     $config = $config_class::getBaseConfig();
     $runner = new ShipItPhaseRunner($config, $config_class::getPhases());
     self::executeRunner($runner);
@@ -54,7 +54,7 @@ trait FBShipItCLITrait {
     ?string $_external_branch = null,
   ): void {
     $config_name = $config === null ? '' : $config->getConfigeratorName();
-    print('--- Starting ShipIt: '.$config_name."\n");
+    ShipItLogger::out("--- Starting ShipIt: %s\n", $config_name);
     $runner = new FBShipItProjectRunner(
       FBShipItCLIAction::SHIP_IT,
       $config,
@@ -67,7 +67,7 @@ trait FBShipItCLITrait {
     ?string $external_branch = null,
   ): void {
     $config_name = $config === null ? '' : $config->getConfigeratorName();
-    print('--- Starting ImportIt: '.$config_name."\n");
+    ShipItLogger::out("--- Starting ImportIt: %s\n", $config_name);
     $runner = new FBShipItProjectRunner(
       FBShipItCLIAction::IMPORT_IT,
       $config,

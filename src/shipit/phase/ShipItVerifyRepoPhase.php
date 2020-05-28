@@ -144,9 +144,7 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
         );
         exit(1);
       }
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      \printf("  Verification OK: destination is in sync.\n");
+      ShipItLogger::out("  Verification OK: destination is in sync.\n");
       exit(0);
     }
 
@@ -194,9 +192,7 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     \file_put_contents($patch_file, $diff);
 
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    \printf(
+    ShipItLogger::out(
       "  Created patch file: %s\n\n".
       "%s\n\n".
       "  To apply:\n\n".

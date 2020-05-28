@@ -620,9 +620,7 @@ abstract class FBShipItConfig {
         /* HH_IGNORE_ERROR[4107] __PHPStdLib */
         $time_elapsed = \time() - $dest_head->getTimestamp();
         if ($time_elapsed < self::UPDATE_SUBMODULE_FREQUENCY) {
-          /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-          /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-          \printf(
+          ShipItLogger::out(
             "  SKIP Not updating submodules for another %d seconds\n",
             self::UPDATE_SUBMODULE_FREQUENCY - $time_elapsed,
           );

@@ -140,9 +140,7 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
       exit(0);
     }
     foreach ($branch_configs as $branch_config) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      \printf(
+      ShipItLogger::out(
         "--- Running for branch: (%s, %s)\n",
         $branch_config['internal'],
         $branch_config['external'],

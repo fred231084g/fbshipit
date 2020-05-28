@@ -64,6 +64,6 @@ final class FBDumpShipItMetadata {
         );
       }
     }
-    print(self::encodeOutput($metadatas));
+    ShipItLogger::out("%s", self::encodeOutput($metadatas));
   }
 }

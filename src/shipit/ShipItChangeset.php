@@ -165,18 +165,14 @@ final class ShipItChangeset {
   }
 
   public function dumpDebugMessages(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    \printf(
+    ShipItLogger::out(
       "  DEBUG %s %s\n    Full ID: %s\n",
       $this->getShortID(),
       $this->getSubject(),
       $this->getID(),
     );
     foreach ($this->getDebugMessages() as $message) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      \printf("    %s\n", $message);
+      ShipItLogger::out("    %s\n", $message);
     }
   }
 

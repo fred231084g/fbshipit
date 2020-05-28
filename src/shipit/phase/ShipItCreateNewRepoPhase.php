@@ -97,7 +97,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       exit(1);
     }
 
-    print('  New repository created at '.$output."\n");
+    ShipItLogger::out("  New repository created at %s\n", $output);
     exit(0);
   }
 
@@ -177,12 +177,12 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       $config->getSourceBranch(),
     );
 
-    print("  Exporting...\n");
+    ShipItLogger::out("  Exporting...\n");
     $export = $source->export($config->getSourceRoots(), $revision);
     $export_dir = $export['tempDir'];
     $rev = $export['revision'];
 
-    print("  Creating unfiltered commit...\n");
+    ShipItLogger::out("  Creating unfiltered commit...\n");
 
     self::initGitRepo($export_dir->getPath(), $committer);
     self::execSteps(
@@ -198,7 +198,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       ],
     );
 
-    print("  Filtering...\n");
+    ShipItLogger::out("  Filtering...\n");
     $exported_repo = ShipItRepo::typedOpen(
       ShipItSourceRepo::class,
       $export_dir->getPath(),
@@ -214,7 +214,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       $changeset->dumpDebugMessages();
     }
 
-    print("  Creating new repo...\n");
+    ShipItLogger::out("  Creating new repo...\n");
 
     self::initGitRepo($output_dir, $committer);
     $filtered_repo = ShipItRepo::typedOpen(
@@ -224,7 +224,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     );
     $filtered_repo->commitPatch($changeset);
 
-    print("  Cleaning up...\n");
+    ShipItLogger::out("  Cleaning up...\n");
     // As we're done with these and nothing else has the random paths, the lock
     // files aren't needed
     foreach (vec[$export_dir->getPath(), $output_dir] as $repo) {
