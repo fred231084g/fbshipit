@@ -14,9 +14,30 @@ namespace Facebook\ShipIt;
 
 use namespace HH\Lib\Str;
 
+type ShipItLoggerOutputFunc = (function(
+  Str\SprintfFormatString,
+  mixed...
+): void);
+
 abstract final class ShipItLogger {
+  private static ?ShipItLoggerOutputFunc $outFunc = null;
+  private static ?ShipItLoggerOutputFunc $errFunc = null;
+
+  public static function redirectOutput(
+    ShipItLoggerOutputFunc $out_func,
+    ?ShipItLoggerOutputFunc $err_func = null,
+  ): void {
+    self::$outFunc = $out_func;
+    self::$errFunc = $err_func ?? $out_func;
+  }
 
   public static function out(Str\SprintfFormatString $f, mixed ...$args): void {
+    $out_func = self::$outFunc;
+    if ($out_func is nonnull) {
+      /* HH_IGNORE_ERROR[4027] Passing in a format string */
+      $out_func($f, ...$args);
+      return;
+    }
     if (!\defined('\STDOUT')) {
       // No place to log to.
       return;
@@ -27,6 +48,12 @@ abstract final class ShipItLogger {
   }
 
   public static function err(Str\SprintfFormatString $f, mixed ...$args): void {
+    $err_func = self::$errFunc;
+    if ($err_func is nonnull) {
+      /* HH_IGNORE_ERROR[4027] Passing in a format string */
+      $err_func($f, ...$args);
+      return;
+    }
     if (!\defined('\STDERR')) {
       // No place to log to.
       return;
