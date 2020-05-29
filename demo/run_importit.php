@@ -20,6 +20,7 @@ use type Facebook\ShipIt\{
   ShipItGitHubInitPhase,
   ShipItRepoSide,
   ShipItTransport,
+  ShipItExitException,
 };
 
 final class ImportDemoProject {
@@ -58,7 +59,11 @@ final class ImportDemoProject {
       new ImportItSyncPhase($changeset ==> self::filterChangeset($changeset)),
     ];
 
-    (new ShipItPhaseRunner($config, $phases))->run();
+    try {
+      (new ShipItPhaseRunner($config, $phases))->run();
+    } catch (ShipItExitException $e) {
+      exit($e->exitCode);
+    }
   }
 }
 

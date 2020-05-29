@@ -23,7 +23,7 @@ final class ShipDemoProject {
     return $changeset
       |> ShipItPathFilters::stripExceptSourceRoots(
         $$,
-        keyset[self::$sourceRoot]
+        keyset[self::$sourceRoot],
       )
       |> ShipItPathFilters::moveDirectories($$, self::getPathMappings());
   }
@@ -60,7 +60,11 @@ final class ShipDemoProject {
       new ShipItPushPhase(),
     ];
 
-    (new ShipItPhaseRunner($config, $phases))->run();
+    try {
+      (new ShipItPhaseRunner($config, $phases))->run();
+    } catch (ShipItExitException $e) {
+      exit($e->exitCode);
+    }
   }
 }
 

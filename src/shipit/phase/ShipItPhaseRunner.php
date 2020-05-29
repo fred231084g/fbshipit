@@ -196,7 +196,7 @@ class ShipItPhaseRunner {
         if ($is_required && !$have_value) {
           echo "ERROR: Expected --".$long."\n\n";
           self::printHelp($config);
-          exit(1);
+          throw new ShipItExitException(1);
         }
       }
 
@@ -223,7 +223,7 @@ class ShipItPhaseRunner {
           $replacement,
         );
         if ($handler === null) {
-          exit(1);
+          throw new ShipItExitException(1);
         }
       } else {
         invariant(
@@ -242,7 +242,7 @@ class ShipItPhaseRunner {
     $raw_opts = $this->argumentParser->parseArgs($config);
     if (C\contains_key($raw_opts, 'h') || C\contains_key($raw_opts, 'help')) {
       self::printHelp($config);
-      exit(0);
+      throw new ShipItExitException(0);
     }
     $this->parseOptions($config, $raw_opts);
   }

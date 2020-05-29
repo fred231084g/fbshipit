@@ -79,7 +79,7 @@ final class FBRepoInitPhase extends \Facebook\ShipIt\ShipItPhase {
         \basename($local_path),
         $this->name,
       );
-      exit(1);
+      throw new \Facebook\ShipIt\ShipItExitException(1);
     }
 
     $command = $this->getCloneCommand();

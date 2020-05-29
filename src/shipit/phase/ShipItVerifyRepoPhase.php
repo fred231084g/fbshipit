@@ -142,10 +142,10 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
         ShipItLogger::err(
           "  CREATE PATCH FAILED: destination is already in sync.\n",
         );
-        exit(1);
+        throw new ShipItExitException(1);
       }
       ShipItLogger::out("  Verification OK: destination is in sync.\n");
-      exit(0);
+      throw new ShipItExitException(0);
     }
 
     if (!$this->createPatch) {
@@ -153,7 +153,7 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
         "  VERIFICATION FAILED: destination repo does not match:\n\n%s\n",
         $diffstat,
       );
-      exit(1);
+      throw new ShipItExitException(1);
     }
 
     /* HH_FIXME[4128] Use ShipItShellCommand */
@@ -215,6 +215,6 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
       $patch_file,
       $source_sync_id,
     );
-    exit(0);
+    throw new ShipItExitException(0);
   }
 }

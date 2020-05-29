@@ -137,7 +137,7 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
         $this->repoMetadataFile,
         \json_encode($this->getRepoMetadata()),
       );
-      exit(0);
+      throw new ShipItExitException(0);
     }
     foreach ($branch_configs as $branch_config) {
       ShipItLogger::out(

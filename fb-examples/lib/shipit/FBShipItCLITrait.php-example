@@ -35,7 +35,7 @@ trait FBShipItCLITrait {
       $ex->getTraceAsString(),
       $first_line,
     );
-    exit(128);
+    throw new ShipItExitException(128);
   }
 
   abstract public static function cliMain(): void;
@@ -79,6 +79,8 @@ trait FBShipItCLITrait {
   private static function executeRunner(ShipItPhaseRunner $runner): void {
     try {
       $runner->run();
+    } catch (ShipItExitException $e) {
+      exit($e->exitCode);
     } catch (ShipItShellCommandException $e) {
       $retry_causes = keyset[
         'abort: unknown compression type',

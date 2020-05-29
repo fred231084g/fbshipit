@@ -81,6 +81,6 @@ final class ShipItSaveConfigPhase extends ShipItPhase {
       \json_encode($this->renderConfig($config), \JSON_PRETTY_PRINT),
     );
     ShipItLogger::out("Finished phase: %s\n", $this->getReadableName());
-    exit(0);
+    throw new ShipItExitException(0);
   }
 }

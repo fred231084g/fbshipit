@@ -94,11 +94,11 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       }
     } catch (\Exception $e) {
       ShipItLogger::err("  Error: %s\n", $e->getMessage());
-      exit(1);
+      throw new ShipItExitException(1);
     }
 
     ShipItLogger::out("  New repository created at %s\n", $output);
-    exit(0);
+    throw new ShipItExitException(0);
   }
 
   private static function initGitRepo(

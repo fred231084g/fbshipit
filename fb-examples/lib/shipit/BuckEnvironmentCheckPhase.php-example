@@ -39,11 +39,11 @@ final class BuckEnvironmentCheckPhase extends EnvironmentCheckPhase {
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     if (!\preg_match_with_matches('@version ([0-9\.]+)@', $ant_v, inout $match)) {
       ShipItLogger::err("Couldn't identify ant version: %s\n", $ant_v);
-      exit(1);
+      throw new ShipItExitException(1);
     }
     if ($match[1] < '1.9') {
       ShipItLogger::err("Needed ant 1.9, got %s\n", $match[1]);
-      exit(1);
+      throw new ShipItExitException(1);
     }
 
     $java_v = self::runCommand(ShipItUtil::RETURN_STDERR, 'java', '-version');
@@ -52,25 +52,25 @@ final class BuckEnvironmentCheckPhase extends EnvironmentCheckPhase {
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     if (!\preg_match_with_matches('@version "([0-9\.]+)@', $java_v, inout $match)) {
       ShipItLogger::err("Couldn't identify java version: %s\n", $java_v);
-      exit(1);
+      throw new ShipItExitException(1);
     }
 
     if ($match[1] < '1.7') {
       ShipItLogger::err("Needed Java 1.7, got %s\n", $match[1]);
-      exit(1);
+      throw new ShipItExitException(1);
     }
 
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     if (\getenv('ANDROID_HOME') === false) {
       ShipItLogger::err("ANDROID_HOME env variable not set\n");
-      exit(1);
+      throw new ShipItExitException(1);
     }
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     if (\getenv('NDK_HOME') === false) {
       ShipItLogger::err("NDK_HOME env variable not set\n");
-      exit(1);
+      throw new ShipItExitException(1);
     }
   }
 }
