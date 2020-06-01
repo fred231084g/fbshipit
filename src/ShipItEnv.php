@@ -24,4 +24,8 @@ final abstract class ShipItEnv {
     }
     return self::$extraEnv;
   }
+
+  public static function getEnvVar(string $name): ?string {
+    return idx(self::getEnv(), $name);
+  }
 }

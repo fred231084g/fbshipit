@@ -49,9 +49,7 @@ abstract class ShipItRepo {
 
   <<__Memoize>>
   private static function useRepositoryLock(): bool {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $env = \getenv('NO_REPO_LOCK');
+    $env = ShipItEnv::getEnvVar('NO_REPO_LOCK');
     if (
       (!$env is string) ||
       $env === '' ||
