@@ -8,6 +8,8 @@
 
 namespace Facebook\ShipIt;
 
+use namespace HH\Lib\Dict;
+
 final abstract class ShipItEnv {
   private static dict<string, string> $extraEnv = dict[];
 
