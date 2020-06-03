@@ -33,18 +33,18 @@ final class ShipItScopedFlock implements IShipItLock {
   public static int $verbose = 0;
 
   public static function createShared(string $path): ShipItScopedFlock {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $dir = \dirname($path);
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     if (!\file_exists($dir)) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \mkdir($dir, /* mode = */ 0755, /* recursive = */ true);
     }
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $fp = \fopen($path, 'w+');
     if (!$fp) {
       throw new \Exception('Failed to fopen: '.$path);
@@ -92,8 +92,8 @@ final class ShipItScopedFlock implements IShipItLock {
     }
 
     $_wouldblock = null;
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $flock_result = \flock($fp, $constructBehavior, inout $_wouldblock);
     if (!$flock_result) {
       throw new \Exception('Failed to acquire lock');
@@ -115,8 +115,8 @@ final class ShipItScopedFlock implements IShipItLock {
     }
 
     $_wouldblock = null;
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $flock_result = \flock($this->fp, $this->destructBehavior, inout $_wouldblock);
     if (!$flock_result) {
       throw new \Exception('Failed to weaken lock');

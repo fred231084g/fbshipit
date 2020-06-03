@@ -23,8 +23,8 @@ final class ShipItMentions {
     (function(string): string) $callback,
   ): ShipItChangeset {
     $_count = null;
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $message = \preg_replace_callback(
       self::MENTIONS_PATTERN,
       $matches ==> $callback($matches[1]),
@@ -57,16 +57,16 @@ final class ShipItMentions {
     ShipItChangeset $changeset,
   ): keyset<string> {
     $matches = varray[];
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \preg_match_all_with_matches(
       self::MENTIONS_PATTERN,
       $changeset->getMessage(),
       inout $matches,
       \PREG_SET_ORDER,
     );
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     return (keyset(\array_map($match ==> $match[1], $matches)));
   }
 

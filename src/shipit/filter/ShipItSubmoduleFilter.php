@@ -121,8 +121,8 @@ index %s..0000000
    */
   public static function isSubmoduleDiff(ShipItDiff $diff): bool {
     $subproject_line = '[-+]Subproject commit [0-9a-fA-F]+';
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     return (bool)\preg_match(
       '@'.
       // Submodule file mode
@@ -153,8 +153,8 @@ index %s..0000000
       return false;
     }
     $subproject_line = '[-+]Subproject commit [0-9a-fA-F]+';
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     return (bool)\preg_match(
       '@'.
       // Regular file mode

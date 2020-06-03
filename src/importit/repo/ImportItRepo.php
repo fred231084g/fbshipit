@@ -33,13 +33,13 @@ abstract class ImportItRepo {
     string $path,
     string $branch,
   ): \Facebook\ShipIt\ShipItRepo {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     if (\file_exists($path.'/.git')) {
       return new ImportItRepoGIT($path, $branch);
     }
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     if (\file_exists($path.'/.hg')) {
       return new ImportItRepoHG($path, $branch);
     }

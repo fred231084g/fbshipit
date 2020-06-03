@@ -107,20 +107,20 @@ abstract final class ShipItPathFilters {
         continue;
       }
 
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       $old_path = \preg_quote($old_path, '@');
 
       $body = $diff['body'];
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       $body = \preg_replace(
         '@^--- (a/'.$old_path.'|"a/.*?"$)@m',
         '--- a/'.$new_path,
         $body,
       );
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       $body = \preg_replace(
         '@^\+\+\+ (b/'.$old_path.'|"b/.*?"$)@m',
         '+++ b/'.$new_path,

@@ -39,8 +39,8 @@ final class ShipItMessageSections {
     $section = '';
     foreach (Str\split($changeset->getMessage(), "\n") as $line) {
       $line = Str\trim_right($line);
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       if (\preg_match('/^[a-zA-Z ]+:/', $line)) {
         $h = Str\lowercase(Str\slice($line, 0, Str\search($line, ':')));
         if ($valid_sections === null || C\contains($valid_sections, $h)) {
@@ -50,8 +50,8 @@ final class ShipItMessageSections {
           // Treat "Summary: FBOnly: bar" as "FBOnly: bar" - handy if using
           // Phabricator
           if (
-            /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-            /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+            /* HH_FIXME[2049] __PHPStdLib */
+            /* HH_FIXME[4107] __PHPStdLib */
             \preg_match('/^[a-zA-Z ]+:/', $value)
             &&
             $valid_sections !== null
@@ -81,8 +81,8 @@ final class ShipItMessageSections {
   ): string {
     $out = '';
     foreach ($sections as $section => $text) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       if (\ctype_space($text) || Str\length($text) === 0) {
         continue;
       }
@@ -102,8 +102,8 @@ final class ShipItMessageSections {
     $lines = Str\split($str, "\n");
     $cn = 0;
     foreach ($lines as $line) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       if (!(\ctype_space($line) || Str\length($line) === 0)) {
         ++$cn;
       }

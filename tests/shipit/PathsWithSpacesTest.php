@@ -45,8 +45,8 @@ final class PathsWithSpacesTest extends ShellTest {
     $path = $temp_dir->getPath();
     $this->execSteps($path, vec['git', 'init']);
     $this->configureGit($temp_dir);
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \mkdir($path.'/'.\dirname(self::FILE_NAME), 0755, /* recursive = */ true);
     $this->execSteps(
       $path,
@@ -63,8 +63,8 @@ final class PathsWithSpacesTest extends ShellTest {
     $path = $temp_dir->getPath();
     $this->execSteps($path, vec['hg', 'init']);
     $this->configureHg($temp_dir);
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \mkdir($path.'/'.\dirname(self::FILE_NAME), 0755, /* recursive = */ true);
     $this->execSteps(
       $path,

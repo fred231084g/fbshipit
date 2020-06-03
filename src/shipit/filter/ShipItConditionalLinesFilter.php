@@ -39,15 +39,15 @@ final class ShipItConditionalLinesFilter {
     bool $remove_content = false,
   ): ShipItChangeset {
     $pattern = '/^([-+ ]\s*)(\S.*) '.
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \preg_quote($comment_start, '/').
       ' '.
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \preg_quote($marker, '/').
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       ($comment_end === null ? '' : (' '.\preg_quote($comment_end, '/'))).
       '$/';
 
@@ -69,16 +69,16 @@ final class ShipItConditionalLinesFilter {
     ?string $comment_end = null,
   ): ShipItChangeset {
     $pattern = '/^([-+ ]\s*)'.
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \preg_quote($comment_start, '/').
       ' '.
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \preg_quote($marker, '/').
       ': (.+)'.
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       ($comment_end === null ? '' : (' '.\preg_quote($comment_end, '/'))).
       '$/';
     $replacement = '\\1\\2 '.$comment_start.' '.$marker;
@@ -99,8 +99,8 @@ final class ShipItConditionalLinesFilter {
       $diff['body'] = Str\split($diff['body'], "\n")
         |> Vec\map(
           $$,
-          /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-          /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+          /* HH_FIXME[2049] __PHPStdLib */
+          /* HH_FIXME[4107] __PHPStdLib */
           $line ==> \preg_replace($pattern, $replacement, $line, /* limit */ 1),
         )
         |> Str\join($$, "\n");

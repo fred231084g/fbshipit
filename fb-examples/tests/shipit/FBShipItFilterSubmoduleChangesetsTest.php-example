@@ -148,8 +148,8 @@ Test Plan:',
 
   public function testShouldSkipUpdateSubmodules(): void {
     $dest_head = self::getSubmodulesChangeset()
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       ->withTimestamp(\time());
     $repo = new FakeShipItRepo($dest_head);
     $changesets = vec[self::getSubmodulesChangeset()];
@@ -160,8 +160,8 @@ Test Plan:',
 
   public function testShouldSkipUpdateSubmodulesNothingToSkip(): void {
     $dest_head = self::getSubmodulesChangeset()
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       ->withTimestamp(\time());
     $repo = new FakeShipItRepo($dest_head);
     // intern has a non-submodule commit
@@ -176,8 +176,8 @@ Test Plan:',
 
   public function testShouldSkipUpdateSubmodulesNoDoubleCommit(): void {
     $dest_head = self::getSubmodulesChangeset()
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       ->withTimestamp(\time())
       // destination head is not a submodule update
       ->withAuthor('');
@@ -191,8 +191,8 @@ Test Plan:',
   public function testShouldSkipUpdateSubmodulesRateLimit(): void {
     $dest_head = self::getSubmodulesChangeset()
       // no submodule commits shipped in the last week
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       ->withTimestamp(\time() - (60 * 60 * 24 * 7));
     $repo = new FakeShipItRepo($dest_head);
     $changesets = vec[self::getSubmodulesChangeset()];
@@ -203,8 +203,8 @@ Test Plan:',
 
   public function testPostFilterChangesets(): void {
     $dest_head = self::getSubmodulesChangeset()
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       ->withTimestamp(\time());
     $repo = new FakeShipItRepo($dest_head);
     $changesets = vec[self::getSubmodulesChangeset()];

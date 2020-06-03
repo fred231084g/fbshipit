@@ -39,26 +39,26 @@ final class DemoSourceRepoInitPhase extends ShipItPhase {
 
     $sh_lock = ShipItRepo::createSharedLockForPath($local_path);
 
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     if (\is_dir($local_path)) {
       return;
     }
 
     $command = vec['git', 'clone', 'https://github.com/facebook/fbshipit.git'];
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $local_parent_path = \dirname($local_path);
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     if (!\is_dir($local_parent_path)) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \mkdir($local_parent_path, 0755, /* recursive = */ true);
     }
     // Make sure that "remove stale temp file" jobs don't clean this up
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \touch($local_parent_path);
 
     (new ShipItShellCommand($local_parent_path, ...$command))

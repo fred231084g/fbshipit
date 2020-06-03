@@ -36,8 +36,8 @@ abstract class ShellTest extends \Facebook\HackTest\HackTest { // @oss-enable
   }
 
   protected function configureHg(ShipItTempDir $temp_dir): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \file_put_contents(
       $temp_dir->getPath().'/.hg/hgrc',
       '[ui]

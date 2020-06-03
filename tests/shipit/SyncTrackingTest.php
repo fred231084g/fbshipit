@@ -73,8 +73,8 @@ final class SyncTrackingTest extends ShellTest {
   }
 
   public function testLastSourceCommitWithGit(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $fake_commit_id = \bin2hex(\random_bytes(16));
     $message = ShipItSync::addTrackingData(
       $this->getBaseConfig(),
@@ -94,8 +94,8 @@ final class SyncTrackingTest extends ShellTest {
     $this->configureHg($tempdir);
 
     // Add a tracked commit
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $fake_commit_id = \bin2hex(\random_bytes(16));
     $message = ShipItSync::addTrackingData(
       $this->getBaseConfig(),
@@ -111,11 +111,11 @@ final class SyncTrackingTest extends ShellTest {
   }
 
   public function testLastSourceCommitMultipleMarkers(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $fake_commit_id_1 = \bin2hex(\random_bytes(16));
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $fake_commit_id_2 = \bin2hex(\random_bytes(16));
     $message_1 = ShipItSync::addTrackingData(
       $this->getBaseConfig(),
@@ -130,8 +130,8 @@ final class SyncTrackingTest extends ShellTest {
   }
 
   public function testLastSourceCommitWithWhitespace(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $fake_commit_id = \bin2hex(\random_bytes(16));
     $message = ShipItSync::addTrackingData(
       $this->getBaseConfig(),
@@ -142,8 +142,8 @@ final class SyncTrackingTest extends ShellTest {
   }
 
   public function testLastSourceCommitMissingWhitespace(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $fake_commit_id = \bin2hex(\random_bytes(16));
     $message = "fbshipit-source-id:".$fake_commit_id;
     $repo = $this->getGITRepoWithCommit($message);
@@ -151,8 +151,8 @@ final class SyncTrackingTest extends ShellTest {
   }
 
   public function testLastSourceCommitWithoutPrefix(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $fake_commit_id = \bin2hex(\random_bytes(16));
     $message = ShipItSync::addTrackingData(
       $this->getBaseConfig()->withCommitMarkerPrefix(false),

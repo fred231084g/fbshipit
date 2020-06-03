@@ -398,16 +398,16 @@ abstract class FBProjectBaseTest extends FBBaseTest {
   // TODO(T22473111) remove after Buck is migrated
   protected static function getShipItClass(
   ): classname<\Facebook\ImportIt\ISupportsFBImportIt> {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $shipit_class = \preg_replace(
       '/([a-zA-Z0-9_]+)Test$/',
       'ShipIt\1',
       static::class,
     );
     invariant(
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \class_exists($shipit_class, false),
       '%s does not exist.  Test and ShipIt class are not named consistently.',
       $shipit_class,

@@ -56,8 +56,8 @@ final class SubmoduleTest extends ShellTest {
     (new ShipItShellCommand($submodule_dir->getPath(), 'git', 'init'))
       ->runSynchronously();
     $this->configureGit($submodule_dir);
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \file_put_contents($submodule_dir->getPath().'/somefile', '');
     (
       new ShipItShellCommand(
@@ -88,14 +88,14 @@ final class SubmoduleTest extends ShellTest {
     (new ShipItShellCommand($source_dir->getPath(), 'git', 'init'))
       ->runSynchronously();
     $this->configureGit($source_dir);
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \file_put_contents(
       $source_dir->getPath().'/rev.txt',
       'Subproject commit '.$submodule_id,
     );
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \file_put_contents(
       $source_dir->getPath().'/.gitmodules',
       '[submodule "test"]
@@ -156,12 +156,12 @@ final class SubmoduleTest extends ShellTest {
     $repo->commitPatch($changeset);
 
     // Now we can finally check stuff!
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \expect(\file_exists($dest_dir->getPath().'/submodule-test'))
       ->toBeTrue('Subrepo should be a directory.');
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \expect(\file_exists($dest_dir->getPath().'/submodule-test/somefile'))
       ->toBeTrue('Subrepo should be checked out at the correct revision.');
 
@@ -190,8 +190,8 @@ final class SubmoduleTest extends ShellTest {
       ->getHeadChangeset()
       ?->getID();
     invariant($submodule_id !== null, 'impossible');
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \file_put_contents(
       $source_dir->getPath().'/rev.txt',
       'Subproject commit '.$submodule_id,
@@ -218,16 +218,16 @@ final class SubmoduleTest extends ShellTest {
     );
     $repo->commitPatch($changeset);
 
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \expect(\file_exists($dest_dir->getPath().'/submodule-test'))
       ->toBeTrue('Subrepo should be a directory.');
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \expect(\file_exists($dest_dir->getPath().'/submodule-test/somefile'))
       ->toBeFalse('Subrepo should be checked out at the correct revision.');
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \expect(\file_exists($dest_dir->getPath().'/submodule-test/otherfile'))
       ->toBeTrue('Subrepo should be checked out at the correct revision.');
 
@@ -262,8 +262,8 @@ final class SubmoduleTest extends ShellTest {
     );
     $repo->commitPatch($changeset);
 
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \expect(\file_exists($dest_dir->getPath().'/submodule-test'))
       ->toBeFalse('Subrepo should no longer exist.');
   }

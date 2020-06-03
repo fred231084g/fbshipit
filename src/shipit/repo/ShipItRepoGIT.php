@@ -141,8 +141,8 @@ class ShipItRepoGIT
           $changeset = $changeset->withSubject($value);
           break;
         case 'date':
-          /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-          /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+          /* HH_FIXME[2049] __PHPStdLib */
+          /* HH_FIXME[4107] __PHPStdLib */
           $changeset = $changeset->withTimestamp(\strtotime($value));
           break;
         /* added due to nonexhaustive switch */
@@ -252,8 +252,8 @@ class ShipItRepoGIT
     $ret = "From {$patch->getID()} Mon Sep 17 00:00:00 2001\n".
       "From: {$patch->getAuthor()}\n".
       "Date: ".
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \date('r', $patch->getTimestamp()).
       "\n".
       "Subject: [PATCH] {$patch->getSubject()}\n\n".
@@ -360,8 +360,8 @@ class ShipItRepoGIT
   }
 
   protected function gitPipeCommand(?string $stdin, string ...$args): string {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     if (!\file_exists("{$this->path}/.git")) {
       throw new ShipItRepoGITException($this, $this->path." is not a GIT repo");
     }
@@ -386,21 +386,21 @@ class ShipItRepoGIT
 
   public static function cloneRepo(string $origin, string $path): void {
     invariant(
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       !\file_exists($path),
       '%s already exists, cowardly refusing to overwrite',
       $path,
     );
 
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $parent_path = \dirname($path);
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     if (!\file_exists($parent_path)) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \mkdir($parent_path, 0755, /* recursive = */ true);
     }
 
@@ -421,16 +421,16 @@ class ShipItRepoGIT
   <<__Override>>
   public function pushLfs(string $pull_endpoint, string $push_endpoint): void {
     invariant(
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \file_exists($this->getPath().'/.gitattributes'),
       '.gitattributes not exists, cowardly refusing to pull lfs',
     );
     // ignore .lfsconfig. otherwise this would interfere
     // with the downstream consumer.
     invariant(
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       !\file_exists($this->getPath().'/.lfsconfig'),
       '.lfsconfig exists, needs to strip it in your config',
     );
@@ -498,12 +498,12 @@ class ShipItRepoGIT
       $dest_submodule_path = $dest->getPath().'/'.$submodule['path'];
       // This removes the empty directory for the submodule that gets created
       // by the git-archive command.
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \rmdir($dest_submodule_path);
       // This will setup a file that looks just like how git stores submodules.
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \file_put_contents($dest_submodule_path, 'Subproject commit '.$sha);
     }
 
@@ -523,14 +523,14 @@ class ShipItRepoGIT
     if ($roots !== null && !C\is_empty($roots) && !C\contains($roots, '')) {
       return vec[];
     }
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     if (!\file_exists($this->getPath().'/.gitmodules')) {
       return vec[];
     }
     $configs = $this->gitCommand('config', '-f', '.gitmodules', '--list');
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $configs = dict(\parse_ini_string($configs))
       |> Dict\filter_keys($$, ($key) ==> {
         return Str\slice($key, 0, 10) === 'submodule.' &&
@@ -549,8 +549,8 @@ class ShipItRepoGIT
       )
       |> Vec\filter(
         $$,
-        /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-        /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+        /* HH_FIXME[2049] __PHPStdLib */
+        /* HH_FIXME[4107] __PHPStdLib */
         $config ==> \file_exists($this->getPath().'/'.$config['path']),
       );
   }

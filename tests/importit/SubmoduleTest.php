@@ -64,8 +64,8 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
     (new ShipItShellCommand($submodule_dir->getPath(), 'git', 'init'))
       ->runSynchronously();
     $this->configureGit($submodule_dir);
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \file_put_contents($submodule_dir->getPath().'/somefile', '');
     (
       new ShipItShellCommand(
@@ -120,14 +120,14 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
     (new ShipItShellCommand($dest_dir->getPath(), 'git', 'init'))
       ->runSynchronously();
     $this->configureGit($dest_dir);
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \file_put_contents(
       $dest_dir->getPath().'/rev.txt',
       'Subproject commit '.$submodule_first_id."\n",
     );
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \file_put_contents(
       $dest_dir->getPath().'/.gitmodules',
       '[submodule "test"]

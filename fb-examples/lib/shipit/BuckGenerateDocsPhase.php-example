@@ -90,8 +90,8 @@ final class BuckGenerateDocsPhase extends ShipItPhase {
     );
 
     $pipes = varray[];
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $proc = \proc_open(
       'docs/soyweb-prod.sh',
       darray[
@@ -102,8 +102,8 @@ final class BuckGenerateDocsPhase extends ShipItPhase {
       inout $pipes,
       $sourcePath,
     );
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \fclose($pipes[0]);
 
     try {
@@ -116,15 +116,15 @@ final class BuckGenerateDocsPhase extends ShipItPhase {
         $docsPath,
       );
     } finally {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       $status = \proc_get_status($proc);
       if ($status !== null) {
         $_output = null;
         $_return_var = null;
         // kill whole tree of docs/soyweb-prod.sh
-        /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-        /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+        /* HH_FIXME[2049] __PHPStdLib */
+        /* HH_FIXME[4107] __PHPStdLib */
         \exec(
           'pstree -pl '.
           $status['pid'].

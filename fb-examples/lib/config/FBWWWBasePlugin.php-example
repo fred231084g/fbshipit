@@ -31,8 +31,8 @@ abstract class FBWWWBasePlugin extends FBShipItConfigeratorConfig {
     return parent::defaultProjectFilterChangeset($changeset, $get_path_mappings)
       |> ShipItPathFilters::rewritePaths(
         $$,
-        /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-        /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+        /* HH_FIXME[2049] __PHPStdLib */
+        /* HH_FIXME[4107] __PHPStdLib */
         $path ==> \preg_replace('@^src/(.+/)?__tests__/@', 'tests/\1', $path),
       )
       |> self::renameGenToAsync($$);
@@ -80,8 +80,8 @@ abstract class FBWWWBasePlugin extends FBShipItConfigeratorConfig {
           $$,
           $line ==> {
             $_count = null;
-            /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-            /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+            /* HH_FIXME[2049] __PHPStdLib */
+            /* HH_FIXME[4107] __PHPStdLib */
             $result = \preg_replace_callback(
               // Comma and dot for doc comments
               '/(function |\\\\|\\|>| |->|::)([a-zA-Z0-9_]+)(\\(|<|,|\\.)/',
@@ -148,8 +148,8 @@ abstract class FBWWWBasePlugin extends FBShipItConfigeratorConfig {
     return $changeset
       |> ShipItPathFilters::rewritePaths(
         $$,
-        /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-        /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+        /* HH_FIXME[2049] __PHPStdLib */
+        /* HH_FIXME[4107] __PHPStdLib */
         $path ==> \preg_replace('@^tests/(.+/)?@', 'src/\1__tests__/', $path),
       )
       |> self::renameAsyncToGen($$)

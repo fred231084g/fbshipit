@@ -146,8 +146,8 @@ class ShipItRepoHG
         '--user',
         $patch->getAuthor(),
         '--date',
-        /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-        /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+        /* HH_FIXME[2049] __PHPStdLib */
+        /* HH_FIXME[4107] __PHPStdLib */
         \date('c', $patch->getTimestamp()),
         '-m',
         self::getCommitMessage($patch),
@@ -168,8 +168,8 @@ class ShipItRepoHG
     $ret = "From {$patch->getID()} Mon Sep 17 00:00:00 2001\n".
       "From: {$patch->getAuthor()}\n".
       "Date: ".
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \date('r', $patch->getTimestamp()).
       "\n".
       "Subject: [PATCH] {$commit_message}\n---\n\n";

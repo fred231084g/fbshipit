@@ -70,8 +70,8 @@ final class FBShipItPublicizeSyncScriptsPhase extends ShipItPhase {
     ];
     $files = keyset[];
     foreach ($globs as $glob) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       $files = Keyset\union($files, \glob($export_root.$glob));
     }
     /* HH_FIXME[4323] Exposed by typing path builtins */
@@ -86,8 +86,8 @@ final class FBShipItPublicizeSyncScriptsPhase extends ShipItPhase {
         $export_root,
       );
       $dest_file = $dest_root.Str\slice($file, Str\length($export_root));
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       if (!\file_exists($dest_file)) {
         $this->releaseFile($dest, $file, $dest_file);
       }
@@ -100,8 +100,8 @@ final class FBShipItPublicizeSyncScriptsPhase extends ShipItPhase {
     string $destination_file,
   ): void {
     $dest_root = $repo->getPath();
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \copy($exported_file, $destination_file);
 
     /* HH_FIXME[4128] Use ShipItShellCommand */
@@ -121,8 +121,8 @@ final class FBShipItPublicizeSyncScriptsPhase extends ShipItPhase {
       'git',
       'commit',
       '-m',
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       '[autocommit] release '.\basename($destination_file),
     );
   }

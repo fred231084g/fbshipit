@@ -35,8 +35,8 @@ final class BuckVerifyNoMoeOccurrencesPhase extends BuildAndTestPhase {
       '-r',
       'MOE',
     );
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $moe_occurrences = \preg_replace("@^.*Binary.*\n@m", '', $moe_occurrences);
     invariant(
       !$moe_occurrences,

@@ -163,8 +163,8 @@ abstract class ShipItUtil {
     Container<string> $patterns,
   ): ?string {
     foreach ($patterns as $pattern) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       if (\preg_match($pattern, $path)) {
         return $pattern;
       }
