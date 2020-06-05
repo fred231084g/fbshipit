@@ -171,19 +171,20 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     shape('name' => string, 'email' => string) $committer,
     ?string $revision = null,
   ): void {
+    $logger = new ShipItVerboseLogger($config->isVerboseEnabled());
+
     $source = ShipItRepo::typedOpen(
       ShipItSourceRepo::class,
       $config->getSourcePath(),
       $config->getSourceBranch(),
     );
 
-    ShipItLogger::out("  Exporting...\n");
+    $logger->out("  Exporting...");
     $export = $source->export($config->getSourceRoots(), $revision);
     $export_dir = $export['tempDir'];
     $rev = $export['revision'];
 
-    ShipItLogger::out("  Creating unfiltered commit...\n");
-
+    $logger->out("  Creating unfiltered commit...");
     self::initGitRepo($export_dir->getPath(), $committer);
     self::execSteps(
       $export_dir->getPath(),
@@ -198,7 +199,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       ],
     );
 
-    ShipItLogger::out("  Filtering...\n");
+    $logger->out("  Filtering...");
     $exported_repo = ShipItRepo::typedOpen(
       ShipItSourceRepo::class,
       $export_dir->getPath(),
@@ -214,8 +215,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       $changeset->dumpDebugMessages();
     }
 
-    ShipItLogger::out("  Creating new repo...\n");
-
+    $logger->out("  Creating new repo...");
     self::initGitRepo($output_dir, $committer);
     $filtered_repo = ShipItRepo::typedOpen(
       ShipItDestinationRepo::class,
@@ -224,7 +224,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     );
     $filtered_repo->commitPatch($changeset);
 
-    ShipItLogger::out("  Cleaning up...\n");
+    $logger->out("  Cleaning up...");
     // As we're done with these and nothing else has the random paths, the lock
     // files aren't needed
     foreach (vec[$export_dir->getPath(), $output_dir] as $repo) {

@@ -49,6 +49,8 @@ abstract class ShipItPhase {
   }
 
   final public function run(ShipItBaseConfig $config): void {
+    $logger = new ShipItVerboseLogger($config->isVerboseEnabled());
+
     if (
       $this->isProjectSpecific() && !$config->areProjectSpecificPhasesEnabled()
     ) {
@@ -56,26 +58,14 @@ abstract class ShipItPhase {
     }
 
     if ($this->isSkipped()) {
-      ShipItLogger::out("Skipping phase: %s\n", $this->getReadableName());
+      $logger->out("Skipping phase: %s", $this->getReadableName());
       return;
     }
-    ShipItLogger::out(
-      "Starting phase%s: %s\n",
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      $config->isVerboseEnabled() ? ' ('.\date('H:i:s').')' : '',
-      $this->getReadableName(),
-    );
+    $logger->out("Starting phase: %s", $this->getReadableName());
     try {
       $this->runImpl($config);
     } finally {
-      ShipItLogger::out(
-        "Finished phase%s: %s\n",
-        /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-        /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-        $config->isVerboseEnabled() ? ' ('.\date('H:i:s').')' : '',
-        $this->getReadableName(),
-      );
+      $logger->out("Finished phase: %s", $this->getReadableName());
     }
   }
 }
