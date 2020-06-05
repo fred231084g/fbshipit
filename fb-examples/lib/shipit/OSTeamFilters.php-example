@@ -22,10 +22,7 @@ final class OSTeamFilters {
      * linked to your internal profile so that FB can track copyright and commit
      * stats correctly.
      */
-    $emailMap = dict[
-      'Phil Dibowitz <phild@fb.com>' => 'Phil Dibowitz <phil@ipom.com>',
-      'Marcin Sawicki <odcinek@fb.com>' => 'Marcin Sawicki <odcinek@gmail.com>',
-      'Bryan Wann <bwann@fb.com>' => 'Bryan Wann <bwann@wann.net>',
+    $email_map = dict[
       'Pat Cox <pcox@fb.com>' => 'Pat Cox <pat@patcox.net>',
       'Joshua Miller <joshmiller@fb.com>' =>
         'Joshua Miller <joshuamiller01@gmail.com>',
@@ -36,7 +33,7 @@ final class OSTeamFilters {
     ];
 
     $author = $changeset->getAuthor();
-    foreach ($emailMap as $internal => $external) {
+    foreach ($email_map as $internal => $external) {
       if ($author === $internal) {
         return $changeset->withAuthor($external);
       }
