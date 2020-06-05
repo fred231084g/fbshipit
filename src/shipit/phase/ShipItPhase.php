@@ -66,13 +66,16 @@ abstract class ShipItPhase {
       $config->isVerboseEnabled() ? ' ('.\date('H:i:s').')' : '',
       $this->getReadableName(),
     );
-    $this->runImpl($config);
-    ShipItLogger::out(
-      "Finished phase%s: %s\n",
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      $config->isVerboseEnabled() ? ' ('.\date('H:i:s').')' : '',
-      $this->getReadableName(),
-    );
+    try {
+      $this->runImpl($config);
+    } finally {
+      ShipItLogger::out(
+        "Finished phase%s: %s\n",
+        /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+        /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+        $config->isVerboseEnabled() ? ' ('.\date('H:i:s').')' : '',
+        $this->getReadableName(),
+      );
+    }
   }
 }
