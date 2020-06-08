@@ -48,6 +48,11 @@ final class ShipItCleanPhase extends ShipItPhase {
         $branch = $config->getDestinationBranch();
         break;
     }
-    ShipItRepo::open($local_path, $branch)->clean();
+    $repo = ShipItRepo::open($local_path, $branch);
+    try {
+      $repo->clean();
+    } finally {
+      $repo->maybeReleaseLock();
+    }
   }
 }

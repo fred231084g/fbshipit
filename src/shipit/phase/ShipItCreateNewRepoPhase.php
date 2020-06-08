@@ -178,9 +178,12 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       $config->getSourcePath(),
       $config->getSourceBranch(),
     );
-
-    $logger->out("  Exporting...");
-    $export = $source->export($config->getSourceRoots(), $revision);
+    try {
+      $logger->out("  Exporting...");
+      $export = $source->export($config->getSourceRoots(), $revision);
+    } finally {
+      $source->maybeReleaseLock();
+    }
     $export_dir = $export['tempDir'];
     $rev = $export['revision'];
 
@@ -205,7 +208,11 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       $export_dir->getPath(),
       'master',
     );
-    $changeset = $exported_repo->getChangesetFromID('HEAD');
+    try {
+      $changeset = $exported_repo->getChangesetFromID('HEAD');
+    } finally {
+      $exported_repo->maybeReleaseLock();
+    }
     invariant($changeset !== null, 'got a null changeset :/');
     $changeset = $changeset->withID($rev);
     $changeset = $filter($changeset)->withSubject('Initial commit');
@@ -222,7 +229,11 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       $output_dir,
       '--orphan='.$config->getDestinationBranch(),
     );
-    $filtered_repo->commitPatch($changeset);
+    try {
+      $filtered_repo->commitPatch($changeset);
+    } finally {
+      $filtered_repo->maybeReleaseLock();
+    }
 
     $logger->out("  Cleaning up...");
     // As we're done with these and nothing else has the random paths, the lock

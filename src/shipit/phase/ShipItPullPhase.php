@@ -64,6 +64,11 @@ final class ShipItPullPhase extends ShipItPhase {
         $branch = $config->getDestinationBranch();
         break;
     }
-    ShipItRepo::open($local_path, $branch)->pull();
+    $repo = ShipItRepo::open($local_path, $branch);
+    try {
+      $repo->pull();
+    } finally {
+      $repo->maybeReleaseLock();
+    }
   }
 }

@@ -66,6 +66,14 @@ abstract class ShipItRepo {
     return $this->lock;
   }
 
+  public function maybeReleaseLock(): void {
+    try {
+      $this->lock->release();
+    } catch (\InvariantViolationException $_) {
+      // ignore
+    }
+  }
+
   const VERBOSE_FETCH = 1;
   const VERBOSE_SHELL = 2;
   const VERBOSE_SHELL_OUTPUT = 4;

@@ -89,7 +89,11 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
         $config->getDestinationPath(),
         $config->getDestinationBranch(),
       );
-      $this->verifySourceCommit = $repo->findLastSourceCommit(keyset[]);
+      try {
+        $this->verifySourceCommit = $repo->findLastSourceCommit(keyset[]);
+      } finally {
+        $repo->maybeReleaseLock();
+      }
     }
     $clean_dir = ShipItCreateNewRepoPhase::createNewGitRepo(
       $config,
@@ -178,7 +182,11 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
         $config->getSourcePath(),
         $config->getSourceBranch(),
       );
-      $changeset = $repo->getHeadChangeset();
+      try {
+        $changeset = $repo->getHeadChangeset();
+      } finally {
+        $repo->maybeReleaseLock();
+      }
       if ($changeset === null) {
         throw new ShipItException('Could not find source id.');
       }

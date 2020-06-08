@@ -30,11 +30,14 @@ final class ShipItSync {
     $rev = $config->getFirstCommit();
     if ($rev === null) {
       $src = $this->getRepo(ShipItSourceRepo::class);
-
-      $rev = $src->findNextCommit(
-        $this->findLastSyncedCommit(),
-        $config->getSourceRoots(),
-      );
+      try {
+        $rev = $src->findNextCommit(
+          $this->findLastSyncedCommit(),
+          $config->getSourceRoots(),
+        );
+      } finally {
+        $src->maybeReleaseLock();
+      }
     }
     return $rev;
   }
@@ -42,18 +45,21 @@ final class ShipItSync {
   private function getSourceChangesets(): vec<ShipItChangeset> {
     $config = $this->syncConfig;
     $src = $this->getRepo(ShipItSourceRepo::class);
+    try {
+      $changesets = vec[];
+      $rev = $this->getFirstSourceID();
+      while ($rev !== null) {
+        $changeset = $src->getChangesetFromID($rev);
 
-    $changesets = vec[];
-    $rev = $this->getFirstSourceID();
-    while ($rev !== null) {
-      $changeset = $src->getChangesetFromID($rev);
+        if (!$changeset) {
+          throw new ShipItException("Unable to get patch for $rev");
+        }
 
-      if (!$changeset) {
-        throw new ShipItException("Unable to get patch for $rev");
+        $changesets[] = $changeset;
+        $rev = $src->findNextCommit($rev, $config->getSourceRoots());
       }
-
-      $changesets[] = $changeset;
-      $rev = $src->findNextCommit($rev, $config->getSourceRoots());
+    } finally {
+      $src->maybeReleaseLock();
     }
     return $changesets;
   }
@@ -115,67 +121,71 @@ final class ShipItSync {
     $verbose = $this->baseConfig->isVerboseEnabled();
     $dest = $this->getRepo(ShipItDestinationRepo::class);
 
-    $changesets = $this->syncConfig->postFilterChangesets($changesets, $dest);
+    try {
+      $changesets = $this->syncConfig->postFilterChangesets($changesets, $dest);
 
-    $changesets_applied = vec[];
-    $changesets_skipped = vec[];
-    foreach ($changesets as $changeset) {
-      if ($patches_dir !== null) {
-        $file = $patches_dir.
-          '/'.
-          $this->baseConfig->getDestinationBranch().
-          '-'.
-          $changeset->getID().
-          '.patch';
-        /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-        /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-        if (\file_exists($file)) {
-          echo Str\format("Overwriting patch file: %s\n", $file);
+      $changesets_applied = vec[];
+      $changesets_skipped = vec[];
+      foreach ($changesets as $changeset) {
+        if ($patches_dir !== null) {
+          $file = $patches_dir.
+            '/'.
+            $this->baseConfig->getDestinationBranch().
+            '-'.
+            $changeset->getID().
+            '.patch';
+          /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+          /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+          if (\file_exists($file)) {
+            echo Str\format("Overwriting patch file: %s\n", $file);
+          }
+          /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+          /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+          \file_put_contents($file, $dest::renderPatch($changeset));
+          $changeset = $changeset->withDebugMessage(
+            'Saved patch file: %s',
+            $file,
+          );
         }
-        /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-        /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-        \file_put_contents($file, $dest::renderPatch($changeset));
-        $changeset = $changeset->withDebugMessage(
-          'Saved patch file: %s',
-          $file,
-        );
+
+        if ($verbose) {
+          $changeset->dumpDebugMessages();
+        }
+
+        if (!$this->isValidChangeToSync($changeset)) {
+          echo Str\format(
+            "  SKIP %s %s\n",
+            $changeset->getShortID(),
+            $changeset->getSubject(),
+          );
+          $changesets_skipped[] = $changeset;
+          continue;
+        }
+
+        try {
+          $dest->commitPatch($changeset);
+          echo Str\format(
+            "  OK %s %s\n",
+            $changeset->getShortID(),
+            $changeset->getSubject(),
+          );
+          $changesets_applied[] = $changeset;
+          continue;
+        } catch (ShipItRepoException $e) {
+          ShipItLogger::err(
+            "Failed to apply patch %s (%s): %s\n",
+            $changeset->getID(),
+            $changeset->getMessage(),
+            $e->getMessage(),
+          );
+          throw $e;
+        }
       }
 
-      if ($verbose) {
-        $changeset->dumpDebugMessages();
-      }
-
-      if (!$this->isValidChangeToSync($changeset)) {
-        echo Str\format(
-          "  SKIP %s %s\n",
-          $changeset->getShortID(),
-          $changeset->getSubject(),
-        );
-        $changesets_skipped[] = $changeset;
-        continue;
-      }
-
-      try {
-        $dest->commitPatch($changeset);
-        echo Str\format(
-          "  OK %s %s\n",
-          $changeset->getShortID(),
-          $changeset->getSubject(),
-        );
-        $changesets_applied[] = $changeset;
-        continue;
-      } catch (ShipItRepoException $e) {
-        ShipItLogger::err(
-          "Failed to apply patch %s (%s): %s\n",
-          $changeset->getID(),
-          $changeset->getMessage(),
-          $e->getMessage(),
-        );
-        throw $e;
-      }
+      $this->maybeLogStats($changesets_applied, $changesets_skipped);
+    } finally {
+      $dest->maybeReleaseLock();
     }
-
-    $this->maybeLogStats($changesets_applied, $changesets_skipped);
   }
 
   /**
@@ -299,12 +309,15 @@ final class ShipItSync {
 
   private function findLastSyncedCommit(): string {
     $dest = $this->getRepo(ShipItDestinationRepo::class);
-
-    $src_commit = $dest->findLastSourceCommit(
-      $this->syncConfig->getDestinationRoots(),
-    );
-    if ($src_commit === null) {
-      throw new ShipItException("Couldn't find synced commit id");
+    try {
+      $src_commit = $dest->findLastSourceCommit(
+        $this->syncConfig->getDestinationRoots(),
+      );
+      if ($src_commit === null) {
+        throw new ShipItException("Couldn't find synced commit id");
+      }
+    } finally {
+      $dest->maybeReleaseLock();
     }
     return $src_commit;
   }
