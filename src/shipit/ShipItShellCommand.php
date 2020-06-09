@@ -24,9 +24,13 @@ final class ShipItShellCommand {
   private bool $outputToScreen = false;
   private int $retries = 0;
   private ?self::TFailureHandler $failureHandler = null;
+  private bool $showShellExecs = false;
 
   public function __construct(private ?string $path, string ...$command) {
     $this->command = vec($command);
+    if (ShipItEnv::getEnvVar("SHIPIT_OUTPUT_EXECS") !== null) {
+      $this->showShellExecs = true;
+    }
   }
 
   public function setStdIn(string $input): this {
@@ -119,6 +123,9 @@ final class ShipItShellCommand {
     $env_vars = Dict\merge(ShipItEnv::getEnv(), $this->environmentVariables);
 
     $command = $this->getCommandAsString();
+    if ($this->showShellExecs) {
+      (new ShipItVerboseLogger(true))->out("Shell command: %s", $command);
+    }
     $pipes = varray[];
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
