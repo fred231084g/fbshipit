@@ -53,37 +53,33 @@ final class ShipItDeleteCorruptedRepoPhase extends ShipItPhase {
       return;
     }
 
-    $sh_lock = ShipItRepo::createSharedLockForPath($local_path);
+    $lock_sh = ShipItRepo::createSharedLockForPath($local_path);
 
-    try {
-      if (!$this->isCorrupted($local_path)) {
-        return;
-      }
+    if (!$this->isCorrupted($local_path)) {
+      return;
+    }
 
-      ShipItLogger::err("  Corruption detected, re-cloning\n");
+    ShipItLogger::err("  Corruption detected, re-cloning\n");
     /* HH_FIXME[2049] __PHPStdLib */
     /* HH_FIXME[4107] __PHPStdLib */
     $path = \dirname($local_path);
     /* HH_FIXME[2049] __PHPStdLib */
     /* HH_FIXME[4107] __PHPStdLib */
     if (Str\contains(\php_uname('s'), 'Darwin')) {
-        // MacOS doesn't have GNU rm
-        (new ShipItShellCommand($path, 'rm', '-rf', $local_path))
-          ->runSynchronously();
-      } else {
-        (
-          new ShipItShellCommand(
-            $path,
-            'rm',
-            '-rf',
-            '--preserve-root',
-            $local_path,
-          )
+      // MacOS doesn't have GNU rm
+      (new ShipItShellCommand($path, 'rm', '-rf', $local_path))
+        ->runSynchronously();
+    } else {
+      (
+        new ShipItShellCommand(
+          $path,
+          'rm',
+          '-rf',
+          '--preserve-root',
+          $local_path,
         )
-          ->runSynchronously();
-      }
-    } finally {
-      $sh_lock->release();
+      )
+        ->runSynchronously();
     }
   }
 

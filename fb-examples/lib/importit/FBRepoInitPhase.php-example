@@ -60,62 +60,58 @@ final class FBRepoInitPhase extends \Facebook\ShipIt\ShipItPhase {
       $local_path,
     );
 
-    try {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      if (\is_dir($local_path)) {
-        return;
-      }
+    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    if (\is_dir($local_path)) {
+      return;
+    }
 
-      // In case the src repo dir was specified by hand
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      if (\basename($local_path) !== $this->name) {
+    // In case the src repo dir was specified by hand
+    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    if (\basename($local_path) !== $this->name) {
       /* HH_IGNORE_ERROR[2049] __PHPStdLib */
       ShipItLogger::err(
-          'Facebook clone scripts require directory names to match repo names: '.
-          "got '%s', expected '%s'\n",
+        'Facebook clone scripts require directory names to match repo names: '.
+        "got '%s', expected '%s'\n",
         /* HH_IGNORE_ERROR[2049] __PHPStdLib */
         /* HH_IGNORE_ERROR[4107] __PHPStdLib */
         \basename($local_path),
-          $this->name,
-        );
-        throw new \Facebook\ShipIt\ShipItExitException(1);
-      }
+        $this->name,
+      );
+      throw new \Facebook\ShipIt\ShipItExitException(1);
+    }
 
-      $command = $this->getCloneCommand();
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      $local_parent_path = \dirname($local_path);
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      if (!\is_dir($local_parent_path)) {
+    $command = $this->getCloneCommand();
+    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    $local_parent_path = \dirname($local_path);
+    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    if (!\is_dir($local_parent_path)) {
       /* HH_IGNORE_ERROR[2049] __PHPStdLib */
       /* HH_IGNORE_ERROR[4107] __PHPStdLib */
       \mkdir($local_parent_path, 0755, /* recursive = */ true);
-      }
-      // Make sure that "remove stale temp file" jobs don't clean this up
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      \touch($local_parent_path);
-
-      (new ShipItShellCommand($local_parent_path, ...$command))
-        ->setRetries(2)
-        ->setFailureHandler(
-          $_ ==> (
-            new ShipItShellCommand(
-              $local_parent_path,
-              'rm',
-              '-rf',
-              '--preserve-root',
-              $local_path,
-            )
-          )->runSynchronously(),
-        )
-        ->runSynchronously();
-    } finally {
-      $sh_lock->release();
     }
+    // Make sure that "remove stale temp file" jobs don't clean this up
+    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    \touch($local_parent_path);
+
+    (new ShipItShellCommand($local_parent_path, ...$command))
+      ->setRetries(2)
+      ->setFailureHandler(
+        $_ ==> (
+          new ShipItShellCommand(
+            $local_parent_path,
+            'rm',
+            '-rf',
+            '--preserve-root',
+            $local_path,
+          )
+        )->runSynchronously(),
+      )
+      ->runSynchronously();
   }
 
   private function getCloneCommand(): vec<string> {

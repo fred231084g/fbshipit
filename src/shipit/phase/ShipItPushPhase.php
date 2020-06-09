@@ -40,17 +40,13 @@ final class ShipItPushPhase extends ShipItPhase {
       $config->getDestinationPath(),
       $config->getDestinationBranch(),
     );
-    try {
-      invariant(
-        $repo is ShipItDestinationRepo,
-        '%s is not a writable repository type - got %s, needed %s',
-        $config->getDestinationPath(),
-        \get_class($repo),
-        ShipItDestinationRepo::class,
-      );
-      $repo->push();
-    } finally {
-      $repo->maybeReleaseLock();
-    }
+    invariant(
+      $repo is ShipItDestinationRepo,
+      '%s is not a writable repository type - got %s, needed %s',
+      $config->getDestinationPath(),
+      \get_class($repo),
+      ShipItDestinationRepo::class,
+    );
+    $repo->push();
   }
 }
