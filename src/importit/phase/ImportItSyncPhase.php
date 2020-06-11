@@ -17,6 +17,7 @@ use type Facebook\ShipIt\{
   ShipItBaseConfig,
   ShipItChangeset,
   ShipItDestinationRepo,
+  ShipItLogger
 };
 
 final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
@@ -140,36 +141,38 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
       $config->getDestinationBranch(),
     );
     if ($base_rev !== null) {
-      echo "  Updating destination branch to new base revision...\n";
+      ShipItLogger::out(
+        "  Updating destination branch to new base revision...\n",
+      );
       $destination_repo->updateBranchTo($base_rev);
     }
     invariant(
       $destination_repo is ShipItDestinationRepo,
       'The destination repository must implement ShipItDestinationRepo!',
     );
-    echo "  Filtering...\n";
+    ShipItLogger::out("  Filtering...\n");
     $filter_fn = $this->filter;
     $changeset = $filter_fn($changeset);
     if ($config->isVerboseEnabled()) {
       $changeset->dumpDebugMessages();
     }
-    echo "  Exporting...\n";
+    ShipItLogger::out("  Exporting...\n");
     $this->maybeSavePatch($destination_repo, $changeset);
     try {
       $rev = $destination_repo->commitPatch($changeset);
-      echo Str\format(
+      ShipItLogger::out(
         "  Done.  %s committed in %s\n",
         $rev,
         $destination_repo->getPath(),
       );
     } catch (\Exception $e) {
       if ($this->patchesDirectory !== null) {
-        echo Str\format(
+        ShipItLogger::out(
           "  Failure to apply patch at %s\n",
           $this->getPatchLocationForChangeset($changeset),
         );
       } else {
-        echo Str\format(
+        ShipItLogger::out(
           "  Failure to apply patch:\n%s\n",
           $destination_repo::renderPatch($changeset),
         );

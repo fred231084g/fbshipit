@@ -194,7 +194,7 @@ class ShipItPhaseRunner {
         }
 
         if ($is_required && !$have_value) {
-          echo "ERROR: Expected --".$long."\n\n";
+          ShipItLogger::err("ERROR: Expected --%s\n\n", $long);
           self::printHelp($config);
           throw new ShipItExitException(1);
         }

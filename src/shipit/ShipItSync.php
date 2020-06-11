@@ -130,7 +130,7 @@ final class ShipItSync {
         /* HH_IGNORE_ERROR[2049] __PHPStdLib */
         /* HH_IGNORE_ERROR[4107] __PHPStdLib */
         if (\file_exists($file)) {
-          echo Str\format("Overwriting patch file: %s\n", $file);
+          ShipItLogger::out("Overwriting patch file: %s\n", $file);
         }
         /* HH_IGNORE_ERROR[2049] __PHPStdLib */
         /* HH_IGNORE_ERROR[4107] __PHPStdLib */
@@ -146,7 +146,7 @@ final class ShipItSync {
       }
 
       if (!$this->isValidChangeToSync($changeset)) {
-        echo Str\format(
+        ShipItLogger::out(
           "  SKIP %s %s\n",
           $changeset->getShortID(),
           $changeset->getSubject(),
@@ -157,7 +157,7 @@ final class ShipItSync {
 
       try {
         $dest->commitPatch($changeset);
-        echo Str\format(
+        ShipItLogger::out(
           "  OK %s %s\n",
           $changeset->getShortID(),
           $changeset->getSubject(),
