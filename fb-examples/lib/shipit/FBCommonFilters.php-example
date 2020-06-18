@@ -32,6 +32,7 @@ final class FBCommonFilters {
       ?'filterMessageSections/keepFields' => keyset<string>,
       ?'keepTags' => bool,
       ?'referencePullRequestNumber' => bool,
+      ?'linkCommitsForProjectFullName' => string,
     ) $config = shape('keepTags' => false),
   ): ShipItChangeset {
     $changeset = self::allowEmptyCommit($changeset)
@@ -44,7 +45,11 @@ final class FBCommonFilters {
       |> self::stripSubjectTags($$, $config['keepTags'] ?? false)
       |> self::stripEmptyTestPlans($$)
       |> self::stripCommands($$)
-      |> self::stripAccept2Ship($$);
+      |> self::stripAccept2Ship($$)
+      |> FBDiffFilters::addCommitLinksToDiffNumbers(
+        $$,
+        Shapes::idx($config, 'linkCommitsForProjectFullName'),
+      );
     if ($config['referencePullRequestNumber'] ?? true) {
       $changeset = self::referencePullRequestNumber($changeset);
     }

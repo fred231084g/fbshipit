@@ -53,6 +53,15 @@ abstract class FBShipItConfig {
 
   public abstract function getDefaultPathMappings(): dict<string, string>;
 
+  public function getFullName(): string {
+    $static_config = $this->getStaticConfig();
+    return Str\format(
+      "%s/%s",
+      $static_config['githubOrg'],
+      $static_config['githubProject'],
+    );
+  }
+
   public function defaultProjectFilterChangeset(
     ShipItChangeset $changeset,
     GetPathMappingsFn $get_path_mappings,
@@ -67,6 +76,7 @@ abstract class FBShipItConfig {
             $this->keepMessageSectionNames(),
           'keepTags' => $this->keepTags(),
           'referencePullRequestNumber' => $this->referencePullRequestNumber(),
+          'linkCommitsForProjectFullName' => $this->getFullName(),
         ),
       )
       |> ShipItPathFilters::stripPaths(
