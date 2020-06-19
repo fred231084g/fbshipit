@@ -33,9 +33,12 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     private ?string $externalBranch = null,
     ?IShipItArgumentParser $argumentParser = null,
   ) {
-    $config = /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      new ShipItBaseConfig(\dirname(__DIR__), 'shipit', 'shipit', keyset[]);
+    $config = new ShipItBaseConfig(
+      '/var/tmp/fbshipit',
+      'shipit',
+      'shipit',
+      keyset[],
+    );
     if ($configObject !== null) {
       parent::__construct(
         $config,
