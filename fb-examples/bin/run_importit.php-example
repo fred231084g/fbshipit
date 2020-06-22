@@ -16,8 +16,4 @@ async function run_importit_entrypoint(): Awaitable<void> {
   await Facebook\ShipIt\FBShipItScripts::shimScriptControllerAsync(
     RunImportItScript::class,
   );
-
-  PHP\ini_set('memory_limit', -1);
-
-  Facebook\ImportIt\RunImportIt::cliMain();
 }
