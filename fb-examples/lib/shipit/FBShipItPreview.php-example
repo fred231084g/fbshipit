@@ -46,6 +46,30 @@ final class FBShipItPreview {
       FBShipItConfigeratorConfigClasses::getAllConfigs();
   }
 
+  public static function hasModifiedPathsForSourceRoots(
+    Traversable<string> $modified_paths,
+    keyset<string> $source_roots,
+  ): bool {
+    return C\any(
+      $modified_paths,
+      $modified_file ==> {
+        if (C\is_empty($source_roots)) {
+          // All paths are relevant.
+          return true;
+        }
+        return C\any(
+          $source_roots,
+          $internal_path ==> {
+            return Str\starts_with(
+              $modified_file,
+              Str\strip_prefix($internal_path, '/'),
+            );
+          },
+        );
+      },
+    );
+  }
+
   final public function handleChangeset(
     string $arcanist_project,
     string $internal_branch,
@@ -89,42 +113,55 @@ order to preview the full patch.';
     foreach ($this->allConfigClasses as $config_object) {
       $repo_config = $config_object->getStaticConfig();
       // Does the repo match this open source project?
-      if ($repo === $repo_config['internalRepo']) {
-        $branch_configs = Vec\filter(
-            $config_object->getBranchConfigs(),
-            $branch_config ==> $branch_config['internal'] === $internal_branch,
-          );
-        foreach ($branch_configs as $branch_config) {
-          $transformed_changeset = $config_object->filterChangeset(
-            $changeset,
-            $branch_config,
-          );
-          // Does the changeset create any diffs on the open source project?
-          if (!C\is_empty($transformed_changeset->getDiffs())) {
-            $commit_message = ShipItRepoGIT::getCommitMessage(
-              $transformed_changeset,
-            );
-            if ($patch !== null) {
-              $transformed_patch = ShipItRepoGIT::renderPatch(
-                $transformed_changeset,
-              );
-            } else {
-              $transformed_patch = null;
-            }
-            if ($hack_patch_override !== null) {
-              $transformed_patch = $hack_patch_override;
-            }
-            $result[] = shape(
-              'changeset' => $transformed_changeset->toData(),
-              'githubOrg' => $repo_config['githubOrg'],
-              'githubProject' => $repo_config['githubProject'],
-              'commitMessage' => $commit_message,
-              'externalBranch' => $branch_config['external'],
-              'patch' => $transformed_patch,
-              'error' => $error,
-            );
-          }
+      if ($repo !== $repo_config['internalRepo']) {
+        continue;
+      }
+      $branch_configs = Vec\filter(
+        $config_object->getBranchConfigs(),
+        $branch_config ==> $branch_config['internal'] === $internal_branch,
+      );
+      foreach ($branch_configs as $branch_config) {
+        $source_roots =
+          $config_object->getBaseConfig($branch_config)->getSourceRoots();
+        $changeset_paths = Vec\map(
+          $changeset->getDiffs(),
+          ($diff) ==> $diff['path'],
+        );
+        if (
+          !self::hasModifiedPathsForSourceRoots($changeset_paths, $source_roots)
+        ) {
+          continue;
         }
+        $transformed_changeset = $config_object->filterChangeset(
+          $changeset,
+          $branch_config,
+        );
+        // Does the changeset create any diffs on the open source project?
+        if (C\is_empty($transformed_changeset->getDiffs())) {
+          continue;
+        }
+        $commit_message = ShipItRepoGIT::getCommitMessage(
+          $transformed_changeset,
+        );
+        if ($patch !== null) {
+          $transformed_patch = ShipItRepoGIT::renderPatch(
+            $transformed_changeset,
+          );
+        } else {
+          $transformed_patch = null;
+        }
+        if ($hack_patch_override !== null) {
+          $transformed_patch = $hack_patch_override;
+        }
+        $result[] = shape(
+          'changeset' => $transformed_changeset->toData(),
+          'githubOrg' => $repo_config['githubOrg'],
+          'githubProject' => $repo_config['githubProject'],
+          'commitMessage' => $commit_message,
+          'externalBranch' => $branch_config['external'],
+          'patch' => $transformed_patch,
+          'error' => $error,
+        );
       }
     }
     return $result;
