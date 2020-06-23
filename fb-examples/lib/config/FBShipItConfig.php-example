@@ -106,9 +106,9 @@ abstract class FBShipItConfig {
 
   /*
    * Override to return a vector of regular expression strings that match
-   * whitelisted files or directories that will not be stripped, even if
+   * files or directories that will not be stripped, even if
    * they have names that would normally exclude them.
-   * Example: '@^facebook[/|$]@' to whitelist files inside facebook/
+   * Example: '@^facebook[/|$]@' to sync files inside facebook/
    * directories.
    */
   public function getStripCommonFileExceptions(): vec<string> {
@@ -116,7 +116,7 @@ abstract class FBShipItConfig {
   }
 
   /*
-   * Blacklist of regular expression strings that match project files which
+   * Blocklist of regular expression strings that match project files which
    * should be stripped out of published commits.
    */
   public function getDefaultStrippedFiles(): vec<string> {
@@ -124,9 +124,9 @@ abstract class FBShipItConfig {
   }
 
   /*
-   * Whitelist of regular expression strings that match project files which
+   * Allowlist of regular expression strings that match project files which
    * should not be stripped, even if they match the above project-specific
-   * blacklist.
+   * blocklist.
    */
   public function getDefaultStrippedFileExceptions(): vec<string> {
     return vec[];

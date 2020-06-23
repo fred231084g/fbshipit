@@ -13,8 +13,6 @@
 namespace Facebook\ShipIt;
 
 final class BuckVerifyNoMoeOccurrencesPhase extends BuildAndTestPhase {
-  private static vec<string> $testsWhitelist = vec[];
-
   <<__Override>>
   protected function build(ShipItBaseConfig $config): void {
     $steps = dict[
