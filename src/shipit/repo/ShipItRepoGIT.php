@@ -250,13 +250,16 @@ class ShipItRepoGIT
     // Mon Sep 17 is a magic date used by format-patch to distinguish from real
     // mailboxes. cf. https://git-scm.com/docs/git-format-patch
     $ret = "From {$patch->getID()} Mon Sep 17 00:00:00 2001\n".
-      "From: {$patch->getAuthor()}\n".
+      Str\format("From: %s\n", self::encodePatchHeader($patch->getAuthor())).
       "Date: ".
       /* HH_FIXME[2049] __PHPStdLib */
       /* HH_FIXME[4107] __PHPStdLib */
       \date('r', $patch->getTimestamp()).
       "\n".
-      "Subject: [PATCH] {$patch->getSubject()}\n\n".
+      Str\format(
+        "Subject: [PATCH] %s\n\n",
+        self::encodePatchHeader($patch->getSubject()),
+      ).
       "{$message}\n---\n\n";
     foreach ($patch->getDiffs() as $diff) {
       $path = $diff['path'];
@@ -553,5 +556,11 @@ class ShipItRepoGIT
         /* HH_FIXME[4107] __PHPStdLib */
         $config ==> \file_exists($this->getPath().'/'.$config['path']),
       );
+  }
+
+  private static function encodePatchHeader(string $to_encode): string {
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
+    return \mb_encode_mimeheader($to_encode);
   }
 }
