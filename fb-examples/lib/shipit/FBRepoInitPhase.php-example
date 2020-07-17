@@ -255,6 +255,9 @@ final class FBRepoInitPhase extends ShipItPhase {
           'ssh://git.vip.facebook.com/data/gitrepos/whatsapp/biz.git',
           'WABIZ',
         ];
+      /* added due to nonexhaustive switch */
+      default:
+        break;
     }
     $config = FBRepoCloneCommand::get($name);
     if ($config !== null) {
