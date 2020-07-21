@@ -179,7 +179,7 @@ final class ShipItBaseConfig {
 
   <<__Memoize>>
   private static function useRepositoryLock(): bool {
-    $env = ShipItEnv::getEnvVar('NO_REPO_LOCK');
+    $env = ShipItEnv::getEnv('NO_REPO_LOCK');
     if (
       (!$env is string) ||
       $env === '' ||

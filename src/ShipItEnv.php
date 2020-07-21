@@ -13,11 +13,11 @@ use namespace HH\Lib\Dict;
 final abstract class ShipItEnv {
   private static dict<string, string> $extraEnv = dict[];
 
-  public static function addEnv(string $key, string $value): void {
+  public static function setEnv(string $key, string $value): void {
     self::$extraEnv[$key] = $value;
   }
 
-  public static function getEnv(): dict<string, string> {
+  public static function getAll(): dict<string, string> {
     /* HH_FIXME[2050] undefined $_ENV */
     if ($_ENV is nonnull) {
       return Dict\merge($_ENV, self::$extraEnv);
@@ -25,7 +25,7 @@ final abstract class ShipItEnv {
     return self::$extraEnv;
   }
 
-  public static function getEnvVar(string $name): ?string {
-    return idx(self::getEnv(), $name);
+  public static function getEnv(string $name): ?string {
+    return idx(self::getAll(), $name);
   }
 }

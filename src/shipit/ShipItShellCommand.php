@@ -28,7 +28,7 @@ final class ShipItShellCommand {
 
   public function __construct(private ?string $path, string ...$command) {
     $this->command = vec($command);
-    if (ShipItEnv::getEnvVar("SHIPIT_OUTPUT_EXECS") !== null) {
+    if (ShipItEnv::getEnv("SHIPIT_OUTPUT_EXECS") !== null) {
       $this->showShellExecs = true;
     }
   }
@@ -120,7 +120,7 @@ final class ShipItShellCommand {
       unset($fds[0]);
     }
 
-    $env_vars = Dict\merge(ShipItEnv::getEnv(), $this->environmentVariables);
+    $env_vars = Dict\merge(ShipItEnv::getAll(), $this->environmentVariables);
 
     $command = $this->getCommandAsString();
     if ($this->showShellExecs) {
