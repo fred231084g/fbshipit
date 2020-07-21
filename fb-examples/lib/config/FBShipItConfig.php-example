@@ -88,7 +88,7 @@ abstract class FBShipItConfig {
 
     if ($this->rewriteCppIncludeDirectives()) {
       $standard_filters = ShipItPathFilters::rewriteCppIncludeDirectivePaths(
-        $changeset,
+        $standard_filters,
         Dict\map_keys(
           $get_path_mappings(),
           // #include directive paths in fbsource do not include fbcode. These
