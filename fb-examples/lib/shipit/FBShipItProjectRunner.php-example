@@ -156,6 +156,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
           $split[0],
           $split[1],
         ),
+        'Got unexpected null',
       );
     }
     // reponame OR FacebookReponame
