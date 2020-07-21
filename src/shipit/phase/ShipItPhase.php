@@ -64,8 +64,13 @@ abstract class ShipItPhase {
     $logger->out("Starting phase: %s", $this->getReadableName());
     try {
       $this->runImpl($config);
-    } finally {
-      $logger->out("Finished phase: %s", $this->getReadableName());
+    } catch (\Exception $e) {
+      $logger->out(
+        "Finished phase WITH EXCEPTION: %s",
+        $this->getReadableName(),
+      );
+      throw $e;
     }
+    $logger->out("Finished phase: %s", $this->getReadableName());
   }
 }
