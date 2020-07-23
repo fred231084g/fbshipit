@@ -105,8 +105,8 @@ environment variable:
 ```
 [fredemmott@devbig349.prn1 ~/fbcode/opensource/shipit/bin] hhvm shipit_folly.php --skip-push --skip-project-specific
 --- Starting Facebook\ShipIt\ShipItFolly
-Starting phase: Sanity-check commit filter
-Finished phase: Sanity-check commit filter
+Starting phase: Assert valid commit filter
+Finished phase: Assert valid commit filter
 Starting phase: Initialize source fbsource repository
 Finished phase: Initialize source fbsource repository
 Starting phase: Pull source repository
@@ -123,8 +123,8 @@ Skipping phase: Verify that destination repository is sync
 Skipping phase: Push destination repository
 [fredemmott@devbig349.prn1 ~/fbcode/opensource/shipit/bin] FBSHIPIT_DEBUG_FLOCK=yes hhvm shipit_folly.php --skip-push --skip-project-specific
 --- Starting Facebook\ShipIt\ShipItFolly
-Starting phase: Sanity-check commit filter
-Finished phase: Sanity-check commit filter
+Starting phase: Assert valid commit filter
+Finished phase: Assert valid commit filter
 Starting phase: Initialize source fbsource repository
 Finished phase: Initialize source fbsource repository
 Starting phase: Pull source repository

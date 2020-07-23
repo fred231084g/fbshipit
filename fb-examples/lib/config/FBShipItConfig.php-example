@@ -308,7 +308,7 @@ abstract class FBShipItConfig {
   ): vec<ShipItPhase> {
     $static_config = $this->getStaticConfig();
     return vec[
-      new ShipItFilterSanityCheckPhase(
+      new ShipItAssertValidFilterPhase(
         $changeset ==> $this->filterChangeset($changeset, $branch_config),
         $this->getDefaultStrippedFiles(),
       ),

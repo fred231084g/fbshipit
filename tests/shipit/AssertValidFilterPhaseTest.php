@@ -18,9 +18,9 @@ use type Facebook\HackTest\DataProvider; // @oss-enable
 
 
 <<\Oncalls('open_source')>>
-final class FilterSanityCheckPhaseTest extends BaseTest {
+final class AssertValidFilterPhaseTest extends BaseTest {
   public function testAllowsValidCombination(): void {
-    $phase = new ShipItFilterSanityCheckPhase(
+    $phase = new ShipItAssertValidFilterPhase(
       $changeset ==> $changeset->withDiffs(
         Vec\filter(
           $changeset->getDiffs(),
@@ -46,14 +46,14 @@ final class FilterSanityCheckPhaseTest extends BaseTest {
   public function testAllowsIdentityFunctionForEmptyRoots(
     keyset<string> $roots,
   ): void {
-    $phase = new ShipItFilterSanityCheckPhase($changeset ==> $changeset);
+    $phase = new ShipItAssertValidFilterPhase($changeset ==> $changeset);
     $phase->assertValid($roots);
     // no exception thrown :)
   }
 
   public function testThrowsForIdentityFunctionWithRoots(): void {
     \expect(() ==> {
-      $phase = new ShipItFilterSanityCheckPhase(
+      $phase = new ShipItAssertValidFilterPhase(
         $changeset ==> $changeset, // stuff outside of 'foo' should be removed
       );
       $phase->assertValid(keyset['foo/']);
@@ -64,7 +64,7 @@ final class FilterSanityCheckPhaseTest extends BaseTest {
 
   public function testThrowsForEmptyChangeset(): void {
     \expect(() ==> {
-      $phase = new ShipItFilterSanityCheckPhase(
+      $phase = new ShipItAssertValidFilterPhase(
         $_changeset ==> (new ShipItChangeset()),
       );
       $phase->assertValid(keyset['foo/']);
@@ -75,7 +75,7 @@ final class FilterSanityCheckPhaseTest extends BaseTest {
 
   public function testThrowsForPartialMatch(): void {
     \expect(() ==> {
-      $phase = new ShipItFilterSanityCheckPhase(
+      $phase = new ShipItAssertValidFilterPhase(
         $changeset ==> $changeset->withDiffs(
           Vec\filter(
             $changeset->getDiffs(),
@@ -90,7 +90,7 @@ final class FilterSanityCheckPhaseTest extends BaseTest {
   }
 
   public function testAllowsForStrippedPaths(): void {
-    $phase = new ShipItFilterSanityCheckPhase(
+    $phase = new ShipItAssertValidFilterPhase(
       $changeset ==> $changeset->withDiffs(
         Vec\filter(
           $changeset->getDiffs(),

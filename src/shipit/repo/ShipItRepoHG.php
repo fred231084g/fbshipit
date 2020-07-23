@@ -489,7 +489,7 @@ class ShipItRepoHG
         'listfile:/dev/stdin',
       );
     } catch (ShipItShellCommandException $_e) {
-      // ignore, not all repos are shallow
+      ShipItLogger::err("Failed to prefetch.\n");
     } finally {
       $lock->release();
     }

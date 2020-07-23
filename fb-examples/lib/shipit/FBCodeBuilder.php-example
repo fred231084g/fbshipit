@@ -56,7 +56,7 @@ final class FBCodeBuilder {
       '('.
       Str\join(Keyset\map($dependencies, $d ==> PHP\preg_quote($d, '@')), '|').
       ')-rev.txt$@',
-      // This is just to appease ShipItFilterSanityCheckPhase
+      // This is just to appease ShipItAssertValidFilterPhase
       '@^'.FBCodeBuilder::DEST_GITHUB_HASHES.'shipit_test_file.txt$@',
     ];
   }

@@ -14,7 +14,7 @@ namespace Facebook\ShipIt;
 
 use namespace HH\Lib\{Str, C};
 
-final class ShipItFilterSanityCheckPhase extends ShipItPhase {
+final class ShipItAssertValidFilterPhase extends ShipItPhase {
   const TEST_FILE_NAME = 'shipit_test_file.txt';
 
   public function __construct(
@@ -29,15 +29,15 @@ final class ShipItFilterSanityCheckPhase extends ShipItPhase {
 
   <<__Override>>
   public function getReadableName(): string {
-    return 'Sanity-check commit filter';
+    return 'Assert valid commit filter';
   }
 
   <<__Override>>
   public function getCLIArguments(): vec<ShipItCLIArgument> {
     return vec[
       shape(
-        'long_name' => 'skip-filter-sanity-check',
-        'description' => 'Skip the filter sanity check.',
+        'long_name' => 'skip-assert-valid-filter',
+        'description' => 'Skip checking the commit filter for validity.',
         'write' => $_ ==> $this->skip(),
       ),
     ];
