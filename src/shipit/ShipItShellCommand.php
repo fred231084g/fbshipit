@@ -28,9 +28,9 @@ final class ShipItShellCommand {
 
   public function __construct(private ?string $path, string ...$command) {
     $this->command = vec($command);
-    // if (ShipItEnv::getEnv("SHIPIT_OUTPUT_EXECS") !== null) {
+    if (ShipItEnv::getEnv("SHIPIT_OUTPUT_EXECS") !== null) {
       $this->showShellExecs = true;
-    // }
+    }
   }
 
   public function setStdIn(string $input): this {
