@@ -64,6 +64,11 @@ abstract class ShipItPhase {
     $logger->out("Starting phase: %s", $this->getReadableName());
     try {
       $this->runImpl($config);
+    } catch (ShipItExitException $e) {
+      $logger->out("Finished phase: %s", $this->getReadableName());
+      // This is used to signal that ShipIt is exiting, not a reportable
+      // error message.
+      throw $e;
     } catch (\Exception $e) {
       $logger->out(
         "Finished phase WITH EXCEPTION: %s",
