@@ -124,7 +124,7 @@ final class ShipItShellCommand {
 
     $command = $this->getCommandAsString();
     if ($this->showShellExecs) {
-      (new ShipItVerboseLogger(true))->out("Shell command: %s", $command);
+      (new ShipItVerboseLogger(true))->out("Shell command: %s; cwd: %s", $command, $this->path ?? ".");
     }
     $pipes = varray[];
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
