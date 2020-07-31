@@ -156,7 +156,10 @@ final class ShipItSync {
       }
 
       try {
-        $dest->commitPatch($changeset);
+        $dest->commitPatch(
+          $changeset,
+          $this->syncConfig->getShouldDoSubmodules(),
+        );
         ShipItLogger::out(
           "  OK %s %s\n",
           $changeset->getShortID(),

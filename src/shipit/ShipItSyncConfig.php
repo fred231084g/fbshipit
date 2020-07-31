@@ -28,6 +28,7 @@ final class ShipItSyncConfig {
   private keyset<string> $destinationRoots = keyset[];
   private ?string $statsFilename = null;
   private ?bool $allowEmptyCommit = false;
+  private bool $doSubmodules = true;
 
   public function __construct(
     private keyset<string> $sourceRoots,
@@ -134,6 +135,19 @@ final class ShipItSyncConfig {
   }
   public function getAllowEmptyCommits(): bool {
     return $this->allowEmptyCommit !== null && $this->allowEmptyCommit;
+  }
+
+  public function withShouldDoSubmodules(bool $do_submodules): this {
+    return $this->modified(
+      $ret ==> {
+        $ret->doSubmodules = $do_submodules;
+        return $this->doSubmodules;
+      },
+    );
+  }
+
+  public function getShouldDoSubmodules(): bool {
+    return $this->doSubmodules;
   }
 
   private function modified<Tignored>(

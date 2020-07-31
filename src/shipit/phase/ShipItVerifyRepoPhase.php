@@ -18,6 +18,7 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
   private bool $createPatch = false;
   private bool $useLatestSourceCommit = false;
   private ?string $verifySourceCommit = null;
+  private bool $shouldDoSubmodules = true;
 
   public function __construct(
     private (function(ShipItChangeset): ShipItChangeset) $filter,
@@ -71,6 +72,14 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
           return $this->useLatestSourceCommit;
         },
       ),
+      shape(
+        'long_name' => 'skip-submodules',
+        'description' => 'Don\'t sync submodules',
+        'write' => $_ ==> {
+          $this->shouldDoSubmodules = false;
+          return $this->shouldDoSubmodules;
+        },
+      ),
     ];
   }
 
@@ -99,6 +108,7 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
         'name' => 'FBShipIt Internal User',
         'email' => 'fbshipit@example.com',
       ),
+      $this->shouldDoSubmodules,
       $this->verifySourceCommit,
     );
     $clean_path = $clean_dir->getPath();

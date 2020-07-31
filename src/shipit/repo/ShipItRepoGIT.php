@@ -274,7 +274,10 @@ class ShipItRepoGIT
   /**
    * Commit a standardized patch to the repo
    */
-  public function commitPatch(ShipItChangeset $patch): string {
+  public function commitPatch(
+    ShipItChangeset $patch,
+    bool $do_submodules = true,
+  ): string {
     if (C\is_empty($patch->getDiffs())) {
       // This is an empty commit, which `git am` does not handle properly.
       $this->gitCommand(
@@ -305,7 +308,11 @@ class ShipItRepoGIT
       throw $e;
     }
 
-    $submodules = $this->getSubmodules();
+    if ($do_submodules) {
+      $submodules = $this->getSubmodules();
+    } else {
+      $submodules = vec[];
+    }
     foreach ($submodules as $submodule) {
       // If a submodule has changed, then we need to actually update to the
       // new version. + before commit hash represents changed submdoule.
@@ -472,6 +479,7 @@ class ShipItRepoGIT
 
   public function export(
     keyset<string> $roots,
+    bool $do_submodules,
     ?string $rev = null,
   ): shape('tempDir' => ShipItTempDir, 'revision' => string) {
     if ($rev === null) {
@@ -490,8 +498,13 @@ class ShipItRepoGIT
     (new ShipItShellCommand($dest->getPath(), 'tar', 'x'))->setStdIn($tar)
       ->runSynchronously();
 
+    if ($do_submodules) {
+      $submodules = $this->getSubmodules($roots);
+    } else {
+      $submodules = vec[];
+    }
     // If we have any submodules, we'll need to set them up manually.
-    foreach ($this->getSubmodules($roots) as $submodule) {
+    foreach ($submodules as $submodule) {
       $status = $this->gitCommand('submodule', 'status', $submodule['path']);
       $sha = $status
         // Strip any -, +, or U at the start of the status (see the man page for

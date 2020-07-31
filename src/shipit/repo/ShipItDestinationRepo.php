@@ -30,7 +30,10 @@ interface ShipItDestinationRepo {
   /**
    * Commit a standardized patch to the repo
    */
-  public function commitPatch(ShipItChangeset $patch): string;
+  public function commitPatch(
+    ShipItChangeset $patch,
+    bool $do_submodules = true,
+  ): string;
 
   /**
    * push local changes to the upstream

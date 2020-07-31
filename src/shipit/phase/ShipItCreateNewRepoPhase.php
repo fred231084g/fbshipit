@@ -15,6 +15,7 @@ namespace Facebook\ShipIt;
 final class ShipItCreateNewRepoPhase extends ShipItPhase {
   private ?string $sourceCommit = null;
   private ?string $outputPath = null;
+  private bool $shouldDoSubmodules = true;
 
   public function __construct(
     private (function(ShipItChangeset): ShipItChangeset) $filter,
@@ -66,6 +67,14 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
         'long_name' => 'special-create-new-repo',
         'replacement' => 'create-new-repo',
       ),
+      shape(
+        'long_name' => 'skip-submodules',
+        'description' => 'Don\'t sync submodules',
+        'write' => $_ ==> {
+          $this->shouldDoSubmodules = false;
+          return $this->shouldDoSubmodules;
+        },
+      ),
     ];
   }
 
@@ -78,6 +87,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
           $config,
           $this->filter,
           $this->committer,
+          $this->shouldDoSubmodules,
           $this->sourceCommit,
         );
         // Do not delete the output directory.
@@ -89,6 +99,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
           $output,
           $this->filter,
           $this->committer,
+          $this->shouldDoSubmodules,
           $this->sourceCommit,
         );
       }
@@ -119,6 +130,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     ShipItBaseConfig $config,
     (function(ShipItChangeset): ShipItChangeset) $filter,
     shape('name' => string, 'email' => string) $committer,
+    bool $do_submodules = true,
     ?string $revision = null,
   ): ShipItTempDir {
     $temp_dir = new ShipItTempDir('git-with-initial-commit');
@@ -127,6 +139,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       $config,
       $filter,
       $committer,
+      $do_submodules,
       $revision,
     );
     return $temp_dir;
@@ -137,6 +150,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     string $output_dir,
     (function(ShipItChangeset): ShipItChangeset) $filter,
     shape('name' => string, 'email' => string) $committer,
+    bool $do_submodules = true,
     ?string $revision = null,
   ): void {
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
@@ -154,6 +168,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
         $config,
         $filter,
         $committer,
+        $do_submodules,
         $revision,
       );
     } catch (\Exception $e) {
@@ -169,6 +184,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     ShipItBaseConfig $config,
     (function(ShipItChangeset): ShipItChangeset) $filter,
     shape('name' => string, 'email' => string) $committer,
+    bool $do_submodules,
     ?string $revision = null,
   ): void {
     $logger = new ShipItVerboseLogger($config->isVerboseEnabled());
@@ -181,7 +197,11 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     );
 
     $logger->out("  Exporting...");
-    $export = $source->export($config->getSourceRoots(), $revision);
+    $export = $source->export(
+      $config->getSourceRoots(),
+      $do_submodules,
+      $revision,
+    );
     $export_dir = $export['tempDir'];
     $rev = $export['revision'];
 
@@ -239,7 +259,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     } finally {
       $output_lock->release();
     }
-    $filtered_repo->commitPatch($changeset);
+    $filtered_repo->commitPatch($changeset, $do_submodules);
   }
 
   private static function execSteps(

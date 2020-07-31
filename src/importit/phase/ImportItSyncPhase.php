@@ -17,7 +17,7 @@ use type Facebook\ShipIt\{
   ShipItBaseConfig,
   ShipItChangeset,
   ShipItDestinationRepo,
-  ShipItLogger
+  ShipItLogger,
 };
 
 final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
@@ -27,6 +27,7 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
   private ?string $pullRequestNumber;
   private bool $skipPullRequest = false;
   private bool $applyToLatest = false;
+  private bool $shouldDoSubmodules = true;
 
   public function __construct(
     private (function(ShipItChangeset): ShipItChangeset) $filter,
@@ -89,6 +90,14 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
         'write' => $_ ==> {
           $this->applyToLatest = true;
           return $this->applyToLatest;
+        },
+      ),
+      shape(
+        'long_name' => 'skip-submodules',
+        'description' => 'Don\'t sync submodules',
+        'write' => $_ ==> {
+          $this->shouldDoSubmodules = false;
+          return $this->shouldDoSubmodules;
         },
       ),
     ];
@@ -161,7 +170,10 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
     ShipItLogger::out("  Exporting...\n");
     $this->maybeSavePatch($destination_repo, $changeset);
     try {
-      $rev = $destination_repo->commitPatch($changeset);
+      $rev = $destination_repo->commitPatch(
+        $changeset,
+        $this->shouldDoSubmodules,
+      );
       ShipItLogger::out(
         "  Done.  %s committed in %s\n",
         $rev,

@@ -19,6 +19,7 @@ final class ShipItSyncPhase extends ShipItPhase {
   private keyset<string> $skippedSourceCommits = keyset[];
   private ?string $patchesDirectory = null;
   private ?string $statsFilename = null;
+  private bool $shouldDoSubmodules = true;
 
   public function __construct(
     private ShipItSyncConfig::TFilterFn $filter,
@@ -101,6 +102,14 @@ final class ShipItSyncPhase extends ShipItPhase {
           return $this->postFilterChangesets;
         },
       ),
+      shape(
+        'long_name' => 'skip-submodules',
+        'description' => 'Don\'t sync submodules',
+        'write' => $_ ==> {
+          $this->shouldDoSubmodules = false;
+          return $this->shouldDoSubmodules;
+        },
+      ),
     ];
   }
 
@@ -118,7 +127,8 @@ final class ShipItSyncPhase extends ShipItPhase {
       ->withSkippedSourceCommits($this->skippedSourceCommits)
       ->withPatchesDirectory($this->patchesDirectory)
       ->withStatsFilename($this->statsFilename)
-      ->withAllowEmptyCommits($this->allowEmptyCommit);
+      ->withAllowEmptyCommits($this->allowEmptyCommit)
+      ->withShouldDoSubmodules($this->shouldDoSubmodules);
 
     (new ShipItSync($base, $sync))->run();
   }

@@ -140,7 +140,10 @@ class ShipItRepoHG
     return $match['commit'];
   }
 
-  public function commitPatch(ShipItChangeset $patch): string {
+  public function commitPatch(
+    ShipItChangeset $patch,
+    bool $_do_submodules = true, // Not relevant for hg
+  ): string {
     if (C\is_empty($patch->getDiffs())) {
       // This is an empty commit, which `hg patch` does not handle properly.
       $this->hgCommand(
@@ -509,6 +512,7 @@ class ShipItRepoHG
 
   public function export(
     keyset<string> $roots,
+    bool $_do_submodules, // Not relevant for hg
     ?string $rev = null,
   ): shape('tempDir' => ShipItTempDir, 'revision' => string) {
     $branch = $this->branch;
