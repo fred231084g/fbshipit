@@ -130,7 +130,7 @@ final class ShipItShellCommand {
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     $fp = \proc_open($command, $fds, inout $pipes, $this->path, dict($env_vars));
-    if (!$fp || !\is_array($pipes)) {
+    if (!$fp || !\HH\is_any_array($pipes)) {
       throw new \Exception("Failed executing $command");
     }
     if ($stdin !== null) {
