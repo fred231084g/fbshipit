@@ -140,7 +140,7 @@ abstract class ShipItRepo {
   /**
    * Convert a hunk to a ShipItDiff shape
    */
-  protected static function parseDiffHunk(string $hunk): ?ShipItDiff {
+  public static function parseDiffHunk(string $hunk): ?ShipItDiff {
     list($header, $body) = Str\split($hunk, "\n", 2);
     $matches = varray[];
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
@@ -154,6 +154,12 @@ abstract class ShipItRepo {
       return null;
     }
     $path = $matches[2];
+    $new_path = C\count($matches) > 3 ? $matches[3] : null;
+    if ($new_path !== null && $path !== $new_path) {
+      $operation = ShipItDiffOperation::RENAME;
+    } else {
+      $operation = ShipItDiffOperation::CHANGE;
+    }
     if ($matches[1] === '"') {
       // Quoted paths may contain escaped characters.
       /* HH_IGNORE_ERROR[2049] __PHPStdLib */
@@ -163,6 +169,8 @@ abstract class ShipItRepo {
     return shape(
       'path' => $path,
       'body' => $body,
+      'operation' => $operation,
+      'new_path' => $new_path,
     );
   }
 

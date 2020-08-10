@@ -14,9 +14,17 @@ namespace Facebook\ShipIt;
 
 use namespace HH\Lib\{Str, C};
 
+enum ShipItDiffOperation: string {
+  CHANGE = 'change';
+  COPY = 'copy';
+  RENAME = 'rename';
+}
+
 type ShipItDiff = shape(
   'path' => string,
   'body' => string,
+  ?'operation' => ?ShipItDiffOperation,
+  ?'new_path' => ?string,
 );
 
 type ShipItChangesetData = shape(
