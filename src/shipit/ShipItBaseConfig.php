@@ -148,6 +148,10 @@ final class ShipItBaseConfig {
   }
 
   private ?IShipItLock $sourceLock = null;
+  public function hasSourceSharedLock(): bool {
+    return $this->sourceLock is nonnull;
+  }
+
   public function getSourceSharedLock(): IShipItLock {
     if ($this->sourceLock is null) {
       if (self::useRepositoryLock()) {
@@ -162,6 +166,10 @@ final class ShipItBaseConfig {
   }
 
   private ?IShipItLock $destinationLock = null;
+  public function hasDestinationSharedLock(): bool {
+    return $this->destinationLock is nonnull;
+  }
+
   public function getDestinationSharedLock(): IShipItLock {
     if ($this->destinationLock is null) {
       if (self::useRepositoryLock()) {

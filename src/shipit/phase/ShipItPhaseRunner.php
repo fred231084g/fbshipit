@@ -32,8 +32,12 @@ class ShipItPhaseRunner {
         $phase->run($this->config);
       }
     } finally {
-      $this->config->getSourceSharedLock()->release();
-      $this->config->getDestinationSharedLock()->release();
+      if ($this->config->hasSourceSharedLock()) {
+        $this->config->getSourceSharedLock()->release();
+      }
+      if ($this->config->hasDestinationSharedLock()) {
+        $this->config->getDestinationSharedLock()->release();
+      }
     }
   }
 
