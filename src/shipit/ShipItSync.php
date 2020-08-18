@@ -175,6 +175,12 @@ final class ShipItSync {
           $e->getMessage(),
         );
         throw $e;
+      } catch (\Exception $e) {
+        ShipItLogger::err(
+          "  !! %s ERROR: sync failed:\n",
+          $changeset->getShortID(),
+        );
+        throw $e;
       }
     }
 
