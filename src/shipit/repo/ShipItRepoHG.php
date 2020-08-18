@@ -241,6 +241,11 @@ class ShipItRepoHG
       if ($line[0] === '#' && !$past_separator) {
         if (Str\starts_with_ci($line, '# User ')) {
           $changeset = $changeset->withAuthor(Str\slice($line, 7));
+          if (!Regex\matches($changeset->getAuthor(), re"/.*<.*>/")) {
+            $changeset = $changeset->withAuthor(
+              Str\format('%s <>', $changeset->getAuthor()),
+            );
+          }
         } else if (Str\starts_with_ci($line, '# Date ')) {
           $changeset = $changeset->withTimestamp((int)Str\slice($line, 7));
         }
