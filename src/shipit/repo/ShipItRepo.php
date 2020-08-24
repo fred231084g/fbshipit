@@ -183,4 +183,86 @@ abstract class ShipItRepo {
   ): string {
     return $changeset->getSubject()."\n\n".$changeset->getMessage();
   }
+
+  /*
+   * Generator yielding patch sections of the diff blocks (individually)
+   * and finally the footer.
+   */
+  public static function parsePatch(string $patch): Iterator<string> {
+    $contents = '';
+    $matches = darray[];
+
+    $minus_lines = 0;
+    $plus_lines = 0;
+    $seen_range_header = false;
+
+    foreach (Str\split($patch, "\n") as $line) {
+      $line = Regex\replace($line, re"/(\r\n|\n)/", "\n");
+
+      if (
+        Regex\matches(
+          Str\trim_right($line),
+          re"@^diff --git \"?[ab]/(.*?)\"? \"?[ab]/(.*?)\"?$@",
+        )
+      ) {
+        if ($contents !== '') {
+          yield $contents;
+        }
+        $seen_range_header = false;
+        $contents = $line."\n";
+        continue;
+      }
+      $matches = Regex\first_match(
+        $line,
+        re"/^@@ -\d+(,(?<minus_lines>\d+))? \+\d+(,(?<plus_lines>\d+))? @@/",
+      );
+      if ($matches !== null) {
+        $minus_lines = $matches['minus_lines'] ?? '';
+        $minus_lines = $minus_lines === '' ? 1 : (int)$minus_lines;
+        $plus_lines = $matches['plus_lines'] ?? '';
+        $plus_lines = $plus_lines === '' ? 1 : (int)$plus_lines;
+
+        $contents .= $line."\n";
+        $seen_range_header = true;
+        continue;
+      }
+
+      if (!$seen_range_header) {
+        $contents .= $line."\n";
+        continue;
+      }
+
+      $leftmost = Str\slice($line, 0, 1);
+      if ($leftmost === "\\") {
+        $contents .= $line."\n";
+        // Doesn't count as a + or - line whatever happens; if NL at EOF
+        // changes, there is a + and - for the last line of content
+        continue;
+      }
+
+      if ($minus_lines <= 0 && $plus_lines <= 0) {
+        continue;
+      }
+
+      $leftmost = Str\slice($line, 0, 1);
+      if ($leftmost === '+') {
+        --$plus_lines;
+      } else if ($leftmost === '-') {
+        --$minus_lines;
+      } else if ($leftmost === ' ') {
+        // Context goes from both.
+        --$plus_lines;
+        --$minus_lines;
+      } else {
+        invariant_violation("Can't parse hunk line: %s", $line);
+      }
+      $contents .= $line."\n";
+    }
+
+    if ($contents !== '') {
+      // If we got the patch from git-diff, there won't be the signature line
+      // from format-patch
+      yield $contents;
+    }
+  }
 }

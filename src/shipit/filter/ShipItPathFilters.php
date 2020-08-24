@@ -32,7 +32,7 @@ abstract final class ShipItPathFilters {
     foreach ($changeset->getDiffs() as $diff) {
       $path = $diff['path'];
 
-      $match = ShipItUtil::matchesAnyPattern($path, $strip_exception_patterns);
+      $match = self::matchesAnyPattern($path, $strip_exception_patterns);
 
       if ($match !== null) {
         $diffs[] = $diff;
@@ -46,7 +46,7 @@ abstract final class ShipItPathFilters {
         continue;
       }
 
-      $match = ShipItUtil::matchesAnyPattern($path, $strip_patterns);
+      $match = self::matchesAnyPattern($path, $strip_patterns);
       if ($match !== null) {
         if ($use_debug) {
           $changeset = $changeset->withDebugMessage(
@@ -79,7 +79,7 @@ abstract final class ShipItPathFilters {
     return self::rewritePaths(
       $changeset,
       $path ==> {
-        $match = ShipItUtil::matchesAnyPattern($path, $skip_patterns);
+        $match = self::matchesAnyPattern($path, $skip_patterns);
         if ($match !== null) {
           return $path;
         }
@@ -221,5 +221,19 @@ abstract final class ShipItPathFilters {
       $diffs[] = $diff;
     }
     return $changeset->withDiffs($diffs);
+  }
+
+  public static function matchesAnyPattern(
+    string $path,
+    Container<string> $patterns,
+  ): ?string {
+    foreach ($patterns as $pattern) {
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
+      if (\preg_match($pattern, $path)) {
+        return $pattern;
+      }
+    }
+    return null;
   }
 }

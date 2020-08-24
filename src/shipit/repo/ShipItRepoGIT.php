@@ -211,7 +211,7 @@ class ShipItRepoGIT
   <<__Override>>
   public static function getDiffsFromPatch(string $patch): vec<ShipItDiff> {
     $diffs = vec[];
-    foreach (ShipItUtil::parsePatch($patch) as $hunk) {
+    foreach (self::parsePatch($patch) as $hunk) {
       $diff = self::parseDiffHunk($hunk);
       if ($diff !== null) {
         $diffs[] = $diff;

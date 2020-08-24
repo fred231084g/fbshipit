@@ -61,7 +61,7 @@ final class ShipItAssertValidFilterPhase extends ShipItPhase {
         ]);
       $changeset = $filter($changeset);
       if (C\count($changeset->getDiffs()) !== 1) {
-        $test_file_is_stripped = ShipItUtil::matchesAnyPattern(
+        $test_file_is_stripped = ShipItPathFilters::matchesAnyPattern(
           $test_file,
           $this->strippedFiles,
         );

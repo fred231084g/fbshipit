@@ -15,10 +15,10 @@ namespace Facebook\ShipIt;
 use namespace HH\Lib\C;
 
 <<\Oncalls('open_source')>>
-final class ShipItUtilTest extends BaseTest {
+final class ShipItRepoTest extends BaseTest {
   public function testDiffofDiffs(): void {
     $patch = \file_get_contents(__DIR__.'/git-diffs/diff-in-diff.patch');
-    $sections = vec(ShipItUtil::parsePatch($patch));
+    $sections = vec(ShipItRepo::parsePatch($patch));
     \expect(C\count($sections))->toBePHPEqual(
       1,
       'Should only get one section!',
