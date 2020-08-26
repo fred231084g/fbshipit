@@ -115,7 +115,11 @@ final class FBCommonFilters {
   public static function skipIfAlreadyOnGitHub(
     ShipItChangeset $changeset,
   ): ShipItChangeset {
-    if (ShipItMentions::containsMention($changeset, '@already-on-github')) {
+    if (
+      ShipItMentions::containsMention($changeset, '@already-on-github') ||
+      // This is a typo that is fairly common for non-native English speakers
+      ShipItMentions::containsMention($changeset, '@already-in-github')
+    ) {
       $changeset = $changeset
         ->withDiffs(vec[])
         ->withDebugMessage('SKIP COMMIT: @already-on-github');
@@ -468,7 +472,7 @@ final class FBCommonFilters {
           await FBToGitHubUserInfo::getDestinationUserFromLocalUser($name),
       );
     // @oss-disable: $names = \Asio::awaitSynchronously($names);
-      $names = \HH\Asio\join(\HH\Asio\v($names)); // @oss-enable
+    $names = \HH\Asio\join(\HH\Asio\v($names)); // @oss-enable
     $names = Vec\filter($names, $x ==> Str\length($x ?? '') > 0);
     $names = Vec\filter_nulls($names);
     $sections['reviewed by'] = Str\join($names, ', ');
