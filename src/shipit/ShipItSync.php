@@ -180,6 +180,12 @@ final class ShipItSync {
           "  !! %s ERROR: sync failed:\n",
           $changeset->getShortID(),
         );
+        if ($verbose) {
+          ShipItLogger::err(
+            "%s\n",
+            ShipItRepoGIT::renderPatch($changeset),
+          );
+        }
         throw $e;
       }
     }
