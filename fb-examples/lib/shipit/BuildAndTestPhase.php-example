@@ -43,13 +43,6 @@ abstract class BuildAndTestPhase extends ShipItPhase {
     $this->test($config);
   }
 
-  <<__Deprecated("Only for OSSSyncAndPush migration", 0)>>
-  final public static function __fb__removeColorCodesPublic(
-    string $line,
-  ): string {
-    return self::removeColorCodes($line);
-  }
-
   final protected static function removeColorCodes(string $line): string {
     // Get rid of codes like ^[[31;31m that may get output to stdout or stderr.
     // 0x1B is the hex code for the escape sequence ^[
