@@ -518,12 +518,7 @@ abstract class FBShipItConfig {
    * pass override functions into the shape.
    */
   public function getBranchConfigs(): vec<FBSourceBranchConfig> {
-    return vec[
-      shape(
-        'internal' => 'master',
-        'external' => 'master',
-      ),
-    ];
+    return vec[];
   }
 
   /**
