@@ -307,9 +307,17 @@ abstract class FBShipItConfig {
     FBSourceBranchConfig $branch_config,
   ): vec<ShipItPhase> {
     $static_config = $this->getStaticConfig();
+    $use_confidential_filter = !C\contains(
+      FBConfidentialFilter::getExcludedOrgs(),
+      $static_config['githubOrg'],
+    );
     return vec[
       new ShipItAssertValidFilterPhase(
-        $changeset ==> $this->filterChangeset($changeset, $branch_config),
+        $changeset ==> $this->filterChangeset(
+          $changeset,
+          $branch_config,
+          $use_confidential_filter,
+        ),
         $this->getDefaultStrippedFiles(),
       ),
       new ShipItSaveConfigPhase(
@@ -345,8 +353,11 @@ abstract class FBShipItConfig {
       new ShipItCleanPhase(ShipItRepoSide::DESTINATION),
       new ShipItPullPhase(ShipItRepoSide::DESTINATION),
       new ShipItSyncPhase(
-        ($_config, $changeset) ==>
-          $this->filterChangeset($changeset, $branch_config),
+        ($_config, $changeset) ==> $this->filterChangeset(
+          $changeset,
+          $branch_config,
+          $use_confidential_filter,
+        ),
         keyset[],
         ($changesets, $dest) ==>
           $this->postFilterChangesets($changesets, $dest),
