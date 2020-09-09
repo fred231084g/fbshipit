@@ -123,6 +123,8 @@ final class FBRepoInitPhase extends ShipItPhase {
           '--no-working-dir',
           '--simple',
           '--no-cloud-rejoin',
+          '--sparse',
+          'tools/scm/sparse/base/base',
         ];
       case 'www':
         return vec[
