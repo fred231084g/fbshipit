@@ -31,6 +31,15 @@ type FBSourceBranchConfig = shape(
   ?'getPathMappings' => GetPathMappingsFn,
 );
 
+type FBShipItStaticConfig = shape(
+  'internalRepo' => string,
+  'githubOrg' => string,
+  'githubProject' => string,
+  ?'destDirName' => string, // defaults to githubProject
+  ?'gitLfs' => bool,
+  ?'allow-empty-commit' => bool, // whether to allow empty commit sync to git
+);
+
 /** Base class for projects that have no special requirements.
  *
  * If you need more flexibility than this provides, use the classes
@@ -49,7 +58,7 @@ abstract class FBShipItConfig {
     return new static();
   }
 
-  public abstract function getStaticConfig(): FBShipItCLIStaticConfig;
+  public abstract function getStaticConfig(): FBShipItStaticConfig;
 
   public abstract function getDefaultPathMappings(): dict<string, string>;
 
