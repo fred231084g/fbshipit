@@ -17,10 +17,19 @@ use namespace HH\Lib\Str;
 
 <<\Oncalls('open_source')>>
 final class FBCommonFiltersTest extends FBBaseTest {
+  private static function getKeepSections(): keyset<string> {
+    return keyset(
+      \opensource_shipit_configs_CONSTANTS::DEFAULT_MESSAGE_SECTION_NAMES(),
+    );
+  }
+
   public function testFBAuthorWithoutGitHubAuthor(): void {
     $in = (new ShipItChangeset())
       ->withAuthor('Joel Marcey <joelm@fb.com>');
-    $out = FBCommonFilters::applyAll($in);
+    $out = FBCommonFilters::applyAll(
+      $in,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($out->getAuthor())->toEqual($in->getAuthor());
   }
 
@@ -28,7 +37,10 @@ final class FBCommonFiltersTest extends FBBaseTest {
     $in = (new ShipItChangeset())
       ->withAuthor('Joel Marcey <joelm@fb.com>')
       ->withMessage('GitHub Author: Fred Emmott <fe@fb.com>');
-    $out = FBCommonFilters::applyAll($in);
+    $out = FBCommonFilters::applyAll(
+      $in,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($out->getAuthor())->toEqual('Fred Emmott <fe@fb.com>');
     \expect($out->getMessage())->toEqual("Pulled By: JoelMarcey");
   }
@@ -57,7 +69,10 @@ final class FBCommonFiltersTest extends FBBaseTest {
     // fredemmott@ => fe@
     $changeset = (new ShipItChangeset())
       ->withAuthor($in_author)
-      |> FBCommonFilters::applyAll($$);
+      |> FBCommonFilters::applyAll(
+        $$,
+        shape('filterMessageSections/keepFields' => self::getKeepSections()),
+      );
     \expect($changeset->getAuthor())->toEqual($expected_author);
   }
 
@@ -95,7 +110,10 @@ final class FBCommonFiltersTest extends FBBaseTest {
     $changeset = (new ShipItChangeset())->withDiffs(vec[
       shape('path' => $file, 'body' => 'junk'),
     ]);
-    $changeset = FBCommonFilters::applyAll($changeset);
+    $changeset = FBCommonFilters::applyAll(
+      $changeset,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
 
     if ($private) {
       $expected = vec[];
@@ -113,7 +131,10 @@ final class FBCommonFiltersTest extends FBBaseTest {
       shape('path' => 'foo/com/facebook/PLATFORM.bzl', 'body' => 'junk'),
       shape('path' => 'foo/com/facebook/something', 'body' => 'junk'),
     ]);
-    $changeset = FBCommonFilters::applyAll($changeset);
+    $changeset = FBCommonFilters::applyAll(
+      $changeset,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect(Vec\map($changeset->getDiffs(), $diff ==> $diff['path']))
       ->toBePHPEqual(vec['foo/com/facebook/something']);
   }
@@ -121,21 +142,30 @@ final class FBCommonFiltersTest extends FBBaseTest {
   public function testOverideUnitFailuresStripped(): void {
     $in = (new ShipItChangeset())
       ->withMessage('Summary: @override-unit-failures');
-    $out = FBCommonFilters::applyAll($in);
+    $out = FBCommonFilters::applyAll(
+      $in,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($out->getMessage())->toEqual('');
   }
 
   public function testBuildDirectiveStripped(): void {
     $in = (new ShipItChangeset())
       ->withMessage("Summary: Test diff\nblah @build[project1,project2]");
-    $out = FBCommonFilters::applyAll($in);
+    $out = FBCommonFilters::applyAll(
+      $in,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($out->getMessage())->toEqual("Summary:\nTest diff\nblah");
   }
 
   public function testAccept2ShipStripped(): void {
     $in = (new ShipItChangeset())
       ->withMessage('Summary: #accept2ship');
-    $out = FBCommonFilters::applyAll($in);
+    $out = FBCommonFilters::applyAll(
+      $in,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($out->getMessage())->toEqual('');
 
     // testing multi-line strings
@@ -163,7 +193,10 @@ final class FBCommonFiltersTest extends FBBaseTest {
       ->withMessage(
         'Summary: This reverts commit abcdabcdabcdabcdabcdabcdabcdabcdabcdabcd',
       );
-    $out = FBCommonFilters::applyAll($in);
+    $out = FBCommonFilters::applyAll(
+      $in,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($out->getMessage())->toEqual(
       'Summary: This reverts commit abcdabcdabcdabcdabcdabcdabcdabcdabcdabcd',
     );
@@ -171,7 +204,10 @@ final class FBCommonFiltersTest extends FBBaseTest {
     // only 'cause_a_sev_many_files'
     $in = (new ShipItChangeset())
       ->withMessage('Summary: cause_a_sev_many_files');
-    $out = FBCommonFilters::applyAll($in);
+    $out = FBCommonFilters::applyAll(
+      $in,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($out->getMessage())->toEqual('Summary: cause_a_sev_many_files');
 
     // both
@@ -182,7 +218,10 @@ some_text
 cause_a_sev_many_files
 Differential Revision: D1234567',
       );
-    $out = FBCommonFilters::applyAll($in);
+    $out = FBCommonFilters::applyAll(
+      $in,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($out->getMessage())->toEqual("Differential Revision: D1234567");
   }
 
@@ -190,7 +229,12 @@ Differential Revision: D1234567',
     $changeset = (new ShipItChangeset())
       ->withMessage("Summary: One line change\nTest plan: run all code paths");
 
-    \expect(FBCommonFilters::applyAll($changeset)->getMessage())
+    \expect(
+      FBCommonFilters::applyAll(
+        $changeset,
+        shape('filterMessageSections/keepFields' => self::getKeepSections()),
+      )->getMessage(),
+    )
       ->toBePHPEqual('Summary: One line change');
   }
 
@@ -203,7 +247,12 @@ Differential Revision: D1234567',
         "Test plan: run all code paths\n",
       );
 
-    \expect(FBCommonFilters::applyAll($changeset)->getMessage())
+    \expect(
+      FBCommonFilters::applyAll(
+        $changeset,
+        shape('filterMessageSections/keepFields' => self::getKeepSections()),
+      )->getMessage(),
+    )
       ->toBePHPEqual(
         'Summary:
 One line change
@@ -239,10 +288,11 @@ Test Plan: run all code paths',
       );
 
     // use default section names
-    $keep = FBCommonFilters::getKeepSections($changeset);
-    \expect(C\count($keep))->toEqual(
-      1 + C\count(FBCommonFilters::DEFAULT_MESSAGE_SECTION_NAMES),
+    $keep = FBCommonFilters::getKeepSections(
+      $changeset,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
     );
+    \expect(C\count($keep))->toEqual(1 + C\count(self::getKeepSections()));
     \expect(C\contains($keep, 'test plan'))->toBeTrue();
 
     // use section names from configuration
@@ -266,10 +316,11 @@ Test Plan: run all code paths',
     $changeset = (new ShipItChangeset());
 
     // use default section names
-    $keep = FBCommonFilters::getKeepSections($changeset);
-    \expect(C\count($keep))->toEqual(
-      C\count(FBCommonFilters::DEFAULT_MESSAGE_SECTION_NAMES),
+    $keep = FBCommonFilters::getKeepSections(
+      $changeset,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
     );
+    \expect(C\count($keep))->toEqual(C\count(self::getKeepSections()));
     \expect(C\contains($keep, 'test plan'))->toBeFalse();
 
     // use section names from configuration
@@ -350,7 +401,10 @@ This fixes a bug.';
     $changeset = (new ShipItChangeset())
       ->withSubject($original_subject)
       ->withMessage($original_message);
-    $changeset = FBCommonFilters::applyAll($changeset);
+    $changeset = FBCommonFilters::applyAll(
+      $changeset,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($changeset->getSubject())->toBePHPEqual($original_subject.' (#42)');
     \expect($changeset->getMessage())->toBePHPEqual($original_message);
 
@@ -362,7 +416,10 @@ cause_a_sev_many_files';
     $changeset = (new ShipItChangeset())
       ->withSubject($original_subject)
       ->withMessage($original_message);
-    $changeset = FBCommonFilters::applyAll($changeset);
+    $changeset = FBCommonFilters::applyAll(
+      $changeset,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($changeset->getSubject())->toBePHPEqual($original_subject.' (#42)');
     \expect($changeset->getMessage())->toBePHPEqual('');
   }
@@ -377,7 +434,10 @@ So is @[12345:This] but with a greedy test char: ] foo
 @[3213:Name2]';
     $changeset = (new ShipItChangeset())
       ->withMessage($original_message);
-    $changeset = FBCommonFilters::applyAll($changeset);
+    $changeset = FBCommonFilters::applyAll(
+      $changeset,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     $expected_message = 'Summary:
 This is a test of Name mentions.
 So is This but with a greedy test char: ] foo
@@ -397,13 +457,19 @@ Name2';
         shape('path' => 'foo/com/facebook/BUILD_MODE.bzl', 'body' => 'junk'),
       ]);
     \expect(() ==> {
-      FBCommonFilters::applyAll($changeset_1);
+      FBCommonFilters::applyAll(
+        $changeset_1,
+        shape('filterMessageSections/keepFields' => self::getKeepSections()),
+      );
     })
       // @oss-disable: ->toThrow(\InvariantViolationException::class);
     ->toThrow(InvariantException::class); // @oss-enable
     $changeset_2 = (new ShipItChangeset())
       ->withMessage($original_message);
-    $changeset_2 = FBCommonFilters::applyAll($changeset_2);
+    $changeset_2 = FBCommonFilters::applyAll(
+      $changeset_2,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($changeset_2->getMessage())->toBePHPEqual('');
   }
 
@@ -412,7 +478,10 @@ Name2';
       ->withMessage(
         "Blah blah summary here\nCo-authored-by: Jon Janzen <jonjanzen@fb.com>",
       );
-    $out = FBCommonFilters::applyAll($in);
+    $out = FBCommonFilters::applyAll(
+      $in,
+      shape('filterMessageSections/keepFields' => self::getKeepSections()),
+    );
     \expect($out->getMessage())->toNotContainSubstring("Co-authored-by");
   }
 

@@ -125,65 +125,18 @@ abstract class FBShipItConfig {
       );
   }
 
-  /*
-   * Override to return a vector of regular expression strings that match
-   * files or directories that will not be stripped, even if
-   * they have names that would normally exclude them.
-   * Example: '@^facebook[/|$]@' to sync files inside facebook/
-   * directories.
-   */
-  public function getStripCommonFileExceptions(): vec<string> {
-    return vec[];
-  }
-
-  /*
-   * Blocklist of regular expression strings that match project files which
-   * should be stripped out of published commits.
-   */
-  public function getDefaultStrippedFiles(): vec<string> {
-    return vec[];
-  }
-
-  /*
-   * Allowlist of regular expression strings that match project files which
-   * should not be stripped, even if they match the above project-specific
-   * blocklist.
-   */
-  public function getDefaultStrippedFileExceptions(): vec<string> {
-    return vec[];
-  }
-
-  /**
-   * Whether to use fb prefix in commit markers.
-   */
-  public function hasCommitMarkerPrefix(): bool {
-    return true;
-  }
-
-  /**
-   * Names of sections to keep in the commit message (e.g. summary)
-   */
-  public function keepMessageSectionNames(): keyset<string> {
-    return FBCommonFilters::DEFAULT_MESSAGE_SECTION_NAMES;
-  }
-
-  /**
-   * Whether to keep bracketed [tags] in a diff title prefix.
-   */
-  public function keepTags(): bool {
-    return false;
-  }
-
-  /**
-   * Whether to reference the PR number (#1234) in the commit subject.
-   */
-  public function referencePullRequestNumber(): bool {
-    return true;
-  }
-
-  public function rewriteCppIncludeDirectives(): bool {
-    return false;
-  }
+  public abstract function getStripCommonFileExceptions(): vec<string>;
+  public abstract function getDefaultStrippedFiles(): vec<string>;
+  public abstract function getDefaultStrippedFileExceptions(): vec<string>;
+  public abstract function hasCommitMarkerPrefix(): bool;
+  public abstract function keepMessageSectionNames(): keyset<string>;
+  public abstract function keepTags(): bool;
+  public abstract function referencePullRequestNumber(): bool;
+  public abstract function rewriteCppIncludeDirectives(): bool;
+  public abstract function getSubmoduleMappings(): dict<string, string>;
+  public abstract function getCommentMarker(): ?string;
+  public abstract function getCommentLine(): string;
+  public abstract function getUncommentLine(): string;
 
   // Public so that you can add a unit test
   final public function filterChangeset(
@@ -204,10 +157,6 @@ abstract class FBShipItConfig {
       $changeset = FBConfidentialFilter::applyAll($changeset);
     }
     return $changeset;
-  }
-
-  public function getSubmoduleMappings(): dict<string, string> {
-    return dict[];
   }
 
   private function getSourceRoots(
@@ -777,28 +726,5 @@ abstract class FBShipItConfig {
       |> Keyset\map($$, $s ==> Str\trim($s))
       |> Keyset\filter($$, $s ==> !Str\is_empty($s));
     return tuple($prefix, $links, $suffix);
-  }
-
-  /**
-   * Override this function with '//' or similar to automatically comment
-   * and uncomment lines marked with oss-enable or oss-disable (configurable,
-   * see below) when exporting or importing commits
-   */
-  public function getCommentMarker(): ?string {
-    return null;
-  }
-
-  /**
-   * Automatically comment out lines that are marked with this when exporting
-   */
-  public function getCommentLine(): string {
-    return '@oss-disable';
-  }
-
-  /**
-   * Automatically comment out lines that are marked with this when importing
-   */
-  public function getUncommentLine(): string {
-    return '@oss-enable';
   }
 }

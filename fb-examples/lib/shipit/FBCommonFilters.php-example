@@ -14,26 +14,19 @@ namespace Facebook\ShipIt;
 
 use namespace HH\Lib\{Str, C, Vec, Regex};
 
-final class FBCommonFilters {
+final abstract class FBCommonFilters {
 
   const NOT_A_TEST_PLAN = 'Imported from GitHub, without a `Test Plan:` line.';
-
-  const keyset<string> DEFAULT_MESSAGE_SECTION_NAMES = keyset[
-    'summary',
-    'reviewed by',
-    'differential revision',
-    'pulled by',
-  ];
 
   public static function applyAll(
     ShipItChangeset $changeset,
     shape(
       ?'stripCommonFiles/exceptions' => vec<string>,
-      ?'filterMessageSections/keepFields' => keyset<string>,
+      'filterMessageSections/keepFields' => keyset<string>,
       ?'keepTags' => bool,
       ?'referencePullRequestNumber' => bool,
       ?'linkCommitsForProjectFullName' => string,
-    ) $config = shape('keepTags' => false),
+    ) $config,
   ): ShipItChangeset {
     $changeset = self::allowEmptyCommit($changeset)
       |> self::skipIfAlreadyOnGitHub($$)
@@ -343,12 +336,11 @@ final class FBCommonFilters {
   public static function getKeepSections(
     ShipItChangeset $changeset,
     shape(
-      ?'filterMessageSections/keepFields' => keyset<string>,
+      'filterMessageSections/keepFields' => keyset<string>,
       ...
-    ) $config = shape(),
+    ) $config,
   ): keyset<string> {
-    $keep = $config['filterMessageSections/keepFields'] ??
-      self::DEFAULT_MESSAGE_SECTION_NAMES;
+    $keep = $config['filterMessageSections/keepFields'];
     if (self::importedFromPullRequest($changeset)) {
       $keep[] = 'test plan';
     }
@@ -357,7 +349,7 @@ final class FBCommonFilters {
 
   public static function filterMessageSections(
     ShipItChangeset $changeset,
-    keyset<string> $keep = self::DEFAULT_MESSAGE_SECTION_NAMES,
+    keyset<string> $keep,
   ): ShipItChangeset {
     $sections = ShipItMessageSections::getSections(
       $changeset,
