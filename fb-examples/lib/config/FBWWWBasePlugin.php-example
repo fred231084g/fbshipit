@@ -15,14 +15,14 @@ namespace Facebook\ShipIt\Config;
 use namespace HH\Lib\{Regex, Str};
 use type Facebook\ShipIt\{
   FBSourceBranchConfig,
-  FBShipItConfigeratorConfig,
+  FBShipItConfig,
   GetPathMappingsFn,
   ShipItChangeset,
   ShipItConditionalLinesFilter,
   ShipItPathFilters,
 };
 
-abstract class FBWWWBasePlugin extends FBShipItConfigeratorConfig {
+abstract class FBWWWBasePlugin extends FBShipItConfig {
   <<__Override>>
   public function defaultProjectFilterChangeset(
     ShipItChangeset $changeset,
