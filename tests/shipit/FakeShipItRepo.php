@@ -50,9 +50,7 @@ final class FakeShipItRepo extends ShipItRepo {
   }
 
   <<__Override>>
-  public static function getDiffsFromPatch(
-    string $_patch,
-  ): vec<ShipItDiff> {
+  public static function getDiffsFromPatch(string $_patch): vec<ShipItDiff> {
     return vec[];
   }
 }

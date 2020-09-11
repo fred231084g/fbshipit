@@ -60,10 +60,7 @@ final class MessageSectionsTest extends BaseTest {
       tuple(dict['foo' => "bar\nbaz"], "Foo:\nbar\nbaz"),
       tuple(dict['foo bar' => 'herp derp'], 'Foo Bar: herp derp'),
       tuple(dict['foo' => ''], ''),
-      tuple(
-        dict['foo' => 'bar', 'herp' => 'derp'],
-        "Foo: bar\n\nHerp: derp",
-      ),
+      tuple(dict['foo' => 'bar', 'herp' => 'derp'], "Foo: bar\n\nHerp: derp"),
       tuple(dict['foo' => '', 'herp' => 'derp'], "Herp: derp"),
     ];
   }

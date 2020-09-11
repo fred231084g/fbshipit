@@ -53,8 +53,7 @@ final class ShipItMessageSections {
             /* HH_FIXME[2049] __PHPStdLib */
             /* HH_FIXME[4107] __PHPStdLib */
             \preg_match('/^[a-zA-Z ]+:/', $value)
-            &&
-            $valid_sections !== null
+&& $valid_sections !== null
           ) {
             $h = Str\lowercase(Str\slice($value, 0, Str\search($value, ':')));
             if (C\contains($valid_sections, $h)) {
@@ -76,9 +75,7 @@ final class ShipItMessageSections {
   }
 
   /** Convert a section map back to a commit message */
-  public static function buildMessage(
-    dict<string, string> $sections,
-  ): string {
+  public static function buildMessage(dict<string, string> $sections): string {
     $out = '';
     foreach ($sections as $section => $text) {
       /* HH_FIXME[2049] __PHPStdLib */

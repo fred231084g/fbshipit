@@ -17,8 +17,6 @@ final class ShitItDiffRenameTest extends ShellTest {
     \expect($diff !== null);
     \expect($diff as nonnull['path'] === 'a.txt');
     \expect(Shapes::idx($diff, 'new_path') !== null);
-    \expect(
-      Shapes::idx($diff, 'new_path') as nonnull === 'a_rename.txt',
-    );
+    \expect(Shapes::idx($diff, 'new_path') as nonnull === 'a_rename.txt');
   }
 }

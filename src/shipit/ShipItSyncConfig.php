@@ -95,8 +95,10 @@ final class ShipItSyncConfig {
     return $this->sourceRoots;
   }
 
-  public function getFilter(
-  ): (function(ShipItManifest, ShipItChangeset): ShipItChangeset) {
+  public function getFilter(): (function(
+    ShipItManifest,
+    ShipItChangeset,
+  ): ShipItChangeset) {
     return $this->filter;
   }
 

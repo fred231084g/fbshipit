@@ -18,8 +18,7 @@ use type Facebook\HackTest\DataProvider; // @oss-enable
 
 <<\Oncalls('open_source')>>
 final class PathFiltersTest extends BaseTest {
-  public static function stripPathsTestData(
-  ): dict<string, (
+  public static function stripPathsTestData(): dict<string, (
     vec<string>, // $patterns,
     vec<string>, // $exceptions,
     keyset<string>, // $expected_files,
@@ -88,8 +87,7 @@ final class PathFiltersTest extends BaseTest {
       ->toBePHPEqual($expected_files);
   }
 
-  public static function examplesForMoveDirectories(
-  ): dict<
+  public static function examplesForMoveDirectories(): dict<
     string,
     (dict<string, string>, vec<string>, vec<string>, vec<string>),
   > {

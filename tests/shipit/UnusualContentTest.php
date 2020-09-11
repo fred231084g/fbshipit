@@ -160,12 +160,8 @@ final class UnusualContentTest extends BaseTest {
   }
 
   public function testQuotedFilenames(): void {
-    $header = \file_get_contents(
-      __DIR__.'/git-diffs/quoted-filenames.header',
-    );
-    $patch = \file_get_contents(
-      __DIR__.'/git-diffs/quoted-filenames.patch',
-    );
+    $header = \file_get_contents(__DIR__.'/git-diffs/quoted-filenames.header');
+    $patch = \file_get_contents(__DIR__.'/git-diffs/quoted-filenames.patch');
     $changeset = ShipItRepoGIT::getChangesetFromExportedPatch($header, $patch);
     $changeset = \expect($changeset)->toNotBeNull();
     // Verify quoted paths were correctly parsed.

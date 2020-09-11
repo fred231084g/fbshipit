@@ -52,7 +52,8 @@ abstract class ShipItPhase {
     $logger = new ShipItVerboseLogger($manifest->isVerboseEnabled());
 
     if (
-      $this->isProjectSpecific() && !$manifest->areProjectSpecificPhasesEnabled()
+      $this->isProjectSpecific() &&
+      !$manifest->areProjectSpecificPhasesEnabled()
     ) {
       $this->skip();
     }
