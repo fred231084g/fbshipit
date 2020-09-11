@@ -102,9 +102,8 @@ final class FBShipItPreview {
         $changeset = $changeset->withDiffs($diffs);
       } else {
         $error = 'This patch contains renamed files, which cannot be accurately
-previewed in the ShipIt API. Please inspect the auto-shipit
-Sandcastle job or export this diff to a GitHub pull request in
-order to preview the full patch.';
+rendered in ShipIt Previews. Please export this diff to a GitHub
+pull request in order to preview the full patch.';
         $hack_patch_override = $error;
       }
     }
