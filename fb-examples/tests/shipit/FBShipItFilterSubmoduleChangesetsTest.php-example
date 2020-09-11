@@ -214,7 +214,6 @@ Test Plan:',
   }
 
   private static function getConfigObject(): FBShipItConfig {
-    return
-      \Facebook\ShipIt\FBShipItConfigeratorConfigClasses::getInstanceForTesting();
+    return \Facebook\ShipIt\FBShipItConfigRegistry::getInstanceForTesting();
   }
 }

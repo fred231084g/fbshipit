@@ -14,7 +14,7 @@ namespace Facebook\ShipIt;
 
 use namespace HH\Lib\{C, Str};
 use type Facebook\ImportIt\FBImportItBranchResolutionPhase;
-use type Facebook\ShipIt\Config\{FBShipItConfigClasses, FBShipItConfigRegistry};
+use type Facebook\ShipIt\{FBShipItConfigRegistry};
 
 enum FBShipItCLIAction: int {
   SHIP_IT = 0;
@@ -143,7 +143,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     // owner/reponame
     $split = Str\split($name, '/');
     if (C\count($split) === 2) {
-      $configerator_config = FBShipItConfigeratorConfigClasses::getConfig(
+      $configerator_config = FBShipItConfigRegistry::getConfig(
         $split[0],
         $split[1],
         $this->configeratorDir,
@@ -152,7 +152,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
         return $configerator_config;
       }
       return \nullthrows(
-        \Facebook\ShipIt\FBShipItConfigeratorConfigClasses::getConfig(
+        \Facebook\ShipIt\FBShipItConfigRegistry::getConfig(
           $split[0],
           $split[1],
         ),
@@ -161,7 +161,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     }
     // reponame OR FacebookReponame
     // Search for a unique match in repo name or class name
-    $config_objects = FBShipItConfigeratorConfigClasses::getAllConfigs(
+    $config_objects = FBShipItConfigRegistry::getAllConfigs(
       $this->configeratorDir,
     );
     $match = null;

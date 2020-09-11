@@ -42,8 +42,7 @@ final class FBShipItPreview {
   private vec<FBShipItConfig> $allConfigClasses;
 
   public function __construct(): void {
-    $this->allConfigClasses =
-      FBShipItConfigeratorConfigClasses::getAllConfigs();
+    $this->allConfigClasses = FBShipItConfigRegistry::getAllConfigs();
   }
 
   public static function hasModifiedPathsForSourceRoots(
