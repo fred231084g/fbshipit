@@ -16,7 +16,7 @@ use namespace HH\Lib\{Regex, Str};
 use type Facebook\ShipIt\{
   FBSourceBranchConfig,
   FBShipItConfig,
-  GetPathMappingsFn,
+  PathMappings,
   ShipItChangeset,
   ShipItConditionalLinesFilter,
   ShipItPathFilters,
@@ -26,9 +26,9 @@ abstract class FBWWWBasePlugin extends FBShipItConfig {
   <<__Override>>
   public function defaultProjectFilterChangeset(
     ShipItChangeset $changeset,
-    GetPathMappingsFn $get_path_mappings,
+    PathMappings $path_mappings,
   ): ShipItChangeset {
-    return parent::defaultProjectFilterChangeset($changeset, $get_path_mappings)
+    return parent::defaultProjectFilterChangeset($changeset, $path_mappings)
       |> ShipItPathFilters::rewritePaths(
         $$,
         /* HH_FIXME[2049] __PHPStdLib */
