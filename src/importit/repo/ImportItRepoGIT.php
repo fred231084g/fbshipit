@@ -99,12 +99,18 @@ final class ImportItRepoGIT extends \Facebook\ShipIt\ShipItRepoGIT {
       '-',
     );
     $this->gitCommand('add', '--all');
-    $status = Str\trim($this->gitCommand('status'));
+    $full_status = Str\trim($this->gitCommand('status'));
+    $abbreviated_status = Str\split($full_status, "\n")
+      |> Vec\take($$, 100)
+      |> Str\join($$, "\n");
+    if ($full_status !== $abbreviated_status) {
+      $abbreviated_status .= "\n...";
+    }
     $this->gitCommand(
       'commit',
       '--allow-empty',
       '-m',
-      $commit_title."\n\n".$status,
+      $commit_title."\n\n".$abbreviated_status,
     );
 
     $rev = Str\trim($this->gitCommand('rev-parse', 'HEAD'));
