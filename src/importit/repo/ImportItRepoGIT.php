@@ -12,8 +12,8 @@
  */
 namespace Facebook\ImportIt;
 
-use namespace HH\Lib\Str;
-use type Facebook\ShipIt\{ShipItChangeset};
+use namespace HH\Lib\{Str, Vec};
+use type Facebook\ShipIt\ShipItChangeset;
 
 /**
  * Specialization of ShipItRepoGIT
