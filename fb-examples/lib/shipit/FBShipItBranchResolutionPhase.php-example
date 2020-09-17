@@ -85,7 +85,8 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
     if ($this->externalBranch !== null) {
       $branch_configs = Vec\filter(
         $branch_configs,
-        $branch_config ==> $branch_config['external'] === $this->externalBranch,
+        $branch_config ==>
+          $branch_config->getExternalBranch() === $this->externalBranch,
       );
       invariant(
         !C\is_empty($branch_configs),
@@ -119,8 +120,10 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
     }
     return shape(
       'land_branch' => $config_object->getLandBranch(),
-      'branches' =>
-        Vec\map($branch_configs, $branch_config ==> $branch_config['external']),
+      'branches' => Vec\map(
+        $branch_configs,
+        $branch_config ==> $branch_config->getExternalBranch(),
+      ),
       'internal_repo' => $internal_repo,
       'arcanist_project' => $arcanist_project,
     );
@@ -142,8 +145,8 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
     foreach ($branch_configs as $branch_config) {
       ShipItLogger::out(
         "--- Running for branch: (%s, %s)\n",
-        $branch_config['internal'],
-        $branch_config['external'],
+        $branch_config->getInternalBranch(),
+        $branch_config->getExternalBranch(),
       );
       $runner = static::getRunner(
         $config_object,

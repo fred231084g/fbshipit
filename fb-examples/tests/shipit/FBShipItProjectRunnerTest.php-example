@@ -64,7 +64,7 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
     \expect($phase)->toNotBeInstanceOf(FBImportItBranchResolutionPhase::class);
     $branches = $phase->getBranchConfigs();
     \expect(C\count($branches))->toBePHPEqual(1);
-    \expect($branches[0]['internal'])->toBePHPEqual('side_branch');
+    \expect($branches[0]->getInternalBranch())->toBePHPEqual('side_branch');
   }
 
   public function testGetPhasesImportIt(): void {
@@ -82,7 +82,7 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
     \expect($phase)->toBeInstanceOf(FBImportItBranchResolutionPhase::class);
     $branches = $phase->getBranchConfigs();
     \expect(C\count($branches))->toBePHPEqual(1);
-    \expect($branches[0]['internal'])->toBePHPEqual('master');
+    \expect($branches[0]->getInternalBranch())->toBePHPEqual('master');
   }
 
   public function testGetPhasesImportItRequiresBranch(): void {
