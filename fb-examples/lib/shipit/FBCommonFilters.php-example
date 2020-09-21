@@ -442,7 +442,15 @@ final abstract class FBCommonFilters {
       );
     }
 
-    return ShipItUserFilters::rewriteAuthorFromGitHubAuthorLine($changeset);
+    $changeset = ShipItUserFilters::rewriteAuthorFromGitHubAuthorLine(
+      $changeset,
+    );
+    if (!Regex\matches($changeset->getAuthor(), re"/.*<.*>/")) {
+      $changeset = $changeset->withAuthor(
+        Str\format('%s <>', $changeset->getAuthor()),
+      );
+    }
+    return $changeset;
   }
 
   public static function rewriteReviewers(
