@@ -22,11 +22,6 @@ final class FBRepoInitPhase extends ShipItPhase {
     $this->assertIsSourceSide();
   }
 
-  <<__Override>>
-  protected function isProjectSpecific(): bool {
-    return false;
-  }
-
   private function assertIsSourceSide(): void {
     invariant(
       $this->side === ShipItRepoSide::SOURCE,

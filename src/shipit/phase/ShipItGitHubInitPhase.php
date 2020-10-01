@@ -26,11 +26,6 @@ final class ShipItGitHubInitPhase extends ShipItPhase {
   }
 
   <<__Override>>
-  protected function isProjectSpecific(): bool {
-    return false;
-  }
-
-  <<__Override>>
   public function getReadableName(): string {
     return 'Initialize '.$this->side.' GitHub repository';
   }

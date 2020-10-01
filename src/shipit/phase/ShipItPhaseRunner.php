@@ -125,15 +125,6 @@ class ShipItPhaseRunner {
         'replacement' => 'verbose',
       ),
       shape(
-        'long_name' => 'skip-project-specific',
-        'description' => 'Skip anything project-specific',
-        'write' => $_ ==> {
-          $this->manifest = $this->manifest
-            ->withProjectSpecificPhasesDisabled();
-          return $this->manifest;
-        },
-      ),
-      shape(
         'short_name' => 'v',
         'long_name' => 'verbose',
         'description' => 'Give more verbose output',

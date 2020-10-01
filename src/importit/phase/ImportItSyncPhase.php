@@ -35,11 +35,6 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
   }
 
   <<__Override>>
-  protected function isProjectSpecific(): bool {
-    return false;
-  }
-
-  <<__Override>>
   final public function getReadableName(): string {
     return 'Import Commits';
   }

@@ -16,11 +16,6 @@ final class ShipItPullPhase extends ShipItPhase {
   public function __construct(private ShipItRepoSide $side) {}
 
   <<__Override>>
-  protected function isProjectSpecific(): bool {
-    return false;
-  }
-
-  <<__Override>>
   public function getReadableName(): string {
     return 'Pull '.$this->side.' repository';
   }

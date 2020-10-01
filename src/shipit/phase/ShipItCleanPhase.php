@@ -16,11 +16,6 @@ final class ShipItCleanPhase extends ShipItPhase {
   public function __construct(private ShipItRepoSide $side) {}
 
   <<__Override>>
-  protected function isProjectSpecific(): bool {
-    return false;
-  }
-
-  <<__Override>>
   final public function getReadableName(): string {
     return 'Clean '.$this->side.' repository';
   }

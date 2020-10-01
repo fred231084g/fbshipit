@@ -13,11 +13,6 @@ final class DemoSourceRepoInitPhase extends ShipItPhase {
   private string $name = "fbshipit-demo";
 
   <<__Override>>
-  public function isProjectSpecific(): bool {
-    return false;
-  }
-
-  <<__Override>>
   public function getReadableName(): string {
     return 'Initialize source '.$this->name.' repository';
   }

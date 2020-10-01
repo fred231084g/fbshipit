@@ -103,7 +103,7 @@ if this is causing problems, try setting the `FBSHIPIT_DEBUG_FLOCK`
 environment variable:
 
 ```
-[fredemmott@devbig349.prn1 ~/fbcode/opensource/shipit/bin] hhvm shipit_folly.php --skip-push --skip-project-specific
+[fredemmott@devbig349.prn1 ~/fbcode/opensource/shipit/bin] hhvm shipit_folly.php --skip-push
 --- Starting Facebook\ShipIt\ShipItFolly
 Starting phase: Assert valid commit filter
 Finished phase: Assert valid commit filter
@@ -121,7 +121,7 @@ Starting phase: Synchronize commits
 Finished phase: Synchronize commits
 Skipping phase: Verify that destination repository is sync
 Skipping phase: Push destination repository
-[fredemmott@devbig349.prn1 ~/fbcode/opensource/shipit/bin] FBSHIPIT_DEBUG_FLOCK=yes hhvm shipit_folly.php --skip-push --skip-project-specific
+[fredemmott@devbig349.prn1 ~/fbcode/opensource/shipit/bin] FBSHIPIT_DEBUG_FLOCK=yes hhvm shipit_folly.php --skip-push
 --- Starting Facebook\ShipIt\ShipItFolly
 Starting phase: Assert valid commit filter
 Finished phase: Assert valid commit filter

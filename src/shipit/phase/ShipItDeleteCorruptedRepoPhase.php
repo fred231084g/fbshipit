@@ -21,11 +21,6 @@ final class ShipItDeleteCorruptedRepoPhase extends ShipItPhase {
   }
 
   <<__Override>>
-  protected function isProjectSpecific(): bool {
-    return false;
-  }
-
-  <<__Override>>
   public function getReadableName(): string {
     return 'Delete '.$this->side.' repository if corrupted';
   }

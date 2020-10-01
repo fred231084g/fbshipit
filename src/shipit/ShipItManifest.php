@@ -81,20 +81,6 @@ final class ShipItManifest {
     );
   }
 
-  private bool $projectSpecificPhases = true;
-  public function areProjectSpecificPhasesEnabled(): bool {
-    return $this->projectSpecificPhases;
-  }
-
-  public function withProjectSpecificPhasesDisabled(): this {
-    return $this->modified(
-      $ret ==> {
-        $ret->projectSpecificPhases = false;
-        return $ret->projectSpecificPhases;
-      },
-    );
-  }
-
   private string $sourceBranch = 'master';
   public function getSourceBranch(): string {
     return $this->sourceBranch;
