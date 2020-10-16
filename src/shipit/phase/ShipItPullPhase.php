@@ -22,29 +22,13 @@ final class ShipItPullPhase extends ShipItPhase {
 
   <<__Override>>
   public function getCLIArguments(): vec<ShipItCLIArgument> {
-    $skip_arg = shape(
-      'long_name' => 'skip-'.$this->side.'-pull',
-      'description' => "Don't pull the ".$this->side." repository",
-      'write' => (string $_) ==> $this->skip(),
-    );
-
-    if ($this->side === ShipItRepoSide::SOURCE) {
-      return vec[
-        $skip_arg,
-        shape(
-          'long_name' => 'skip-src-pull',
-          'replacement' => 'skip-source-pull',
-        ),
-      ];
-    } else {
-      return vec[
-        $skip_arg,
-        shape(
-          'long_name' => 'skip-dest-pull',
-          'replacement' => 'skip-destination-pull',
-        ),
-      ];
-    }
+    return vec[
+      shape(
+        'long_name' => 'skip-'.$this->side.'-pull',
+        'description' => "Don't pull the ".$this->side." repository",
+        'write' => (string $_) ==> $this->skip(),
+      ),
+    ];
   }
 
   <<__Override>>

@@ -58,10 +58,6 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
           return $this->outputPath;
         },
       ),
-      shape( // deprecated, renamed for consistency with verify
-        'long_name' => 'special-create-new-repo',
-        'replacement' => 'create-new-repo',
-      ),
       shape(
         'long_name' => 'skip-submodules',
         'description' => 'Don\'t sync submodules',

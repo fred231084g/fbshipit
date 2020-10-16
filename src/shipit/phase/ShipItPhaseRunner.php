@@ -58,15 +58,6 @@ class ShipItPhaseRunner {
         },
       ),
       shape(
-        'long_name' => 'temp-dir::',
-        'replacement' => 'base-dir',
-        'write' => $x ==> {
-          $this->manifest = $this->manifest
-            ->withBaseDirectory(Str\trim($x));
-          return $this->manifest;
-        },
-      ),
-      shape(
         'long_name' => 'source-repo-dir::',
         'description' => 'path to fetch source from',
         'write' => $x ==> {
@@ -94,15 +85,6 @@ class ShipItPhaseRunner {
         },
       ),
       shape(
-        'long_name' => 'src-branch::',
-        'replacement' => 'source-branch',
-        'write' => $x ==> {
-          $this->manifest = $this->manifest
-            ->withSourceBranch(Str\trim($x));
-          return $this->manifest;
-        },
-      ),
-      shape(
         'long_name' => 'destination-branch::',
         'description' => 'Branch to sync to',
         'write' => $x ==> {
@@ -110,19 +92,6 @@ class ShipItPhaseRunner {
             ->withDestinationBranch(Str\trim($x));
           return $this->manifest;
         },
-      ),
-      shape(
-        'long_name' => 'dest-branch::',
-        'replacement' => 'destination-branch',
-        'write' => $x ==> {
-          $this->manifest = $this->manifest
-            ->withDestinationBranch(Str\trim($x));
-          return $this->manifest;
-        },
-      ),
-      shape(
-        'long_name' => 'debug',
-        'replacement' => 'verbose',
       ),
       shape(
         'short_name' => 'v',
