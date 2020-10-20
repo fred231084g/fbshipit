@@ -314,59 +314,85 @@ class ShipItRepoGIT
       $submodules = vec[];
     }
     foreach ($submodules as $submodule) {
-      // If a submodule has changed, then we need to actually update to the
-      // new version. + before commit hash represents changed submdoule.
-      // - before commit hash represents an uninitialized submodule. Make
-      // sure there is no leading whitespace that comes back when we get the
-      // status since the first character will tell us whether submodule
-      // changed.
-      $sm_status = Str\trim_left(
-        $this->gitCommand('submodule', 'status', $submodule['path']),
-      );
-      if ($sm_status === '') {
-        // If the path exists, we know we are adding a submodule.
-        $full_path = $this->getPath().'/'.$submodule['path'];
-        $sha = Str\trim(Str\slice(
-          \file_get_contents($full_path),
-          Str\length('Subproject commit '),
-        ));
-        $this->gitCommand('rm', $submodule['path']);
-        $this->gitCommand(
-          'submodule',
-          'add',
-          '-f',
-          '--name',
-          $submodule['name'],
-          $submodule['url'],
-          $submodule['path'],
+      try {
+        $this->prepareSubmoduleForPatch($submodule);
+      } catch (ShipItShellCommandException $e) {
+        // HACK: try once again with GitHub HTTPS authentication.
+        // Since most submodules in use don't need auth, it's least disruptive
+        // to do this only when the first attempt fails.
+        $url = $submodule['url'];
+        $match = Regex\first_match(
+          $url,
+          re"@https://github.com/(?<org>[^\./]+)/(?<project>[^\./]+)[\./$]@",
         );
-        (new ShipItShellCommand($full_path, 'git', 'checkout', $sha))
-          ->runSynchronously();
-        $this->gitCommand('add', $submodule['path']);
-        // Preserve any whitespace in the .gitmodules file.
-        $this->gitCommand('checkout', 'HEAD', '.gitmodules');
-        $this->gitCommand('commit', '--amend', '--no-edit');
-      } else if ($sm_status[0] === '+') {
-        $this->gitCommand(
-          'submodule',
-          'update',
-          '--recursive',
-          $submodule['path'],
-        );
-      } else if ($sm_status[0] === '-') {
-        $this->gitCommand(
-          'submodule',
-          'update',
-          '--init',
-          '--recursive',
-          $submodule['path'],
-        );
+        if ($match is null) {
+          throw $e;
+        }
+        // FIXME: FB-specific
+        // @oss-disable: FBGitHubUtils::configureSubmodule(
+          // @oss-disable: $match['org'],
+          // @oss-disable: $match['project'],
+          // @oss-disable: $this->getPath()."/".$submodule['path'],
+        // @oss-disable: );
+        $this->prepareSubmoduleForPatch($submodule);
       }
     }
     // DANGER ZONE!  Cleanup any removed submodules.
     $this->gitCommand('clean', '-f', '-f', '-d');
-
     return $this->getHEADSha();
+  }
+
+  private function prepareSubmoduleForPatch(
+    self::TSubmoduleSpec $submodule,
+  ): void {
+    // If a submodule has changed, then we need to actually update to the
+    // new version. + before commit hash represents changed submdoule.
+    // - before commit hash represents an uninitialized submodule. Make
+    // sure there is no leading whitespace that comes back when we get the
+    // status since the first character will tell us whether submodule
+    // changed.
+    $sm_status = Str\trim_left(
+      $this->gitCommand('submodule', 'status', $submodule['path']),
+    );
+    if ($sm_status === '') {
+      // If the path exists, we know we are adding a submodule.
+      $full_path = $this->getPath().'/'.$submodule['path'];
+      $sha = Str\trim(Str\slice(
+        \file_get_contents($full_path),
+        Str\length('Subproject commit '),
+      ));
+      $this->gitCommand('rm', $submodule['path']);
+      $this->gitCommand(
+        'submodule',
+        'add',
+        '-f',
+        '--name',
+        $submodule['name'],
+        $submodule['url'],
+        $submodule['path'],
+      );
+      (new ShipItShellCommand($full_path, 'git', 'checkout', $sha))
+        ->runSynchronously();
+      $this->gitCommand('add', $submodule['path']);
+      // Preserve any whitespace in the .gitmodules file.
+      $this->gitCommand('checkout', 'HEAD', '.gitmodules');
+      $this->gitCommand('commit', '--amend', '--no-edit');
+    } else if ($sm_status[0] === '+') {
+      $this->gitCommand(
+        'submodule',
+        'update',
+        '--recursive',
+        $submodule['path'],
+      );
+    } else if ($sm_status[0] === '-') {
+      $this->gitCommand(
+        'submodule',
+        'update',
+        '--init',
+        '--recursive',
+        $submodule['path'],
+      );
+    }
   }
 
   protected function gitPipeCommand(?string $stdin, string ...$args): string {
