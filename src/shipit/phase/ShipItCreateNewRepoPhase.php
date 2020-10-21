@@ -198,18 +198,62 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
 
     $logger->out("  Creating unfiltered commit...");
     self::initGitRepo($export_dir->getPath(), $committer);
-    self::execSteps(
-      $export_dir->getPath(),
-      vec[
-        vec['git', 'add', '.', '-f'],
+
+    // The following code is necessarily convoluted. In order to support
+    // creating/verifying repos that are greater than 2 GB we need to break the
+    // unfiltered initial commit into a series of chunks that are small enough
+    // to be processed by ShipIt (max Hack string size is 2GB). After ShipIt
+    // has processed each chunked commit we use git commands to directly squash
+    // everything, dodging the Hack string size limit.
+    //
+    // `git ls-files` is used to get a list of all files, which is then split
+    // into chunks
+    //
+    // For each chunk, `git add` the files and then `git commit`
+    //
+    // To filter, find the initial commit SHA with `git rev-parse` and then
+    // read all commits into ShipItChangesets, apply filtering, and commit.
+    //
+    // After everything, squash to a single commit (with ShipIt tracking info).
+
+    $all_filenames_chunked = (
+      new ShipItShellCommand(
+        $export_dir->getPath(),
+        'git',
+        'ls-files',
+        '--others',
+        '--exclude-standard',
+      )
+    )->runSynchronously()->getStdOut()
+      |> Str\split(
+        $$,
+        "\n",
+      )
+      |> Vec\filter($$, ($line) ==> !Str\is_empty($line))
+      // In an ideal world, we could chunk based on file size. But that's
+      // non-trivial so the next best thing is to hope that average file size
+      // is less than or equal to 4MB (aka 2GB / 500), fingers crossed:
+      |> Vec\chunk($$, 500);
+
+    $chunk_count = C\count($all_filenames_chunked);
+
+    C\fb\each_with_key($all_filenames_chunked, ($i, $chunk_filenames) ==> {
+      if ($manifest->isVerboseEnabled()) {
+        $logger->out("    Processing chunk %d/%d", $i + 1, $chunk_count);
+      }
+      self::execSteps(
+        $export_dir->getPath(),
         vec[
-          'git',
-          'commit',
-          '-m',
-          'initial unfiltered commit',
+          Vec\concat(vec['git', 'add', '--force'], $chunk_filenames),
+          vec[
+            'git',
+            'commit',
+            '--message',
+            Str\format('unfiltered commit chunk #%d', $i),
+          ],
         ],
-      ],
-    );
+      );
+    });
 
     $logger->out("  Filtering...");
     $export_lock = ShipItScopedFlock::createShared(
@@ -222,18 +266,43 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
         $export_dir->getPath(),
         'master',
       );
+      $current_commit = (
+        new ShipItShellCommand(
+          $export_dir->getPath(),
+          'git',
+          'rev-list',
+          '--max-parents=0',
+          'HEAD',
+        )
+      )->runSynchronously()->getStdOut()
+        |> Str\trim($$);
+      $changesets = vec[];
+      while ($current_commit !== null) {
+        if ($manifest->isVerboseEnabled()) {
+          $logger->out("    Processing %s", $current_commit);
+        }
+        $changesets[] =
+          $exported_repo->getChangesetFromID($current_commit)?->withID($rev);
+        $current_commit = $exported_repo->findNextCommit(
+          $current_commit,
+          keyset[],
+        );
+      }
     } finally {
       $export_lock->release();
     }
-    $changeset = $exported_repo->getChangesetFromID('HEAD');
-    invariant($changeset !== null, 'got a null changeset :/');
-    $changeset = $changeset->withID($rev);
-    $changeset = $filter($changeset)->withSubject('Initial commit');
-    $changeset = ShipItSync::addTrackingData($manifest, $changeset, $rev);
-
-    if ($manifest->isVerboseEnabled()) {
-      $changeset->dumpDebugMessages();
-    }
+    $changesets = Vec\filter_nulls($changesets);
+    invariant(!C\is_empty($changesets), 'got a null changeset :/');
+    $changesets = Vec\map($changesets, ($changeset) ==> {
+      $changeset = $filter($changeset);
+      if ($manifest->isVerboseEnabled()) {
+        $changeset->dumpDebugMessages();
+      }
+      return $changeset;
+    });
+    $changesets[0] = $changesets[0]
+      |> $$->withSubject('Initial commit')
+      |> ShipItSync::addTrackingData($manifest, $$, $rev);
 
     $logger->out("  Creating new repo...");
     self::initGitRepo($output_dir, $committer);
@@ -247,10 +316,36 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
         $output_dir,
         '--orphan='.$manifest->getDestinationBranch(),
       );
+      foreach ($changesets as $changeset) {
+        $filtered_repo->commitPatch($changeset, $do_submodules);
+      }
+
+      // Now that we've filtered and committed all files into disparate chunks,
+      // we need to squash the chunks into a single commit. Fortunately, the
+      // following commands work just fine if HEAD == initial commit
+      $initial_commit_sha = (
+        new ShipItShellCommand(
+          $output_dir,
+          'git',
+          'rev-list',
+          '--max-parents=0',
+          'HEAD',
+        )
+      )->runSynchronously()->getStdOut()
+        |> Str\trim($$);
+      self::execSteps(
+        $output_dir,
+        vec[
+          // Rewind HEAD (but NOT checked out file contents) to initial commit:
+          vec['git', 'reset', '--soft', $initial_commit_sha],
+          // Amend initial commit with content from all chunks
+          // (this preserves initial commit's message w/ ShipIt tracking details)
+          vec['git', 'commit', '--amend', '--no-edit'],
+        ],
+      );
     } finally {
       $output_lock->release();
     }
-    $filtered_repo->commitPatch($changeset, $do_submodules);
   }
 
   private static function execSteps(
