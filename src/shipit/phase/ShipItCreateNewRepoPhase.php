@@ -12,6 +12,8 @@
  */
 namespace Facebook\ShipIt;
 
+use namespace HH\Lib\{C, Str, Vec};
+
 final class ShipItCreateNewRepoPhase extends ShipItPhase {
   private ?string $sourceCommit = null;
   private ?string $outputPath = null;
@@ -237,7 +239,8 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
 
     $chunk_count = C\count($all_filenames_chunked);
 
-    C\fb\each_with_key($all_filenames_chunked, ($i, $chunk_filenames) ==> {
+    // @lint-ignore UNUSED_RESULT
+    Vec\map_with_key($all_filenames_chunked, ($i, $chunk_filenames) ==> {
       if ($manifest->isVerboseEnabled()) {
         $logger->out("    Processing chunk %d/%d", $i + 1, $chunk_count);
       }
