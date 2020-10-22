@@ -224,7 +224,6 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
         'git',
         'ls-files',
         '--others',
-        '--exclude-standard',
       )
     )->runSynchronously()->getStdOut()
       |> Str\split(
