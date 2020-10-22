@@ -242,22 +242,28 @@ final abstract class FBCommonFilters {
     );
   }
 
+  public static function stripSubjectPRTag(
+    ShipItChangeset $changeset,
+  ): ShipItChangeset {
+    if (self::importedFromPullRequest($changeset)) {
+      return $changeset->withSubject(
+        Regex\replace(
+          $changeset->getSubject(),
+          re"/\[[^\]]+\]\s*\[PR\](.*)/",
+          '$1',
+        ),
+      );
+    }
+    return $changeset;
+  }
+
   public static function stripSubjectTags(
     ShipItChangeset $changeset,
     bool $keep_tags,
   ): ShipItChangeset {
     if ($keep_tags) {
       // keep all tags except for the automated PR import tags
-      if (self::importedFromPullRequest($changeset)) {
-        return $changeset->withSubject(
-          Regex\replace(
-            $changeset->getSubject(),
-            re"/\[[^\]]+\]\s*\[PR\](.*)/",
-            '$1',
-          ),
-        );
-      }
-      return $changeset;
+      return self::stripSubjectPRTag($changeset);
     } else {
       // strip tags like [hack] from the front of the subject. historically,
       // this happened automatically when ShipItRepoGIT called `git am` without
