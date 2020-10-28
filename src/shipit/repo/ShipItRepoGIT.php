@@ -512,17 +512,32 @@ class ShipItRepoGIT
       $rev = Str\trim($this->gitCommand('rev-parse', 'HEAD'));
     }
 
+    $dest = new ShipItTempDir('git-export');
+    $archive_name = Str\format('%s/archive', $dest->getPath());
+
     $command = vec[
       'archive',
       '--format=tar',
+      '--output',
+      $archive_name,
       $rev,
     ];
     $command = Vec\concat($command, $roots);
-    $tar = $this->gitCommand(...$command);
+    $this->gitCommand(...$command);
 
-    $dest = new ShipItTempDir('git-export');
-    (new ShipItShellCommand($dest->getPath(), 'tar', 'x'))->setStdIn($tar)
+    (
+      new ShipItShellCommand(
+        $dest->getPath(),
+        'tar',
+        'xf',
+        $archive_name,
+      )
+    )
       ->runSynchronously();
+
+    (
+      new ShipItShellCommand($this->path, 'rm', $archive_name)
+    )->runSynchronously();
 
     if ($do_submodules) {
       $submodules = $this->getSubmodules($roots);
