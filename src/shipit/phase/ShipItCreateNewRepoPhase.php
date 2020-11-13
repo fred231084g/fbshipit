@@ -226,11 +226,12 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
         '--others',
       )
     )->runSynchronously()->getStdOut()
-      |> Str\split(
-        $$,
-        "\n",
-      )
+      |> Str\split($$, "\n")
       |> Vec\filter($$, ($line) ==> !Str\is_empty($line))
+      // `git ls-files` returns files with escaping, if necessary. Since we
+      // already escape arguments in ShipItShellCommand, we need to remove
+      // the escaping from any files that have it:
+      |> Vec\map($$, ($line) ==> Str\trim($line, '"'))
       // In an ideal world, we could chunk based on file size. But that's
       // non-trivial so the next best thing is to hope that average file size
       // is less than or equal to 4MB (aka 2GB / 500), fingers crossed:
