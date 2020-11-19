@@ -75,15 +75,7 @@ class ShipItRepoGIT
       ...$roots
     );
     $log = Str\trim($log);
-    $matches = Regex\every_match(
-      $log,
-      re"/^ *(fb)?shipit-source-id: ?(?<commit>[a-z0-9]+)$/m",
-    );
-    $last_match = C\last($matches);
-    if ($last_match === null) {
-      return null;
-    }
-    return $last_match['commit'];
+    return ShipItSync::getTrackingDataFromString($log);
   }
 
   public function findNextCommit(

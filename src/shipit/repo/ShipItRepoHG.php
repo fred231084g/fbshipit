@@ -122,22 +122,13 @@ class ShipItRepoHG
       '--limit',
       '1',
       '--keyword',
-      'fbshipit-source-id:',
+      'shipit-source-id:',
       '--template',
       '{desc}',
       ...$roots
     );
     $log = Str\trim($log);
-    $matches = Regex\every_match(
-      $log,
-      re"/^ *fbshipit-source-id: ?(?<commit>[a-z0-9]+)$/m",
-    );
-
-    $match = C\last($matches);
-    if ($match === null) {
-      return null;
-    }
-    return $match['commit'];
+    return ShipItSync::getTrackingDataFromString($log);
   }
 
   public function commitPatch(

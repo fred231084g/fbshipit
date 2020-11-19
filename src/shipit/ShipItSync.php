@@ -250,11 +250,11 @@ final class ShipItSync {
   *  ChangeSet isTaggedEmpty and the project allows empty commit.
   */
   private function isValidChangeToSync(ShipItChangeset $changeset): bool {
-    $isEmpty = $changeset->isEmptyChange();
-    $isTaggedEmptyCommit = $changeset->getIsTaggedEmptyCommit();
+    $is_empty = $changeset->isEmptyChange();
+    $is_tagged_empty_commit = $changeset->getIsTaggedEmptyCommit();
     return (
-      !$isEmpty ||
-      ($this->syncConfig->getAllowEmptyCommits() && $isTaggedEmptyCommit)
+      !$is_empty ||
+      ($this->syncConfig->getAllowEmptyCommits() && $is_tagged_empty_commit)
     );
   }
 
@@ -343,5 +343,19 @@ final class ShipItSync {
       $new_message .= "\n\n".$co_author_lines;
     }
     return $changeset->withMessage(Str\trim($new_message));
+  }
+
+  public static function getTrackingDataFromString(
+    string $raw_changeset,
+  ): ?string {
+    $matches = Regex\every_match(
+      $raw_changeset,
+      re"/^ *(fb)?shipit-source-id: ?(?<commit>[a-z0-9]+)$/m",
+    );
+    $last_match = C\last($matches);
+    if ($last_match is null) {
+      return null;
+    }
+    return $last_match['commit'];
   }
 }
