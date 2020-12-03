@@ -46,7 +46,7 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
     );
     \expect($phase)->toNotBeInstanceOf(FBImportItBranchResolutionPhase::class);
     $branches = $phase->getBranchConfigs();
-    \expect(C\count($branches))->toBePHPEqual(3);
+    \expect(C\count($branches))->toBePHPEqual(2);
   }
 
   public function testGetPhasesWithBranch(): void {
