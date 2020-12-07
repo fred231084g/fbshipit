@@ -524,4 +524,8 @@ class ShipItRepoHG
 
     return shape('tempDir' => $temp_dir, 'revision' => $rev);
   }
+
+  public function getFileContents(string $rev, string $path): string {
+    return $this->hgCommand('cat', '-r', $rev, $path);
+  }
 }
