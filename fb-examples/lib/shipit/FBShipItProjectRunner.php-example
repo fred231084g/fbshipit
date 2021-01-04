@@ -151,12 +151,16 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
       if ($configerator_config !== null) {
         return $configerator_config;
       }
+
       return \nullthrows(
         \Facebook\ShipIt\FBShipItConfigRegistry::getConfig(
           $split[0],
           $split[1],
         ),
-        'Got unexpected null',
+        "Could not find any config that matches %s. \n".
+        "  The config needs to be landed and / or canaried before it can ".
+        "be used.",
+        $name,
       );
     }
     // reponame OR FacebookReponame
