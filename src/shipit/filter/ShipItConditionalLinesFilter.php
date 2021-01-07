@@ -30,9 +30,10 @@ use namespace HH\Lib\{Str, Vec};
  *  - // @x-oss-disable: foo()
  *  + foo() // @x-oss-disable
  */
-final class ShipItConditionalLinesFilter {
+final abstract class ShipItConditionalLinesFilter {
   public static function commentLines(
     ShipItChangeset $changeset,
+    ?string $path_regex,
     string $marker,
     string $comment_start,
     ?string $comment_end = null,
@@ -59,11 +60,12 @@ final class ShipItConditionalLinesFilter {
       $replacement .= ' '.$comment_end;
     }
 
-    return self::process($changeset, $pattern, $replacement);
+    return self::process($changeset, $path_regex, $pattern, $replacement);
   }
 
   public static function uncommentLines(
     ShipItChangeset $changeset,
+    ?string $path_regex,
     string $marker,
     string $comment_start,
     ?string $comment_end = null,
@@ -86,16 +88,23 @@ final class ShipItConditionalLinesFilter {
       $replacement .= ' '.$comment_end;
     }
 
-    return self::process($changeset, $pattern, $replacement);
+    return self::process($changeset, $path_regex, $pattern, $replacement);
   }
 
   private static function process(
     ShipItChangeset $changeset,
+    ?string $path_regex,
     string $pattern,
     string $replacement,
   ): ShipItChangeset {
     $diffs = vec[];
     foreach ($changeset->getDiffs() as $diff) {
+      if (
+        $path_regex is nonnull && !\Regex::isMatch($path_regex, $diff['path'])
+      ) {
+        $diffs[] = $diff;
+        continue;
+      }
       $diff['body'] = Str\split($diff['body'], "\n")
         |> Vec\map(
           $$,

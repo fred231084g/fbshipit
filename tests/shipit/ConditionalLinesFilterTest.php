@@ -33,6 +33,7 @@ final class ConditionalLinesFilterTest extends BaseTest {
     $changeset = self::getChangeset(self::COMMENT_LINES_NO_COMMENT_END);
     $changeset = ShipItConditionalLinesFilter::commentLines(
       $changeset,
+      null,
       '@x-oss-disable',
       '//',
     );
@@ -49,6 +50,7 @@ final class ConditionalLinesFilterTest extends BaseTest {
     $changeset = self::getChangeset(self::COMMENT_LINES_COMMENT_END);
     $changeset = ShipItConditionalLinesFilter::commentLines(
       $changeset,
+      null,
       '@x-oss-disable',
       '/*',
       '*/',
@@ -78,12 +80,14 @@ final class ConditionalLinesFilterTest extends BaseTest {
     $changeset = self::getChangeset($name);
     $commented = ShipItConditionalLinesFilter::commentLines(
       $changeset,
+      null,
       '@x-oss-disable',
       $comment_start,
       $comment_end,
     );
     $uncommented = ShipItConditionalLinesFilter::uncommentLines(
       $commented,
+      null,
       '@x-oss-disable',
       $comment_start,
       $comment_end,
@@ -94,5 +98,44 @@ final class ConditionalLinesFilterTest extends BaseTest {
     \expect($uncommented->getDiffs()[0]['body'])->toEqual(
       $changeset->getDiffs()[0]['body'],
     );
+  }
+
+  public function testCommentingLinesWithPathRegex(): void {
+    $changeset = self::getChangeset(self::COMMENT_LINES_NO_COMMENT_END);
+    $good_regex_changeset = ShipItConditionalLinesFilter::commentLines(
+      $changeset,
+      '@foo@',
+      '@x-oss-disable',
+      '//',
+    );
+    $good_regex_diffs = $good_regex_changeset->getDiffs();
+    \expect(C\count($good_regex_diffs))->toBePHPEqual(1);
+    $good_regex_diff = $good_regex_diffs[0]['body'];
+
+    \expect($good_regex_diff)->toMatchRegex(
+      re"/^\+\/\/ @x-oss\-disable\: baz$/m",
+    );
+    \expect($good_regex_diff)->toMatchRegex(
+      re"/^\-  \/\/ @x-oss\-disable\: derp$/m",
+    );
+    \expect($good_regex_diff)->toNotMatchRegex(re"/ @x-oss-disable$/");
+
+    $bad_regex_changeset = ShipItConditionalLinesFilter::commentLines(
+      $changeset,
+      '@baz@',
+      '@x-oss-disable',
+      '//',
+    );
+    $bad_regex_diffs = $bad_regex_changeset->getDiffs();
+    \expect(C\count($bad_regex_diffs))->toBePHPEqual(1);
+    $bad_regex_diff = $bad_regex_diffs[0]['body'];
+
+    \expect($bad_regex_diff)->toNotMatchRegex(
+      re"/^\+\/\/ @x-oss\-disable\: baz$/m",
+    );
+    \expect($bad_regex_diff)->toNotMatchRegex(
+      re"/^\-  \/\/ @x-oss\-disable\: derp$/m",
+    );
+    \expect($bad_regex_diff)->toMatchRegex(re"/ @x-oss-disable$/");
   }
 }
