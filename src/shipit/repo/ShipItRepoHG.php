@@ -98,7 +98,7 @@ class ShipItRepoHG
       '--limit',
       '1',
       '-r',
-      "({$revision}::{$branch}) - {$revision}",
+      "({$revision}::'{$branch}') - {$revision}",
       '--template',
       '{node}\\n',
       ...$roots
