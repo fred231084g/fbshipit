@@ -40,7 +40,7 @@ final class UnicodeTest extends ShellTest {
   public async function afterEachTestAsync(): Awaitable<void> {
     /* HH_FIXME[2049] __PHPStdLib */
     /* HH_FIXME[4107] __PHPStdLib */
-    \putenv('LC_CTYPE='.$this->ctype);
+    \putenv('LC_CTYPE='.(string)$this->ctype);
   }
 
   <<__Memoize>>

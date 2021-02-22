@@ -228,6 +228,6 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
   private function getPatchLocationForChangeset(
     ShipItChangeset $changeset,
   ): string {
-    return $this->patchesDirectory.'/'.$changeset->getID().'.patch';
+    return (string)$this->patchesDirectory.'/'.$changeset->getID().'.patch';
   }
 }
