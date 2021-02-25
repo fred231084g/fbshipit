@@ -12,8 +12,8 @@
  */
 
 <<__EntryPoint>>
-async function run_importit_entrypoint(): Awaitable<void> {
-  await Facebook\ShipIt\FBShipItScripts::shimScriptControllerAsync(
+function run_importit_entrypoint(): void {
+  Facebook\ShipIt\FBShipItScripts::tellUserToUseScriptController(
     RunImportItScript::class,
   );
 }
