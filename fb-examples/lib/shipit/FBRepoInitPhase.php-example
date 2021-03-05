@@ -171,6 +171,13 @@ final class FBRepoInitPhase extends ShipItPhase {
           'ssh://projects.git-ro.vip.facebook.com/data/gitrepos/llvm/llvm.git',
           'llvm-bolt',
         ];
+      case 'openbic':
+        return vec[
+          '/usr/bin/git',
+          'clone',
+          'ssh://projects.git-ro.vip.facebook.com/data/gitrepos/openbic.git',
+          'openbic',
+        ];
       case 'meta-openbmc':
         return vec[
           '/usr/bin/git',
