@@ -19,7 +19,7 @@ use namespace HH\Lib\Str;
 final class FBCommonFiltersTest extends FBBaseTest {
   private static function getKeepSections(): keyset<string> {
     return keyset(
-      \opensource_shipit_configs_CONSTANTS::DEFAULT_MESSAGE_SECTION_NAMES,
+      Config\shipit_configs_CONSTANTS::DEFAULT_MESSAGE_SECTION_NAMES,
     );
   }
 
