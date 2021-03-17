@@ -12,9 +12,6 @@
  */
 namespace Facebook\ShipIt;
 
-
-use type Facebook\ShipIt\Config\RepoArcanistProject;
-
 class FBShipItBranchResolutionPhase extends ShipItPhase {
 
   const type TRepoMetadata = shape(

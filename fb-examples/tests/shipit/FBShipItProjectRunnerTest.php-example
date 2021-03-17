@@ -14,8 +14,6 @@ namespace Facebook\ShipIt;
 
 use type Facebook\ImportIt\FBImportItBranchResolutionPhase;
 
-use type Facebook\ShipIt\Config\FacebookPhabtest1Git;
-
 <<\Oncalls('open_source')>>
 final class FBShipItProjectRunnerTest extends FBBaseTest {
 
