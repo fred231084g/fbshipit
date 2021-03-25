@@ -39,8 +39,7 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
     invariant(
       $phase is FBShipItBranchResolutionPhase,
       'Unexpected phase type: %s',
-      /* HH_FIXME[4110] %s expects a string */
-      $phase,
+      \get_class($phase),
     );
     \expect($phase)->toNotBeInstanceOf(FBImportItBranchResolutionPhase::class);
     $branches = $phase->getBranchConfigs();
@@ -56,8 +55,7 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
     invariant(
       $phase is FBShipItBranchResolutionPhase,
       'Unexpected phase type: %s',
-      /* HH_FIXME[4110] %s expects a string */
-      $phase,
+      \get_class($phase),
     );
     \expect($phase)->toNotBeInstanceOf(FBImportItBranchResolutionPhase::class);
     $branches = $phase->getBranchConfigs();
@@ -74,8 +72,7 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
     invariant(
       $phase is FBImportItBranchResolutionPhase,
       'Unexpected phase type: %s',
-      /* HH_FIXME[4110] %s expects a string */
-      $phase,
+      \get_class($phase),
     );
     \expect($phase)->toBeInstanceOf(FBImportItBranchResolutionPhase::class);
     $branches = $phase->getBranchConfigs();
@@ -91,8 +88,7 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
     invariant(
       $phase is FBImportItBranchResolutionPhase,
       'Unexpected phase type: %s',
-      /* HH_FIXME[4110] %s expects a string */
-      $phase,
+      \get_class($phase),
     );
     \expect($phase)->toBeInstanceOf(FBImportItBranchResolutionPhase::class);
     \expect(() ==> $phase->getBranchConfigs())
