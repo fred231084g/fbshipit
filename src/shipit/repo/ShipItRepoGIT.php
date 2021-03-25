@@ -321,12 +321,20 @@ class ShipItRepoGIT
           throw $e;
         }
         // FIXME: FB-specific
-        // @oss-disable: FBGitHubUtils::configureSubmodule(
-          // @oss-disable: $match['org'],
-          // @oss-disable: $match['project'],
-          // @oss-disable: $this->getPath()."/".$submodule['path'],
-        // @oss-disable: );
-        $this->prepareSubmoduleForPatch($submodule);
+        try {
+          // @oss-disable: FBGitHubUtils::configureSubmodule(
+            // @oss-disable: $match['org'],
+            // @oss-disable: $match['project'],
+            // @oss-disable: $this->getPath(),
+            // @oss-disable: $submodule,
+          // @oss-disable: );
+          $this->prepareSubmoduleForPatch($submodule);
+        } finally {
+          // Cleanup from submodule auth
+          try {
+            $this->gitCommand('restore', '.gitmodules');
+          } catch (ShipItShellCommandException $_) {}
+        }
       }
     }
     // DANGER ZONE!  Cleanup any removed submodules.
