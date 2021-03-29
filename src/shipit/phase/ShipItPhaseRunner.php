@@ -179,7 +179,7 @@ class ShipItPhaseRunner {
       }
 
       $description = Shapes::idx($opt, 'description');
-      if ($description !== null && !Str\is_empty($description)) {
+      if ($description !== null && $description !== '') {
         continue;
       }
 
