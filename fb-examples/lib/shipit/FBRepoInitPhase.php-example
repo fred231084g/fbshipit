@@ -259,6 +259,15 @@ final class FBRepoInitPhase extends ShipItPhase {
           'ssh://git.vip.facebook.com/data/gitrepos/whatsapp/biz.git',
           'WABIZ',
         ];
+      case 'cinder':
+        return vec[
+          '/usr/bin/git',
+          'clone',
+          'ssh://git.vip.facebook.com/data/gitrepos/cpython',
+          '-b',
+          'cinder/3.8',
+          'cinder',
+        ];
       /* added due to nonexhaustive switch */
       default:
         break;
