@@ -12,7 +12,7 @@
  */
 namespace Facebook\ShipIt;
 
-use namespace HH\Lib\{C, Str};
+use namespace HH\Lib\{C, Str}; // @oss-enable
 
 final class ShipItMentions {
   // Ignore things like email addresses, let them pass cleanly through

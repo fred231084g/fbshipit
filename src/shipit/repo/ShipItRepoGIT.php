@@ -12,7 +12,7 @@
  */
 namespace Facebook\ShipIt;
 
-use namespace HH\Lib\{C, Dict, Regex, Str, Vec};
+use namespace HH\Lib\{C, Dict, Regex, Str, Vec}; // @oss-enable
 
 final class ShipItRepoGITException extends ShipItRepoException {}
 

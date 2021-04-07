@@ -12,7 +12,7 @@
  */
 namespace Facebook\ImportIt;
 
-use namespace HH\Lib\{Str, C};
+use namespace HH\Lib\{Str, C}; // @oss-enable
 
 
 use type Facebook\ShipIt\{

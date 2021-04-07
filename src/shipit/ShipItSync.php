@@ -12,7 +12,7 @@
  */
 namespace Facebook\ShipIt;
 
-use namespace HH\Lib\{C, Regex, Str, Vec};
+use namespace HH\Lib\{C, Regex, Str, Vec}; // @oss-enable
 
 class ShipItException extends \Exception {}
 

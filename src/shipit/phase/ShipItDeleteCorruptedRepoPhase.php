@@ -12,7 +12,7 @@
  */
 namespace Facebook\ShipIt;
 
-use namespace HH\Lib\Str;
+use namespace HH\Lib\Str; // @oss-enable
 
 final class ShipItDeleteCorruptedRepoPhase extends ShipItPhase {
   public function __construct(private ShipItRepoSide $side) {

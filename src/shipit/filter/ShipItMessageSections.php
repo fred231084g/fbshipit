@@ -12,7 +12,7 @@
  */
 namespace Facebook\ShipIt;
 
-use namespace HH\Lib\{C, Dict, Str};
+use namespace HH\Lib\{C, Dict, Str}; // @oss-enable
 
 /** Utility class for commit messages with sections preceded by "Header: ".
  *
