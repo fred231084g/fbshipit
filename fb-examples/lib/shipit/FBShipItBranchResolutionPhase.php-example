@@ -126,9 +126,7 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
     $config_object = $this->configObject;
     $branch_configs = $this->getBranchConfigs();
     if ($this->repoMetadataFile !== null) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      \file_put_contents(
+      \Filesystem::writeFile(
         $this->repoMetadataFile,
         \json_encode($this->getRepoMetadata()),
       );
