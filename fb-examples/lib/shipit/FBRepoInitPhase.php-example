@@ -111,8 +111,8 @@ final class FBRepoInitPhase extends ShipItPhase {
         return vec[
           '/usr/local/bin/hg-clone-www',
           '--no-working-dir',
-          '--simple',
           '--no-cloud-rejoin',
+          '--simple',
         ];
       case 'pse-demos':
         return vec[
