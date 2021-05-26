@@ -190,7 +190,6 @@ abstract class ShipItRepo {
    */
   public static function parsePatch(string $patch): Iterator<string> {
     $contents = '';
-    $matches = darray[];
 
     $minus_lines = 0;
     $plus_lines = 0;

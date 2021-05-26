@@ -52,8 +52,6 @@ abstract class ShipItGitHubUtils {
     $git_config = (string $key, string $value) ==>
       new ShipItShellCommand($local_path, 'git', 'config', $key, $value);
 
-    $origin = null;
-
     switch ($transport) {
       case ShipItTransport::SSH:
         invariant(
