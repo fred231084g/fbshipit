@@ -141,13 +141,6 @@ final class FBRepoInitPhase extends ShipItPhase {
           'ssh://projects.git-ro.vip.facebook.com/data/gitrepos/infer',
           'infer-fb',
         ];
-      case 'buck_internal':
-        return vec[
-          '/usr/bin/git',
-          'clone',
-          'ssh://projects.git.vip.facebook.com/data/gitrepos/buck.git',
-          'buck_internal',
-        ];
       case 'llvm-bolt':
         return vec[
           '/usr/bin/git',
@@ -230,13 +223,6 @@ final class FBRepoInitPhase extends ShipItPhase {
           'clone',
           'ssh://git.vip.facebook.com/data/gitrepos/fbwin-gameroom.git',
           'fbwin-gameroom',
-        ];
-      case 'fb-vscode':
-        return vec[
-          '/usr/bin/git',
-          'clone',
-          'ssh://git-ro.vip.facebook.com/data/gitrepos/fb-vscode.git',
-          'fb-vscode',
         ];
       case 'WABIZ':
         return vec[
