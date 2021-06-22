@@ -230,5 +230,11 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
       self::printHelp($config);
       throw new ShipItExitException(0);
     }
+    if ($this->configObject is null) {
+      ShipItLogger::err(
+        "You must pass --project=ORG/REPO (e.g. --project=facebook/relay)\n",
+      );
+      throw new ShipItExitException(1);
+    }
   }
 }
