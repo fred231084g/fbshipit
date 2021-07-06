@@ -119,7 +119,9 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
   }
 
   <<__Override>>
-  final protected function runImpl(ShipItManifest $manifest): void {
+  protected async function genRunImpl(
+    \Facebook\ShipIt\ShipItManifest $manifest,
+  ): Awaitable<void> {
     list($changeset, $destination_base_rev) =
       $this->getSourceChangsetAndDestinationBaseRevision($manifest);
     if ($this->applyToTarget is nonnull) {

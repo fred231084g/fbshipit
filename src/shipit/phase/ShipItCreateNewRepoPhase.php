@@ -72,7 +72,9 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
   }
 
   <<__Override>>
-  public function runImpl(ShipItManifest $manifest): void {
+  protected async function genRunImpl(
+    ShipItManifest $manifest,
+  ): Awaitable<void> {
     $output = $this->outputPath;
     try {
       if ($output === null) {

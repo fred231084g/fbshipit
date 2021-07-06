@@ -46,7 +46,9 @@ final class FBRepoInitPhase extends \Facebook\ShipIt\ShipItPhase {
   }
 
   <<__Override>>
-  public function runImpl(\Facebook\ShipIt\ShipItManifest $manifest): void {
+  protected async function genRunImpl(
+    \Facebook\ShipIt\ShipItManifest $manifest,
+  ): Awaitable<void> {
     $local_path = $this->side === \Facebook\ShipIt\ShipItRepoSide::SOURCE
       ? $manifest->getSourcePath()
       : $manifest->getDestinationPath();

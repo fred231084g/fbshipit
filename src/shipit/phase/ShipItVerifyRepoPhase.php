@@ -78,7 +78,9 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
   }
 
   <<__Override>>
-  public function runImpl(ShipItManifest $manifest): void {
+  protected async function genRunImpl(
+    ShipItManifest $manifest,
+  ): Awaitable<void> {
     if ($this->useLatestSourceCommit) {
       if ($this->verifySourceCommit !== null) {
         throw new ShipItException(

@@ -43,7 +43,9 @@ final class ShipItPushLfsPhase extends ShipItPhase {
   }
 
   <<__Override>>
-  final protected function runImpl(ShipItManifest $manifest): void {
+  protected async function genRunImpl(
+    ShipItManifest $manifest,
+  ): Awaitable<void> {
     switch ($this->side) {
       case ShipItRepoSide::SOURCE:
         $lock = $manifest->getSourceSharedLock();

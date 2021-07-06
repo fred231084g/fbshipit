@@ -39,7 +39,9 @@ final class ShipItAssertValidFilterPhase extends ShipItPhase {
   }
 
   <<__Override>>
-  protected function runImpl(ShipItManifest $manifest): void {
+  protected async function genRunImpl(
+    ShipItManifest $manifest,
+  ): Awaitable<void> {
     $this->assertValid($manifest->getSourceRoots());
   }
 

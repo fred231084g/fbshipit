@@ -109,7 +109,9 @@ final class ShipItSyncPhase extends ShipItPhase {
   }
 
   <<__Override>>
-  protected function runImpl(ShipItManifest $manifest): void {
+  protected async function genRunImpl(
+    ShipItManifest $manifest,
+  ): Awaitable<void> {
     $sync = (
       new ShipItSyncConfig(
         $manifest->getSourceRoots(),

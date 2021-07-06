@@ -122,7 +122,9 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
   }
 
   <<__Override>>
-  public function runImpl(ShipItManifest $_manifest): void {
+  protected async function genRunImpl(
+    ShipItManifest $manifest,
+  ): Awaitable<void> {
     $config_object = $this->configObject;
     $branch_configs = $this->getBranchConfigs();
     if ($this->repoMetadataFile !== null) {
@@ -143,7 +145,8 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
         $branch_config,
         $this->argumentParser,
       );
-      $runner->run();
+      // @lint-ignore AWAIT_IN_LOOP need sync execution
+      await $runner->genRun();
     }
   }
 }

@@ -25,11 +25,12 @@ class ShipItPhaseRunner {
     $this->argumentParser = $argumentParser ?? new ShipItCLIArgumentParser();
   }
 
-  public function run(): void {
+  public async function genRun(): Awaitable<void> {
     $this->parseCLIArguments();
     try {
       foreach ($this->phases as $phase) {
-        $phase->run($this->manifest);
+        // @lint-ignore AWAIT_IN_LOOP need sync execution
+        await $phase->genRun($this->manifest);
       }
     } finally {
       if ($this->manifest->hasSourceSharedLock()) {
