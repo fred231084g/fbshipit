@@ -56,7 +56,7 @@ final class ShipItMentions {
   public static function getMentions(
     ShipItChangeset $changeset,
   ): keyset<string> {
-    $matches = varray[];
+    $matches = vec[];
     /* HH_FIXME[2049] __PHPStdLib */
     /* HH_FIXME[4107] __PHPStdLib */
     \preg_match_all_with_matches(
