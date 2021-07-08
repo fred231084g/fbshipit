@@ -58,6 +58,7 @@ final class ShipItAssertValidFilterPhase extends ShipItPhase {
         ->withDiffs(vec[
           shape('path' => $test_file, 'body' => 'junk'),
         ]);
+      // @lint-ignore AWAIT_IN_LOOP Need sync
       $changeset = await $gen_filter($changeset);
       if (C\count($changeset->getDiffs()) !== 1) {
         $test_file_is_stripped = ShipItPathFilters::matchesAnyPattern(
