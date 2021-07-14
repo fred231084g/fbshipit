@@ -18,7 +18,7 @@ final abstract class FBCommonFilters {
 
   const NOT_A_TEST_PLAN = 'Imported from GitHub, without a `Test Plan:` line.';
 
-  public static function applyAll(
+  public static async function genApplyAll(
     ShipItChangeset $changeset,
     shape(
       ?'stripCommonFiles/exceptions' => vec<string>,
@@ -27,15 +27,17 @@ final abstract class FBCommonFilters {
       ?'referencePullRequestNumber' => bool,
       ?'linkCommitsForProjectFullName' => string,
     ) $config,
-  ): ShipItChangeset {
-    $changeset = self::allowEmptyCommit($changeset)
+  ): Awaitable<ShipItChangeset> {
+    $changeset = await (
+      self::allowEmptyCommit($changeset)
       |> self::skipIfAlreadyOnGitHub($$)
       |> self::stripCommonFiles(
         $$,
         $config['stripCommonFiles/exceptions'] ?? vec[],
       )
       |> self::stripSubjectMergePrefix($$)
-      |> self::stripSubjectTags($$, $config['keepTags'] ?? false)
+      |> self::genStripSubjectTags($$, $config['keepTags'] ?? false)
+    )
       |> self::stripEmptyTestPlans($$)
       |> self::stripCommands($$)
       |> self::stripAccept2Ship($$)
@@ -46,16 +48,18 @@ final abstract class FBCommonFilters {
     if ($config['referencePullRequestNumber'] ?? true) {
       $changeset = self::referencePullRequestNumber($changeset);
     }
-    return self::stripSevRevertSummary($changeset)
+    $changeset = await (
+      self::stripSevRevertSummary($changeset)
       |> self::delinkifyDifferentialURLs($$)
       |> ShipItUserFilters::rewriteSVNAuthor($$, FBToGitHubUserInfo::class)
-      |> self::restoreGitHubAuthor($$)
-      |> self::filterMessageSections(
-        $$,
-        self::getKeepSections($changeset, $config),
-      )
-      |> self::rewriteMentions($$)
-      |> self::rewriteReviewers($$)
+      |> self::genRestoreGitHubAuthor($$)
+    );
+    $changeset = self::filterMessageSections(
+      $changeset,
+      await self::genKeepSections($changeset, $config),
+    )
+      |> self::rewriteMentions($$);
+    return await self::genRewriteReviewers($changeset)
       |> self::rewriteAuthor($$)
       |> self::stripCoAuthoredByLines($$);
   }
@@ -242,10 +246,10 @@ final abstract class FBCommonFilters {
     );
   }
 
-  public static function stripSubjectPRTag(
+  public static async function genStripSubjectPRTag(
     ShipItChangeset $changeset,
-  ): ShipItChangeset {
-    if (self::importedFromPullRequest($changeset)) {
+  ): Awaitable<ShipItChangeset> {
+    if (await self::genImportedFromPullRequest($changeset)) {
       return $changeset->withSubject(
         Regex\replace(
           $changeset->getSubject(),
@@ -257,13 +261,13 @@ final abstract class FBCommonFilters {
     return $changeset;
   }
 
-  public static function stripSubjectTags(
+  public static async function genStripSubjectTags(
     ShipItChangeset $changeset,
     bool $keep_tags,
-  ): ShipItChangeset {
+  ): Awaitable<ShipItChangeset> {
     if ($keep_tags) {
       // keep all tags except for the automated PR import tags
-      return self::stripSubjectPRTag($changeset);
+      return await self::genStripSubjectPRTag($changeset);
     } else {
       // strip tags like [hack] from the front of the subject. historically,
       // this happened automatically when ShipItRepoGIT called `git am` without
@@ -339,15 +343,15 @@ final abstract class FBCommonFilters {
     ];
   }
 
-  public static function getKeepSections(
+  public static async function genKeepSections(
     ShipItChangeset $changeset,
     shape(
       'filterMessageSections/keepFields' => keyset<string>,
       ...
     ) $config,
-  ): keyset<string> {
+  ): Awaitable<keyset<string>> {
     $keep = $config['filterMessageSections/keepFields'];
-    if (self::importedFromPullRequest($changeset)) {
+    if (await self::genImportedFromPullRequest($changeset)) {
       $keep[] = 'test plan';
     }
     return $keep;
@@ -408,9 +412,9 @@ final abstract class FBCommonFilters {
     );
   }
 
-  public static function restoreGitHubAuthor(
+  public static async function genRestoreGitHubAuthor(
     ShipItChangeset $changeset,
-  ): ShipItChangeset {
+  ): Awaitable<ShipItChangeset> {
     if (!Regex\matches($changeset->getMessage(), re"/^Github author:/mi")) {
       return $changeset;
     }
@@ -436,11 +440,8 @@ final abstract class FBCommonFilters {
     }
 
     if ($pulled_by_unixname !== null) {
-      // @oss-disable: $pulled_by = \Asio::awaitSynchronously(
-        $pulled_by = \HH\Asio\join( // @oss-enable
-        FBToGitHubUserInfo::getDestinationUserFromLocalUser(
-          $pulled_by_unixname,
-        ),
+      $pulled_by = await FBToGitHubUserInfo::genDestinationUserFromLocalUser(
+        $pulled_by_unixname,
       );
 
       $changeset = $changeset->withMessage(
@@ -459,9 +460,9 @@ final abstract class FBCommonFilters {
     return $changeset;
   }
 
-  public static function rewriteReviewers(
+  public static async function genRewriteReviewers(
     ShipItChangeset $changeset,
-  ): ShipItChangeset {
+  ): Awaitable<ShipItChangeset> {
     $sections = ShipItMessageSections::getSections(
       $changeset,
       self::getSupportedMessageSectionNames(),
@@ -469,16 +470,16 @@ final abstract class FBCommonFilters {
     if (!C\contains_key($sections, 'reviewed by')) {
       return $changeset;
     }
-    $names = Str\split($sections['reviewed by'], ', ')
+    $names = await (
+      Str\split($sections['reviewed by'], ', ')
       // No project reviewers e.g., #WDT in D2407623
       |> Vec\filter($$, $name ==> Str\slice(Str\trim($name), 0, 1) !== '#')
       |> Vec\map_async(
         $$,
         async $name ==>
-          await FBToGitHubUserInfo::getDestinationUserFromLocalUser($name),
-      );
-    // @oss-disable: $names = \Asio::awaitSynchronously($names);
-    $names = \HH\Asio\join(\HH\Asio\v($names)); // @oss-enable
+          await FBToGitHubUserInfo::genDestinationUserFromLocalUser($name),
+      )
+    );
     $names = Vec\filter($names, $x ==> Str\length($x ?? '') > 0);
     $names = Vec\filter_nulls($names);
     $sections['reviewed by'] = Str\join($names, ', ');
@@ -503,10 +504,11 @@ final abstract class FBCommonFilters {
       ->withCoAuthorLines($co_author_lines);
   }
 
-  public static function importedFromPullRequest(
+  public static async function genImportedFromPullRequest(
     ShipItChangeset $changeset,
-  ): bool {
+  ): Awaitable<bool> {
+    $github_author_restored = await self::genRestoreGitHubAuthor($changeset);
     return self::referencePullRequestNumber($changeset) !== $changeset &&
-      self::restoreGitHubAuthor($changeset) !== $changeset;
+      $github_author_restored !== $changeset;
   }
 }

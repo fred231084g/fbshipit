@@ -18,15 +18,15 @@ use type Facebook\HackTest\DataProvider; // @oss-enable
 
 final class UserInfoTestImplementation extends ShipItUserInfo {
   <<__Override>>
-  public static async function getDestinationAuthorFromLocalUser(
+  public static async function genDestinationAuthorFromLocalUser(
     string $local_user,
   ): Awaitable<string> {
-    $user = await self::getDestinationUserFromLocalUser($local_user);
+    $user = await self::genDestinationUserFromLocalUser($local_user);
     return 'Example User <'.$user.'@example.com>';
   }
 
   <<__Override>>
-  public static async function getDestinationUserFromLocalUser(
+  public static async function genDestinationUserFromLocalUser(
     string $local_user,
   ): Awaitable<string> {
     return $local_user.'-public';

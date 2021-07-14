@@ -15,12 +15,12 @@ namespace Facebook\ShipIt;
 // Not an interface: https://github.com/facebook/hhvm/issues/6820
 abstract class ShipItUserInfo {
   // eg convert a local unix account name to a github account name
-  abstract public static function getDestinationUserFromLocalUser(
+  abstract public static function genDestinationUserFromLocalUser(
     string $local_user,
   ): Awaitable<?string>;
 
   // eg convert a local unix account name to "Foo Bar <foobar@example.com>"
-  abstract public static function getDestinationAuthorFromLocalUser(
+  abstract public static function genDestinationAuthorFromLocalUser(
     string $local_user,
   ): Awaitable<?string>;
 }

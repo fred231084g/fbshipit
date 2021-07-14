@@ -33,7 +33,7 @@ final class ShipItUserFilters {
     ) {
       // @oss-disable: $author = \Asio::awaitSynchronously(
         $author = \HH\Asio\join( // @oss-enable
-        $user_info::getDestinationAuthorFromLocalUser($matches['user']),
+        $user_info::genDestinationAuthorFromLocalUser($matches['user']),
       );
       if ($author !== null) {
         return $changeset->withAuthor($author);
@@ -68,7 +68,7 @@ final class ShipItUserFilters {
         $mention = Str\slice($mention, 1); // chop off leading @
         // @oss-disable: $new = \Asio::awaitSynchronously(
           $new = \HH\Asio\join( // @oss-enable
-          $user_info::getDestinationUserFromLocalUser($mention),
+          $user_info::genDestinationUserFromLocalUser($mention),
         );
         return '@'.($new ?? $mention);
       },
