@@ -19,13 +19,13 @@ final class FBRepoInitPhase extends \Facebook\ShipIt\ShipItPhase {
 
   public function __construct(
     private \Facebook\ShipIt\ShipItRepoSide $side,
-    private string $name,
+    private \Facebook\ShipIt\FBShipItInternalRepo $repo,
   ) {
   }
 
   <<__Override>>
   public function getReadableName(): string {
-    return 'Initialize '.$this->side.' '.$this->name.' repository';
+    return 'Initialize '.$this->side.' '.$this->repo['name'].' repository';
   }
 
   <<__Override>>
@@ -58,12 +58,12 @@ final class FBRepoInitPhase extends \Facebook\ShipIt\ShipItPhase {
     }
 
     // In case the src repo dir was specified by hand
-    if (\Filesystem::basename($local_path) !== $this->name) {
+    if (\Filesystem::basename($local_path) !== $this->repo['name']) {
       ShipItLogger::err(
         'Facebook clone scripts require directory names to match repo names: '.
         "got '%s', expected '%s'\n",
         \Filesystem::basename($local_path),
-        $this->name,
+        $this->repo['name'],
       );
       throw new \Facebook\ShipIt\ShipItExitException(1);
     }
@@ -94,7 +94,7 @@ final class FBRepoInitPhase extends \Facebook\ShipIt\ShipItPhase {
 
   private function getCloneCommand(): vec<string> {
     return Vec\filter(
-      \Facebook\ShipIt\FBRepoInitPhase::getCloneCommand($this->name),
+      $this->repo['cloneCommand'],
       $command ==> $command !== '--no-working-dir',
     );
   }

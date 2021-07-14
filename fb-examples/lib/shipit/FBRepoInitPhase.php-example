@@ -17,7 +17,7 @@ final class FBRepoInitPhase extends ShipItPhase {
 
   public function __construct(
     private ShipItRepoSide $side,
-    private string $name,
+    private FBShipItInternalRepo $repo,
   ) {
     $this->assertIsSourceSide();
   }
@@ -31,7 +31,7 @@ final class FBRepoInitPhase extends ShipItPhase {
 
   <<__Override>>
   public function getReadableName(): string {
-    return 'Initialize '.$this->side.' '.$this->name.' repository';
+    return 'Initialize '.$this->side.' '.$this->repo['name'].' repository';
   }
 
   <<__Override>>
@@ -64,17 +64,17 @@ final class FBRepoInitPhase extends ShipItPhase {
     }
 
     // In case the src repo dir was specified by hand
-    if (\Filesystem::basename($local_path) !== $this->name) {
+    if (\Filesystem::basename($local_path) !== $this->repo['name']) {
       ShipItLogger::err(
         'Facebook clone scripts require directory names to match repo names: '.
         "got '%s', expected '%s'\n",
         \Filesystem::basename($local_path),
-        $this->name,
+        $this->repo['name'],
       );
       throw new ShipItExitException(1);
     }
 
-    $command = self::getCloneCommand($this->name);
+    $command = $this->repo['cloneCommand'];
     $local_parent_path = PHP\dirname($local_path);
     if (!PHP\is_dir($local_parent_path)) {
       PHP\mkdir($local_parent_path, 0755, /* recursive = */ true);

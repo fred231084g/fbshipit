@@ -98,25 +98,14 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
     $config_object = $this->configObject;
     $branch_configs = $this->getBranchConfigs();
     $internal_repo = $config_object->getStaticConfig()['internalRepo'];
-    if (
-      C\contains(
-        RepoArcanistProject::getNotInArcanistExceptions(),
-        $internal_repo,
-      )
-    ) {
-      $arcanist_project = null;
-    } else {
-      $arcanist_project = RepoArcanistProject::getArcanistProject(
-        $internal_repo,
-      );
-    }
+    $arcanist_project = $internal_repo['arcanistProject'];
     return shape(
       'land_branch' => $config_object->getLandBranch(),
       'branches' => Vec\map(
         $branch_configs,
         $branch_config ==> $branch_config->getExternalBranch(),
       ),
-      'internal_repo' => $internal_repo,
+      'internal_repo' => $internal_repo['name'],
       'arcanist_project' => $arcanist_project,
     );
   }
