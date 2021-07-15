@@ -14,16 +14,16 @@ namespace Facebook\ShipIt;
 
 use namespace HH\Lib\{C, Str}; // @oss-enable
 
-final class ShipItUserFilters {
+abstract final class ShipItUserFilters {
   /** Rewrite authors that match a certain pattern.
    *
    * @param $pattern a regular expression defining a 'user' named capture
    */
-  public static function rewriteAuthorWithUserPattern(
+  public static async function genRewriteAuthorWithUserPattern(
     ShipItChangeset $changeset,
     classname<ShipItUserInfo> $user_info,
     string $pattern,
-  ): ShipItChangeset {
+  ): Awaitable<ShipItChangeset> {
     $matches = dict[];
     if (
       /* HH_FIXME[2049] __PHPStdLib */
@@ -31,9 +31,8 @@ final class ShipItUserFilters {
       \preg_match_with_matches($pattern, $changeset->getAuthor(), inout $matches) &&
       C\contains_key($matches, 'user')
     ) {
-      // @oss-disable: $author = \Asio::awaitSynchronously(
-        $author = \HH\Asio\join( // @oss-enable
-        $user_info::genDestinationAuthorFromLocalUser($matches['user']),
+      $author = await $user_info::genDestinationAuthorFromLocalUser(
+        $matches['user'],
       );
       if ($author !== null) {
         return $changeset->withAuthor($author);
@@ -47,11 +46,11 @@ final class ShipItUserFilters {
    * Original author: foobar@uuid
    * New author: Foo Bar <foobar@example.com>
    */
-  public static function rewriteSVNAuthor(
+  public static async function genRewriteSVNAuthor(
     ShipItChangeset $changeset,
     classname<ShipItUserInfo> $user_info,
-  ): ShipItChangeset {
-    return self::rewriteAuthorWithUserPattern(
+  ): Awaitable<ShipItChangeset> {
+    return await self::genRewriteAuthorWithUserPattern(
       $changeset,
       $user_info,
       '/^(?<user>.*)@[a-f0-9-]{36}$/',

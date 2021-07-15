@@ -78,11 +78,14 @@ final class FBCommonFiltersTest extends FBBaseTest {
     \expect($changeset->getAuthor())->toEqual($expected_author);
   }
 
-  public function testSVNAuthor(): void {
+  public async function testSVNAuthor(): Awaitable<void> {
     $fake_uuid = Str\repeat('a', 36);
     $in = (new ShipItChangeset())
       ->withAuthor('fredemmott@'.$fake_uuid);
-    $out = ShipItUserFilters::rewriteSVNAuthor($in, FBToGitHubUserInfo::class);
+    $out = await ShipItUserFilters::genRewriteSVNAuthor(
+      $in,
+      FBToGitHubUserInfo::class,
+    );
     \expect($out->getAuthor())->toEqual('Fred Emmott <fe@fb.com>');
   }
 

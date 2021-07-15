@@ -108,12 +108,17 @@ final class UserFiltersTest extends BaseTest {
   }
 
   <<DataProvider('examplesForSVNUserMapping')>>
-  public function testSVNUserMapping(string $in, string $expected): void {
-    $changeset = (new ShipItChangeset())->withAuthor($in)
-      |> ShipItUserFilters::rewriteSVNAuthor(
+  public async function testSVNUserMapping(
+    string $in,
+    string $expected,
+  ): Awaitable<void> {
+    $changeset = await (
+      (new ShipItChangeset())->withAuthor($in)
+      |> ShipItUserFilters::genRewriteSVNAuthor(
         $$,
         UserInfoTestImplementation::class,
-      );
+      )
+    );
     \expect($changeset->getAuthor())->toEqual($expected);
   }
 }
