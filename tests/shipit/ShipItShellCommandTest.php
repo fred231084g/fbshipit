@@ -46,9 +46,7 @@ final class ShipItShellCommandTest extends ShellTest {
   }
 
   public function testSettingEnvironmentVariable(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $herp = PHP\bin2hex(\random_bytes(16));
+    $herp = ShipItTempDir::randomHex(16);
     $result = (new ShipItShellCommand('/', 'env'))
       ->setEnvironmentVariables(dict['HERP' => $herp])
       ->runSynchronously();

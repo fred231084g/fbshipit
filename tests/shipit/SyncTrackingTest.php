@@ -73,9 +73,7 @@ final class SyncTrackingTest extends ShellTest {
   }
 
   public function testLastSourceCommitWithGit(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $fake_commit_id = PHP\bin2hex(\random_bytes(16));
+    $fake_commit_id = ShipItTempDir::randomHex(16);
     $message = ShipItSync::addTrackingData(
       $this->getManifest(),
       (new ShipItChangeset())->withID($fake_commit_id),
@@ -94,9 +92,7 @@ final class SyncTrackingTest extends ShellTest {
     self::configureHg($tempdir);
 
     // Add a tracked commit
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $fake_commit_id = PHP\bin2hex(\random_bytes(16));
+    $fake_commit_id = ShipItTempDir::randomHex(16);
     $message = ShipItSync::addTrackingData(
       $this->getManifest(),
       (new ShipItChangeset())->withID($fake_commit_id),
@@ -111,12 +107,8 @@ final class SyncTrackingTest extends ShellTest {
   }
 
   public function testLastSourceCommitMultipleMarkers(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $fake_commit_id_1 = PHP\bin2hex(\random_bytes(16));
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $fake_commit_id_2 = PHP\bin2hex(\random_bytes(16));
+    $fake_commit_id_1 = ShipItTempDir::randomHex(16);
+    $fake_commit_id_2 = ShipItTempDir::randomHex(16);
     $message_1 = ShipItSync::addTrackingData(
       $this->getManifest(),
       (new ShipItChangeset())->withID($fake_commit_id_1),
@@ -130,9 +122,7 @@ final class SyncTrackingTest extends ShellTest {
   }
 
   public function testLastSourceCommitWithWhitespace(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $fake_commit_id = PHP\bin2hex(\random_bytes(16));
+    $fake_commit_id = ShipItTempDir::randomHex(16);
     $message = ShipItSync::addTrackingData(
       $this->getManifest(),
       (new ShipItChangeset())->withID($fake_commit_id),
@@ -142,18 +132,14 @@ final class SyncTrackingTest extends ShellTest {
   }
 
   public function testLastSourceCommitMissingWhitespace(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $fake_commit_id = PHP\bin2hex(\random_bytes(16));
+    $fake_commit_id = ShipItTempDir::randomHex(16);
     $message = "fbshipit-source-id:".$fake_commit_id;
     $repo = $this->getGITRepoWithCommit($message);
     \expect($repo->findLastSourceCommit(keyset[]))->toEqual($fake_commit_id);
   }
 
   public function testLastSourceCommitWithoutPrefix(): void {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $fake_commit_id = PHP\bin2hex(\random_bytes(16));
+    $fake_commit_id = ShipItTempDir::randomHex(16);
     $message = ShipItSync::addTrackingData(
       $this->getManifest()->withCommitMarkerPrefix(false),
       (new ShipItChangeset())->withID($fake_commit_id),

@@ -23,11 +23,15 @@ final class ShipItTempDir {
   private string $path;
   private ShipItTempDirMode $mode = ShipItTempDirMode::AUTO_REMOVE;
 
-  public function __construct(string $component) {
-    $path = PHP\sys_get_temp_dir().'/shipit-'.$component.'-';
+  public static function randomHex(int $length): string {
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $path .= PHP\bin2hex(\random_bytes(32));
+    return PHP\bin2hex(\random_bytes($length));
+  }
+
+  public function __construct(string $component) {
+    $path = PHP\sys_get_temp_dir().'/shipit-'.$component.'-';
+    $path .= self::randomHex(32);
     PHP\mkdir($path);
     $this->path = $path;
   }
