@@ -75,7 +75,8 @@ final class FBShipItPreview {
     ?string $patch = null,
   ): Awaitable<vec<ShipItPreviewOutput>> {
     try {
-      $repo = RepoArcanistProject::getRepo($arcanist_project);
+      $internal_repo = FBShipItGlobalConfig::get()
+        ->getInternalRepoForArcanistProject($arcanist_project);
     // @oss-disable: } catch (\InvariantViolationException $_e) {
       } catch (InvariantException $e) { // @oss-enable
       // If we don't recognize the arcanist project,
@@ -111,7 +112,7 @@ pull request in order to preview the full patch.';
       async $config_object ==> {
         $repo_config = $config_object->getStaticConfig();
         // Does the repo match this open source project?
-        if ($repo !== $repo_config['internalRepo']['name']) {
+        if ($internal_repo['name'] !== $repo_config['internalRepo']['name']) {
           return null;
         }
         $branch_configs = Vec\filter(
