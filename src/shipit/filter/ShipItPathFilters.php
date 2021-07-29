@@ -222,7 +222,7 @@ abstract final class ShipItPathFilters {
     Container<string> $patterns,
   ): ?string {
     foreach ($patterns as $pattern) {
-      $matches = varray[];
+      $matches = vec[];
       if (PHP\preg_match($pattern, $path, inout $matches)) {
         return $pattern;
       }

@@ -127,7 +127,7 @@ final class ShipItDeleteCorruptedRepoPhase extends ShipItPhase {
       return true;
     }
     $revision = Str\trim($result->getStdOut());
-    $matches = varray[];
+    $matches = vec[];
     if (PHP\preg_match('/^0+$/', $revision, inout $matches)) {
       // 000000...0 is not a valid revision ID, but it's what we get
       // for an empty repository

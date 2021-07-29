@@ -121,7 +121,7 @@ index %s..0000000
    */
   public static function isSubmoduleDiff(ShipItDiff $diff): bool {
     $subproject_line = '[-+]Subproject commit [0-9a-fA-F]+';
-    $matches = varray[];
+    $matches = vec[];
     return (bool)PHP\preg_match(
       '@'.
       // Submodule file mode
@@ -153,7 +153,7 @@ index %s..0000000
       return false;
     }
     $subproject_line = '[-+]Subproject commit [0-9a-fA-F]+';
-    $matches = varray[];
+    $matches = vec[];
     return (bool)PHP\preg_match(
       '@'.
       // Regular file mode

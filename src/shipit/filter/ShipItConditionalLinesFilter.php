@@ -87,7 +87,7 @@ final abstract class ShipItConditionalLinesFilter {
   ): ShipItChangeset {
     $diffs = vec[];
     foreach ($changeset->getDiffs() as $diff) {
-      $_matches = varray[];
+      $_matches = vec[];
       if (
         $path_regex is nonnull && !PHP\preg_match($path_regex, $diff['path'], inout $_matches)
       ) {

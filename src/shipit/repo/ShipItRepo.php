@@ -138,7 +138,7 @@ abstract class ShipItRepo {
    */
   public static function parseDiffHunk(string $hunk): ?ShipItDiff {
     list($header, $body) = Str\split($hunk, "\n", 2);
-    $matches = varray[];
+    $matches = vec[];
     PHP\preg_match(
       '@^diff --git ("?)[ab]/(.*?)"? "?[ab]/(.*?)"?$@',
       Str\trim($header),
