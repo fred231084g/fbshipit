@@ -311,7 +311,7 @@ class ShipItRepoGIT
         $url = $submodule['url'];
         $match = Regex\first_match(
           $url,
-          re"@https://github.com/(?<org>[^\./]+)/(?<project>[^\./]+)[\./$]@",
+          re"@https://github.com/(?<org>[^\./]+)/(?<project>[^\./]+)[\./]?@",
         );
         if ($match is null) {
           throw $e;
