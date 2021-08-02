@@ -12,7 +12,7 @@
  */
 namespace Facebook\ShipIt;
 
-use namespace HH\Lib\Str; // @oss-enable
+use namespace HH\Lib\{File, Str}; // @oss-enable
 
 <<\Oncalls('open_source')>>
 final class ShipItShellCommandTest extends ShellTest {
@@ -135,10 +135,10 @@ final class ShipItShellCommandTest extends ShellTest {
   }
 
   public function testNoRetriesByDefault(): void {
-    $file = PHP\tempnam(PHP\sys_get_temp_dir(), __CLASS__) as string;
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    \unlink($file);
+    using ($patch_file = File\temporary_file(__CLASS__)) {
+      $file = $patch_file->getHandle()->getPath();
+      // the file is intentionally deleted at the end of this block
+    }
     $result = (new ShipItShellCommand('/', 'test', '-e', $file))
       ->setFailureHandler($_ ==> PHP\touch($file))
       ->setNoExceptions()
@@ -150,10 +150,10 @@ final class ShipItShellCommandTest extends ShellTest {
   }
 
   public function testRetries(): void {
-    $file = PHP\tempnam(PHP\sys_get_temp_dir(), __CLASS__) as string;
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    \unlink($file);
+    using ($patch_file = File\temporary_file(__CLASS__)) {
+      $file = $patch_file->getHandle()->getPath();
+      // the file is intentionally deleted at the end of this block
+    }
     $result = (new ShipItShellCommand('/', 'test', '-e', $file))
       ->setFailureHandler($_ ==> PHP\touch($file))
       ->setNoExceptions()
@@ -168,22 +168,19 @@ final class ShipItShellCommandTest extends ShellTest {
   }
 
   public function testRetriesNotUsedOnSuccess(): void {
-    $file = PHP\tempnam(PHP\sys_get_temp_dir(), __CLASS__) as string;
-    // rm will fail if ran twice with same arg
-    if (Str\contains(PHP\php_uname('s'), 'Darwin')) {
-      // MacOS doesn't have GNU rm
-      $result = (new ShipItShellCommand('/', 'rm', $file))
-        ->setRetries(1)
-        ->runSynchronously();
-    } else {
-      $result = (new ShipItShellCommand('/', 'rm', '--preserve-root', $file))
-        ->setRetries(1)
-        ->runSynchronously();
-    }
-    if (PHP\file_exists($file)) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-      \unlink($file);
+    using ($patch_file = File\temporary_file(__CLASS__)) {
+      $file = $patch_file->getHandle()->getPath();
+      // rm will fail if ran twice with same arg
+      if (Str\contains(PHP\php_uname('s'), 'Darwin')) {
+        // MacOS doesn't have GNU rm
+        $result = (new ShipItShellCommand('/', 'rm', $file))
+          ->setRetries(1)
+          ->runSynchronously();
+      } else {
+        $result = (new ShipItShellCommand('/', 'rm', '--preserve-root', $file))
+          ->setRetries(1)
+          ->runSynchronously();
+      }
     }
     \expect($result->getExitCode())->toEqual(0);
   }
