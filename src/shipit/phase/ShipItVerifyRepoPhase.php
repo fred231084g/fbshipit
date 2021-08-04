@@ -12,7 +12,6 @@
  */
 namespace Facebook\ShipIt;
 
-use namespace HH\Lib\File; // @oss-enable
 
 final class ShipItVerifyRepoPhase extends ShipItPhase {
   private bool $createPatch = false;
@@ -184,9 +183,8 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
       $source_sync_id = $changeset->getID();
     }
 
-    using $patch_file = File\temporary_file('shipit-resync-patch-');
-    $f = $patch_file->getHandle();
-    await $f->writeAllAsync($diff);
+    $patch_file = PHP\tempnam(PHP\sys_get_temp_dir(), 'shipit-resync-patch-') as string;
+    PHP\file_put_contents($patch_file, $diff);
 
     ShipItLogger::out(
       "  Created patch file: %s\n\n".
@@ -205,10 +203,10 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
       "    4. FBShipIt has a bug\n\n".
       "  APPLYING THE PATCH IS ONLY CORRECT FOR THE FIRST SITUATION; review\n".
       "  the changes carefully.\n\n",
-      $f->getPath(),
+      $patch_file,
       $diffstat,
       $manifest->getDestinationPath(),
-      $f->getPath(),
+      $patch_file,
       $source_sync_id,
     );
     throw new ShipItExitException(0);

@@ -69,6 +69,10 @@ function sys_get_temp_dir(): string {
   return \sys_get_temp_dir();
 }
 
+function tempnam(string $dir, string $prefix): dynamic {
+  return \tempnam($dir, $prefix);
+}
+
 function escapeshellarg(string $arg): string {
   if ($arg === '') {
     // Preserving legacy broken HHVM behavior that www currently relies on.
