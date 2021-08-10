@@ -57,21 +57,21 @@ final abstract class FBCommonFilters {
     $changeset = self::filterMessageSections(
       $changeset,
       await self::genKeepSections($changeset, $config),
-    )
-      |> self::rewriteMentions($$);
+    );
+    $changeset = await self::genRewriteMentions($changeset);
     $changeset = await self::genRewriteReviewers($changeset);
     return await self::genRewriteAuthor($changeset)
       |> self::stripCoAuthoredByLines($$);
   }
 
-  public static function stripSummariesByDefault(
+  public static async function genStripSummariesByDefault(
     ShipItChangeset $changeset,
-  ): ShipItChangeset {
+  ): Awaitable<ShipItChangeset> {
     $mentions = ShipItMentions::getMentions($changeset);
     if (C\contains($mentions, '@public')) {
-      return ShipItMentions::rewriteMentions(
+      return await ShipItMentions::genRewriteMentions(
         $changeset,
-        $mention ==> $mention === '@public' ? '' : $mention,
+        async $mention ==> $mention === '@public' ? '' : $mention,
       );
     }
 
@@ -371,15 +371,15 @@ final abstract class FBCommonFilters {
     );
   }
 
-  public static function rewriteMentions(
+  public static async function genRewriteMentions(
     ShipItChangeset $changeset,
-  ): ShipItChangeset {
+  ): Awaitable<ShipItChangeset> {
     $changeset = self::rewriteFBMentions($changeset);
-    $changeset = ShipItUserFilters::rewriteMentions(
+    $changeset = await ShipItUserFilters::genRewriteMentions(
       $changeset,
       FBToGitHubUserInfo::class,
     );
-    $changeset = ShipItMentions::rewriteMentionsWithoutAt(
+    $changeset = await ShipItMentions::genRewriteMentionsWithoutAt(
       $changeset,
       /* exceptions = */ keyset[
         '@override-unit-failures',

@@ -55,18 +55,15 @@ abstract final class ShipItUserFilters {
     );
   }
 
-  public static function rewriteMentions(
+  public static async function genRewriteMentions(
     ShipItChangeset $changeset,
     classname<ShipItUserInfo> $user_info,
-  ): ShipItChangeset {
-    return ShipItMentions::rewriteMentions(
+  ): Awaitable<ShipItChangeset> {
+    return await ShipItMentions::genRewriteMentions(
       $changeset,
-      function(string $mention): string use ($user_info) {
+      async function(string $mention): Awaitable<string> use ($user_info) {
         $mention = Str\slice($mention, 1); // chop off leading @
-        // @oss-disable: $new = \Asio::awaitSynchronously(
-          $new = \HH\Asio\join( // @oss-enable
-          $user_info::genDestinationUserFromLocalUser($mention),
-        );
+        $new = await $user_info::genDestinationUserFromLocalUser($mention);
         return '@'.($new ?? $mention);
       },
     );

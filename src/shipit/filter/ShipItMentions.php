@@ -12,21 +12,29 @@
  */
 namespace Facebook\ShipIt;
 
-use namespace HH\Lib\{C, Keyset, Str}; // @oss-enable
+use namespace HH\Lib\{C, Keyset, Regex, Str}; // @oss-enable
 
-final class ShipItMentions {
-  // Ignore things like email addresses, let them pass cleanly through
-  const string MENTIONS_PATTERN = '/(?<![a-zA-Z0-9\.=\+-])(@:?[a-zA-Z0-9-]+)/';
-
-  public static function rewriteMentions(
+abstract final class ShipItMentions {
+  public static async function genRewriteMentions(
     ShipItChangeset $changeset,
-    (function(string): string) $callback,
-  ): ShipItChangeset {
-    $message = PHP\preg_replace_callback(
-      self::MENTIONS_PATTERN,
-      $matches ==> $callback($matches[1]),
+    (function(string): Awaitable<string>) $callback,
+  ): Awaitable<ShipItChangeset> {
+    // Ignore things like email addresses, let them pass cleanly through
+    $pattern = re'/(?<![a-zA-Z0-9\.=\+-])(@:?[a-zA-Z0-9-]+)/';
+
+    $mentions = await (
+      Regex\every_match($changeset->getMessage(), $pattern)
+      |> Dict\fb\gen_pull(
+        $$,
+        async $match ==> await $callback($match[1]),
+        $match ==> $match[1],
+      )
+    );
+
+    $message = Regex\replace_with(
       $changeset->getMessage(),
-      -1,
+      $pattern,
+      $matches ==> $mentions[$matches[1]],
     );
 
     return $changeset->withMessage(Str\trim($message));
@@ -37,13 +45,15 @@ final class ShipItMentions {
    * Handy for github, otherwise everyone gets notified whenever a fork
    * rebases.
    */
-  public static function rewriteMentionsWithoutAt(
+  public static async function genRewriteMentionsWithoutAt(
     ShipItChangeset $changeset,
     keyset<string> $exceptions = keyset[],
-  ): ShipItChangeset {
-    return self::rewriteMentions(
+  ): Awaitable<ShipItChangeset> {
+    return await self::genRewriteMentions(
       $changeset,
-      $it ==> (C\contains($exceptions, $it) || Str\slice($it, 0, 1) !== '@')
+      async $it ==> (
+        C\contains($exceptions, $it) || Str\slice($it, 0, 1) !== '@'
+      )
         ? $it
         : Str\slice($it, 1),
     );
@@ -52,15 +62,11 @@ final class ShipItMentions {
   public static function getMentions(
     ShipItChangeset $changeset,
   ): keyset<string> {
-    $matches = vec[];
-    PHP\preg_match_all(
-      self::MENTIONS_PATTERN,
-      $changeset->getMessage(),
-      inout $matches,
-      \PREG_SET_ORDER,
-    );
-    /* HH_FIXME[4110] */
-    return Keyset\map($matches as Container<_>, (KeyedContainer<int, string> $match) ==> $match[1]);
+    // Ignore things like email addresses, let them pass cleanly through
+    $pattern = re'/(?<![a-zA-Z0-9\.=\+-])(@:?[a-zA-Z0-9-]+)/';
+
+    return Regex\every_match($changeset->getMessage(), $pattern)
+      |> Keyset\map($$, ($match) ==> $match[1]);
   }
 
   public static function containsMention(

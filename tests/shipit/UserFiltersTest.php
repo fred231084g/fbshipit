@@ -55,40 +55,42 @@ final class UserFiltersTest extends BaseTest {
   }
 
   public static function rewriteMentionsExamples(
-  ): vec<(string, (function(string): string), string)> {
+  ): vec<(string, (function(string): Awaitable<string>), string)> {
     return vec[
       tuple(
         '@foo @bar @baz',
-        $mention ==> $mention === '@foo' ? '@herp' : $mention,
+        async $mention ==> $mention === '@foo' ? '@herp' : $mention,
         '@herp @bar @baz',
       ),
       tuple(
         '@foo @bar @baz',
-        $mention ==> $mention === '@bar' ? '@herp' : $mention,
+        async $mention ==> $mention === '@bar' ? '@herp' : $mention,
         '@foo @herp @baz',
       ),
       tuple(
         '@foo @bar @baz',
-        $mention ==> $mention === '@bar' ? '' : $mention,
+        async $mention ==> $mention === '@bar' ? '' : $mention,
         '@foo  @baz',
       ),
       tuple(
         '@foo @bar @baz',
-        $mention ==> Str\slice($mention, 1),
+        async $mention ==> Str\slice($mention, 1),
         'foo bar baz',
       ),
     ];
   }
 
   <<DataProvider('rewriteMentionsExamples')>>
-  public function testRewriteMentions(
+  public async function testRewriteMentions(
     string $message,
-    (function(string): string) $callback,
+    (function(string): Awaitable<string>) $callback,
     string $expected_message,
-  ): void {
+  ): Awaitable<void> {
     $changeset = (new ShipItChangeset())->withMessage($message);
     \expect(
-      ShipItMentions::rewriteMentions($changeset, $callback)->getMessage(),
+      (
+        await ShipItMentions::genRewriteMentions($changeset, $callback)
+      )->getMessage(),
     )->toEqual($expected_message);
   }
 
