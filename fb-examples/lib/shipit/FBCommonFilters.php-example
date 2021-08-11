@@ -105,7 +105,7 @@ final abstract class FBCommonFilters {
     return await ShipItUserFilters::genRewriteAuthorWithUserPattern(
       $changeset,
       FBToGitHubUserInfo::class,
-      '/<(?<user>[^<]+)@fb.com>$/',
+      re'/<(?<user>[^<]+)@fb.com>$/',
     );
   }
 

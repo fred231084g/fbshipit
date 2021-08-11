@@ -22,13 +22,10 @@ abstract final class ShipItUserFilters {
   public static async function genRewriteAuthorWithUserPattern(
     ShipItChangeset $changeset,
     classname<ShipItUserInfo> $user_info,
-    string $pattern,
+    Regex\Pattern<shape('user' => string, ...)> $pattern,
   ): Awaitable<ShipItChangeset> {
-    $matches = dict[];
-    if (
-      PHP\preg_match($pattern, $changeset->getAuthor(), inout $matches) &&
-      C\contains_key($matches as KeyedContainer<_, _>, 'user')
-    ) {
+    $matches = Regex\first_match($changeset->getAuthor(), $pattern);
+    if ($matches is nonnull) {
       $author = await $user_info::genDestinationAuthorFromLocalUser(
         $matches['user'],
       );
@@ -51,7 +48,7 @@ abstract final class ShipItUserFilters {
     return await self::genRewriteAuthorWithUserPattern(
       $changeset,
       $user_info,
-      '/^(?<user>.*)@[a-f0-9-]{36}$/',
+      re'/^(?<user>.*)@[a-f0-9-]{36}$/',
     );
   }
 
@@ -79,10 +76,10 @@ abstract final class ShipItUserFilters {
    */
   public static function rewriteAuthorFromMessagePattern(
     ShipItChangeset $changeset,
-    string $pattern,
+    Regex\Pattern<shape('author' => string, ...)> $pattern,
   ): ShipItChangeset {
-    $matches = dict[];
-    if (PHP\preg_match($pattern, $changeset->getMessage(), inout $matches)) {
+    $matches = Regex\first_match($changeset->getMessage(), $pattern);
+    if ($matches is nonnull) {
       return $changeset->withAuthor($matches['author']);
     }
     return $changeset;
@@ -94,7 +91,7 @@ abstract final class ShipItUserFilters {
   ): ShipItChangeset {
     return self::rewriteAuthorFromMessagePattern(
       $changeset,
-      '/(^|\n)GitHub Author:\s*(?<author>.*?)(\n|$)/si',
+      re'/(^|\n)GitHub Author:\s*(?<author>.*?)(\n|$)/si',
     );
   }
 }

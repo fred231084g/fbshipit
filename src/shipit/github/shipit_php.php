@@ -170,22 +170,6 @@ function preg_match_all(
   );
 }
 
-function preg_replace_callback(
-  mixed $pattern,
-  (function(darray<arraykey, string>): string) $callback,
-  mixed $subject,
-  int $limit = -1,
-): dynamic {
-  $count = null;
-  return \preg_replace_callback(
-    $pattern,
-    $callback,
-    $subject,
-    $limit,
-    inout $count,
-  );
-}
-
 function vsprintf(mixed $format, mixed $args): dynamic {
   return \vsprintf($format, $args);
 }
