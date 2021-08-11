@@ -69,7 +69,7 @@ final class ShipItAssertValidFilterPhase extends ShipItPhase {
           $test_file_is_stripped !== null,
           "Source root '%s' specified, but is removed by filter; debug: %s\n",
           $root,
-          \var_export($changeset->getDebugMessages(), /* return = */ true),
+          \var_export($changeset->getDebugMessages(), true),
         );
       }
 
