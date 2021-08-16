@@ -116,7 +116,7 @@ pull request in order to preview the full patch.';
           return null;
         }
         $branch_configs = Vec\filter(
-          $config_object->getBranchConfigs(),
+          await $config_object->genBranchConfigs(),
           $branch_config ==>
             $branch_config->getInternalBranch() === $internal_branch,
         );

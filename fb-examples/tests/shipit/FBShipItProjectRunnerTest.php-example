@@ -31,7 +31,7 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
     );
   }
 
-  public function testGetPhasesNoBranch(): void {
+  public async function testGetPhasesNoBranch(): Awaitable<void> {
     $phase = self::getPhases(
       FBShipItCLIAction::SHIP_IT,
       self::getConfigObject(),
@@ -42,11 +42,11 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
       \get_class($phase),
     );
     \expect($phase)->toNotBeInstanceOf(FBImportItBranchResolutionPhase::class);
-    $branches = $phase->getBranchConfigs();
+    $branches = await $phase->genBranchConfigs();
     \expect(C\count($branches))->toBePHPEqual(2);
   }
 
-  public function testGetPhasesWithBranch(): void {
+  public async function testGetPhasesWithBranch(): Awaitable<void> {
     $phase = self::getPhases(
       FBShipItCLIAction::SHIP_IT,
       self::getConfigObject(),
@@ -58,12 +58,12 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
       \get_class($phase),
     );
     \expect($phase)->toNotBeInstanceOf(FBImportItBranchResolutionPhase::class);
-    $branches = $phase->getBranchConfigs();
+    $branches = await $phase->genBranchConfigs();
     \expect(C\count($branches))->toBePHPEqual(1);
     \expect($branches[0]->getInternalBranch())->toBePHPEqual('side_branch');
   }
 
-  public function testGetPhasesImportIt(): void {
+  public async function testGetPhasesImportIt(): Awaitable<void> {
     $phase = self::getPhases(
       FBShipItCLIAction::IMPORT_IT,
       self::getConfigObject(),
@@ -75,12 +75,12 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
       \get_class($phase),
     );
     \expect($phase)->toBeInstanceOf(FBImportItBranchResolutionPhase::class);
-    $branches = $phase->getBranchConfigs();
+    $branches = await $phase->genBranchConfigs();
     \expect(C\count($branches))->toBePHPEqual(1);
     \expect($branches[0]->getInternalBranch())->toBePHPEqual('master');
   }
 
-  public function testGetPhasesImportItRequiresBranch(): void {
+  public async function testGetPhasesImportItRequiresBranch(): Awaitable<void> {
     $phase = self::getPhases(
       FBShipItCLIAction::IMPORT_IT,
       self::getConfigObject(),
@@ -91,7 +91,7 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
       \get_class($phase),
     );
     \expect($phase)->toBeInstanceOf(FBImportItBranchResolutionPhase::class);
-    \expect(() ==> $phase->getBranchConfigs())
+    \expect(async () ==> await $phase->genBranchConfigs())
       // @oss-disable: ->toThrow(\InvariantViolationException::class);
     ->toThrow(InvariantException::class); // @oss-enable
   }

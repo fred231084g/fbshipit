@@ -26,7 +26,7 @@ class ShipItPhaseRunner {
   }
 
   public async function genRun(): Awaitable<void> {
-    $this->parseCLIArguments();
+    await $this->genParseCLIArguments();
     try {
       foreach ($this->phases as $phase) {
         // @lint-ignore AWAIT_IN_LOOP need sync execution
@@ -207,7 +207,7 @@ class ShipItPhaseRunner {
     }
   }
 
-  protected function parseCLIArguments(): void {
+  protected async function genParseCLIArguments(): Awaitable<void> {
     $config = $this->getCLIArguments();
     $raw_opts = $this->argumentParser->parseArgs($config);
     if (C\contains_key($raw_opts, 'h') || C\contains_key($raw_opts, 'help')) {

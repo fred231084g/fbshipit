@@ -192,7 +192,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
   }
 
   <<__Override>>
-  protected function parseCLIArguments(): void {
+  protected async function genParseCLIArguments(): Awaitable<void> {
     $config = $this->getCLIArguments();
     $raw_opts = $this->argumentParser->parseArgs($config);
     $this->parseOptions($config, $raw_opts);
@@ -220,7 +220,8 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
             $config_object = $phase->getConfigObject();
             $project_runner = $phase::getRunner(
               $config_object,
-              $config_object->getBranchConfigs()[0],
+              // @lint-ignore AWAIT_IN_LOOP We want to execute this serially
+              (await $config_object->genBranchConfigs())[0],
             );
             self::printHelp($project_runner->getCLIArguments());
             throw new ShipItExitException(0);
