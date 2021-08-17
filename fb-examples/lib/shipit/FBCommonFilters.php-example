@@ -150,34 +150,14 @@ final abstract class FBCommonFilters {
     ShipItChangeset $changeset,
     vec<string> $exception_patterns = vec[],
   ): ShipItChangeset {
+    $global_config = FBShipItGlobalConfig::at();
     return ShipItPathFilters::stripPaths(
       $changeset,
-      vec[
-        '@^([^/]+/)*(?:(?!com/)([^/]+/))facebook(/|$)@',
-        '@^facebook[/|$]@',
-        '@(^|/)\.patternlint(/|$)@',
-        '@(^|/)fb[-_]?only(/|$)@',
-        '@(^|/)fb(/|$)@',
-        '@/AUTODEPS$@',
-        '@/TARGETS$@',
-        '@/PLATFORM$@',
-        '@/\.hgsparse(-\w+)?$@',
-        '@/BUCK$@', /** MOBILE DEVELOPERS: HERE BE DANGER **/
-        '@/BUCK\.\w+$@',
-        '@/FBBUILD_CONFIG$@',
-        '@/BUILD_MODE$@',
-        '@\.bzl$@i',
-        '@\.mk$@',
-        '@pull_request_metadata_DO_NOT_COMMIT_THIS_FILE_OR_YOU_WILL_BE_FIRED\.json@',
-        '@/\.pyre_configuration\.local$@',
-        '@re_worker_requirements$@',
-        '@/\.autodeps.toml$@',
-      ],
-      Vec\concat($exception_patterns, vec[
-        // Various Facebook projects depend on this project hashes to update
-        // submodules in GitHub.
-        '@^fbcode/opensource/project_hashes/.*$@',
-      ]),
+      $global_config->getStripCommonFiles(),
+      Vec\concat(
+        $exception_patterns,
+        $global_config->getStripCommonFilesExceptions(),
+      ),
     );
   }
 

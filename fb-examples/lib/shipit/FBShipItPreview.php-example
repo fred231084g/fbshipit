@@ -75,7 +75,7 @@ final class FBShipItPreview {
     ?string $patch = null,
   ): Awaitable<vec<ShipItPreviewOutput>> {
     try {
-      $internal_repo = FBShipItGlobalConfig::get()
+      $internal_repo = FBShipItGlobalConfig::at()
         ->getInternalRepoForArcanistProject($arcanist_project);
     // @oss-disable: } catch (\InvariantViolationException $_e) {
       } catch (InvariantException $e) { // @oss-enable
