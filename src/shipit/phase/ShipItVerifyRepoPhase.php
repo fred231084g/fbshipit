@@ -111,7 +111,7 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
     $dirty_remote = 'shipit_dest';
     $dirty_ref = $dirty_remote.'/'.$manifest->getDestinationBranch();
 
-    (
+    await (
       new ShipItShellCommand(
         $clean_path,
         'git',
@@ -120,21 +120,23 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
         $dirty_remote,
         $manifest->getDestinationPath(),
       )
-    )->runSynchronously();
-    (
+    )->genRun();
+    await (
       new ShipItShellCommand($clean_path, 'git', 'fetch', $dirty_remote)
-    )->runSynchronously();
+    )->genRun();
 
     $diffstat = (
-      new ShipItShellCommand(
-        $clean_path,
-        'git',
-        'diff',
-        '--stat',
-        'HEAD',
-        $dirty_ref,
-      )
-    )->runSynchronously()->getStdOut();
+      await (
+        new ShipItShellCommand(
+          $clean_path,
+          'git',
+          'diff',
+          '--stat',
+          'HEAD',
+          $dirty_ref,
+        )
+      )->genRun()
+    )->getStdOut();
 
     if ($diffstat === '') {
       if ($this->createPatch) {
@@ -156,17 +158,19 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
     }
 
     $diff = (
-      new ShipItShellCommand(
-        $clean_path,
-        'git',
-        'diff',
-        '--full-index',
-        '--binary',
-        '--no-color',
-        $dirty_ref,
-        'HEAD',
-      )
-    )->runSynchronously()->getStdOut();
+      await (
+        new ShipItShellCommand(
+          $clean_path,
+          'git',
+          'diff',
+          '--full-index',
+          '--binary',
+          '--no-color',
+          $dirty_ref,
+          'HEAD',
+        )
+      )->genRun()
+    )->getStdOut();
 
     $source_sync_id = $this->verifySourceCommit;
     if ($source_sync_id === null) {
@@ -183,7 +187,8 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
       $source_sync_id = $changeset->getID();
     }
 
-    $patch_file = PHP\tempnam(PHP\sys_get_temp_dir(), 'shipit-resync-patch-') as string;
+    $patch_file = PHP\tempnam(PHP\sys_get_temp_dir(), 'shipit-resync-patch-')
+      as string;
     PHP\file_put_contents($patch_file, $diff);
 
     ShipItLogger::out(

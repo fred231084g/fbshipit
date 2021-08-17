@@ -74,6 +74,10 @@ final class ShipItShellCommand {
     return $this;
   }
 
+  public async function genRun(): Awaitable<ShipItShellCommandResult> {
+    return $this->runSynchronously();
+  }
+
   public function runSynchronously(): ShipItShellCommandResult {
     $max_tries = $this->retries + 1;
     $tries_remaining = $max_tries;

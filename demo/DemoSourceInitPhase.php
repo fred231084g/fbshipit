@@ -44,13 +44,13 @@ final class DemoSourceRepoInitPhase extends ShipItPhase {
     // Make sure that "remove stale temp file" jobs don't clean this up
     PHP\touch($local_parent_path);
 
-    (new ShipItShellCommand($local_parent_path, ...$command))
+    await (new ShipItShellCommand($local_parent_path, ...$command))
       ->setRetries(2)
       ->setFailureHandler(
         $_ ==> (
           new ShipItShellCommand($local_parent_path, 'rm', '-rf', $local_path)
         )->runSynchronously(),
       )
-      ->runSynchronously();
+      ->genRun();
   }
 }

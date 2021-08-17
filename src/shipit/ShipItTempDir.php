@@ -41,11 +41,11 @@ final class ShipItTempDir {
     $this->mode = ShipItTempDirMode::KEEP;
   }
 
-  public function remove(): void {
+  public async function genRemove(): Awaitable<void> {
     $this->assertMode(ShipItTempDirMode::AUTO_REMOVE);
-    (
+    await (
       new ShipItShellCommand(PHP\sys_get_temp_dir(), 'rm', '-rf', $this->path)
-    )->runSynchronously();
+    )->genRun();
     $this->mode = ShipItTempDirMode::REMOVED;
   }
 

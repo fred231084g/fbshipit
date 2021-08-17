@@ -107,11 +107,11 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     throw new ShipItExitException(0);
   }
 
-  private static function initGitRepo(
+  private static async function genInitGitRepo(
     string $path,
     shape('name' => string, 'email' => string) $committer,
-  ): void {
-    self::execSteps(
+  ): Awaitable<void> {
+    await self::genExecSteps(
       $path,
       vec[
         vec['git', 'init'],
@@ -163,9 +163,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
         $revision,
       );
     } catch (\Exception $e) {
-      (
-        new ShipItShellCommand(null, 'rm', '-rf', $output_dir)
-      )->runSynchronously();
+      await (new ShipItShellCommand(null, 'rm', '-rf', $output_dir))->genRun();
       throw $e;
     }
   }
@@ -197,7 +195,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     $rev = $export['revision'];
 
     $logger->out("  Creating unfiltered commit...");
-    self::initGitRepo($export_dir->getPath(), $committer);
+    await self::genInitGitRepo($export_dir->getPath(), $committer);
 
     // The following code is necessarily convoluted. In order to support
     // creating/verifying repos that are greater than 2 GB we need to break the
@@ -217,13 +215,15 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     // After everything, squash to a single commit (with ShipIt tracking info).
 
     $all_filenames_chunked = (
-      new ShipItShellCommand(
-        $export_dir->getPath(),
-        'git',
-        'ls-files',
-        '--others',
-      )
-    )->runSynchronously()->getStdOut()
+      await (
+        new ShipItShellCommand(
+          $export_dir->getPath(),
+          'git',
+          'ls-files',
+          '--others',
+        )
+      )->genRun()
+    )->getStdOut()
       |> Str\split($$, "\n")
       |> Vec\filter($$, ($line) ==> !Str\is_empty($line))
       // `git ls-files` returns files with escaping, if necessary. Since we
@@ -238,11 +238,14 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     $chunk_count = C\count($all_filenames_chunked);
 
     // @lint-ignore UNUSED_RESULT
-    Vec\map_with_key($all_filenames_chunked, ($i, $chunk_filenames) ==> {
+    await Dict\map_with_key_async($all_filenames_chunked, async (
+      $i,
+      $chunk_filenames,
+    ) ==> {
       if ($manifest->isVerboseEnabled()) {
         $logger->out("    Processing chunk %d/%d", $i + 1, $chunk_count);
       }
-      self::execSteps(
+      await self::genExecSteps(
         $export_dir->getPath(),
         vec[
           Vec\concat(vec['git', 'add', '--force'], $chunk_filenames),
@@ -268,14 +271,16 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
         'master',
       );
       $current_commit = (
-        new ShipItShellCommand(
-          $export_dir->getPath(),
-          'git',
-          'rev-list',
-          '--max-parents=0',
-          'HEAD',
-        )
-      )->runSynchronously()->getStdOut()
+        await (
+          new ShipItShellCommand(
+            $export_dir->getPath(),
+            'git',
+            'rev-list',
+            '--max-parents=0',
+            'HEAD',
+          )
+        )->genRun()
+      )->getStdOut()
         |> Str\trim($$);
       $changesets = vec[];
       while ($current_commit !== null) {
@@ -306,7 +311,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       |> ShipItSync::addTrackingData($manifest, $$, $rev);
 
     $logger->out("  Creating new repo...");
-    self::initGitRepo($output_dir, $committer);
+    await self::genInitGitRepo($output_dir, $committer);
     $output_lock = ShipItScopedFlock::createShared(
       ShipItScopedFlock::getLockFilePathForRepoPath($output_dir),
     );
@@ -325,16 +330,18 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       // we need to squash the chunks into a single commit. Fortunately, the
       // following commands work just fine if HEAD == initial commit
       $initial_commit_sha = (
-        new ShipItShellCommand(
-          $output_dir,
-          'git',
-          'rev-list',
-          '--max-parents=0',
-          'HEAD',
-        )
-      )->runSynchronously()->getStdOut()
+        await (
+          new ShipItShellCommand(
+            $output_dir,
+            'git',
+            'rev-list',
+            '--max-parents=0',
+            'HEAD',
+          )
+        )->genRun()
+      )->getStdOut()
         |> Str\trim($$);
-      self::execSteps(
+      await self::genExecSteps(
         $output_dir,
         vec[
           // Rewind HEAD (but NOT checked out file contents) to initial commit:
@@ -349,12 +356,13 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     }
   }
 
-  private static function execSteps(
+  private static async function genExecSteps(
     string $path,
     vec<vec<string>> $steps,
-  ): void {
+  ): Awaitable<void> {
     foreach ($steps as $step) {
-      (new ShipItShellCommand($path, ...$step))->runSynchronously();
+      // @lint-ignore AWAIT_IN_LOOP This needs to be done serially
+      await (new ShipItShellCommand($path, ...$step))->genRun();
     }
   }
 }

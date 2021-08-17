@@ -47,7 +47,7 @@ final class SyncTrackingTest extends ShellTest {
 
   <<__Override>>
   public async function afterEachTestAsync(): Awaitable<void> {
-    $this->tempDir?->remove();
+    await $this->tempDir?->genRemove();
   }
 
   private function getManifest(): ShipItManifest {

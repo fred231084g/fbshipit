@@ -48,7 +48,7 @@ final class ShipItDeleteCorruptedRepoPhase extends ShipItPhase {
       return;
     }
 
-    if (!$this->isCorrupted($local_path)) {
+    if (!(await $this->genIsCorrupted($local_path))) {
       return;
     }
 
@@ -56,10 +56,9 @@ final class ShipItDeleteCorruptedRepoPhase extends ShipItPhase {
     $path = PHP\dirname($local_path);
     if (Str\contains(PHP\php_uname('s'), 'Darwin')) {
       // MacOS doesn't have GNU rm
-      (new ShipItShellCommand($path, 'rm', '-rf', $local_path))
-        ->runSynchronously();
+      await (new ShipItShellCommand($path, 'rm', '-rf', $local_path))->genRun();
     } else {
-      (
+      await (
         new ShipItShellCommand(
           $path,
           'rm',
@@ -68,30 +67,35 @@ final class ShipItDeleteCorruptedRepoPhase extends ShipItPhase {
           $local_path,
         )
       )
-        ->runSynchronously();
+        ->genRun();
     }
   }
 
-  private function isCorrupted(string $local_path): bool {
+  private async function genIsCorrupted(string $local_path): Awaitable<bool> {
     if (PHP\file_exists($local_path.'/.git/')) {
-      return $this->isCorruptedGitRepo($local_path);
+      return await $this->genIsCorruptedGitRepo($local_path);
     }
     if (PHP\file_exists($local_path.'/.hg/')) {
-      return $this->isCorruptedHGRepo($local_path);
+      return await $this->genIsCorruptedHGRepo($local_path);
     }
     return false;
   }
 
-  private function isCorruptedGitRepo(string $local_path): bool {
+  private async function genIsCorruptedGitRepo(
+    string $local_path,
+  ): Awaitable<bool> {
     $commands = vec[
       vec['git', 'show', 'HEAD'],
       vec['git', 'fsck'],
     ];
 
     foreach ($commands as $command) {
-      $exit_code = (new ShipItShellCommand($local_path, ...$command))
-        ->setNoExceptions()
-        ->runSynchronously()
+      $exit_code = (
+        // @lint-ignore AWAIT_IN_LOOP perform shell opertaions serially
+        await (new ShipItShellCommand($local_path, ...$command))
+          ->setNoExceptions()
+          ->genRun()
+      )
         ->getExitCode();
       if ($exit_code !== 0) {
         return true;
@@ -101,14 +105,16 @@ final class ShipItDeleteCorruptedRepoPhase extends ShipItPhase {
     return false;
   }
 
-  private function isCorruptedHGRepo(string $local_path): bool {
+  private async function genIsCorruptedHGRepo(
+    string $local_path,
+  ): Awaitable<bool> {
     // Given ShipItRepoHG's lock usage, there should never be a transaction in
     // progress if we have the lock.
     if (PHP\file_exists($local_path.'/.hg/store/journal')) {
       return true;
     }
 
-    $result = (
+    $result = await (
       new ShipItShellCommand(
         $local_path,
         'hg',
@@ -121,7 +127,7 @@ final class ShipItDeleteCorruptedRepoPhase extends ShipItPhase {
     )
       ->setNoExceptions()
       ->setEnvironmentVariables(dict['HGPLAIN' => '1'])
-      ->runSynchronously();
+      ->genRun();
 
     if ($result->getExitCode() !== 0) {
       return true;
