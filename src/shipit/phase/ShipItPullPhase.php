@@ -47,6 +47,6 @@ final class ShipItPullPhase extends ShipItPhase {
         $branch = $manifest->getDestinationBranch();
         break;
     }
-    ShipItRepo::open($lock, $local_path, $branch)->pull();
+    (await ShipItRepo::genOpen($lock, $local_path, $branch))->pull();
   }
 }

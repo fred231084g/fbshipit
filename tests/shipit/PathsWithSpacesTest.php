@@ -33,7 +33,11 @@ final class PathsWithSpacesTest extends ShellTest {
   public async function testPathWithSpace(
     ShipItTempDir $temp_dir,
   ): Awaitable<void> {
-    $repo = ShipItRepo::open(new ShipItDummyLock(), $temp_dir->getPath(), '.');
+    $repo = await ShipItRepo::genOpen(
+      new ShipItDummyLock(),
+      $temp_dir->getPath(),
+      '.',
+    );
     $head = await $repo->genHeadChangeset();
 
     $head = \expect($head)->toNotBeNull();

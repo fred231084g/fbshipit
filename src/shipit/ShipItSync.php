@@ -25,26 +25,27 @@ final class ShipItSync {
   ) {
   }
 
-  private function getFirstSourceID(): ?string {
+  private async function genFirstSourceID(): Awaitable<?string> {
     $config = $this->syncConfig;
     $rev = $config->getFirstCommit();
     if ($rev === null) {
-      $src = $this->getRepo(ShipItSourceRepo::class);
+      $src = await $this->genRepo(ShipItSourceRepo::class);
 
       $rev = $src->findNextCommit(
-        $this->findLastSyncedCommit(),
+        await $this->genFindLastSyncedCommit(),
         $config->getSourceRoots(),
       );
     }
     return $rev;
   }
 
-  private function getSourceChangesets(): vec<ShipItChangeset> {
+  private async function genSourceChangesets(
+  ): Awaitable<vec<ShipItChangeset>> {
     $config = $this->syncConfig;
-    $src = $this->getRepo(ShipItSourceRepo::class);
+    $src = await $this->genRepo(ShipItSourceRepo::class);
 
     $changesets = vec[];
-    $rev = $this->getFirstSourceID();
+    $rev = await $this->genFirstSourceID();
     while ($rev !== null) {
       $changeset = $src->getChangesetFromID($rev);
 
@@ -64,8 +65,9 @@ final class ShipItSync {
     $skipped_ids = $this->syncConfig->getSkippedSourceCommits();
     $gen_filter = $this->syncConfig->getFilter();
 
+    $source_changesets = await $this->genSourceChangesets();
     return await Vec\map_async(
-      $this->getSourceChangesets(),
+      $source_changesets,
       async $changeset ==> {
         $skip_match = null;
         foreach ($skipped_ids as $skip_id) {
@@ -110,7 +112,7 @@ final class ShipItSync {
     }
 
     $verbose = $this->manifest->isVerboseEnabled();
-    $dest = $this->getRepo(ShipItDestinationRepo::class);
+    $dest = await $this->genRepo(ShipItDestinationRepo::class);
 
     $changesets = await $this->syncConfig
       ->genPostFilterChangesets($changesets, $dest);
@@ -209,11 +211,10 @@ final class ShipItSync {
       );
       $filename = $filename.'/'.$namesafe_branch.'.json';
     }
-    $source_changeset = await $this
-      ->getRepo(ShipItSourceRepo::class)
-      ->genHeadChangeset();
-    $destination_changeset = await $this
-      ->getRepo(ShipItDestinationRepo::class)
+    $source_repo = await $this->genRepo(ShipItSourceRepo::class);
+    $source_changeset = await $source_repo->genHeadChangeset();
+    $destination_repo = await $this->genRepo(ShipItDestinationRepo::class);
+    $destination_changeset = await $destination_repo
       ->genHeadChangeset();
     PHP\file_put_contents(
       $filename,
@@ -271,13 +272,13 @@ final class ShipItSync {
   }
 
   <<__Memoize>>
-  private function getRepo<Trepo as ShipItRepo>(
+  private async function genRepo<Trepo as ShipItRepo>(
     classname<Trepo> $class,
-  ): Trepo {
+  ): Awaitable<Trepo> {
     $manifest = $this->manifest;
 
     if ($class === ShipItSourceRepo::class) {
-      return ShipItRepo::typedOpen(
+      return await ShipItRepo::genTypedOpen(
         $class,
         $manifest->getSourceSharedLock(),
         $manifest->getSourcePath(),
@@ -286,7 +287,7 @@ final class ShipItSync {
     }
 
     if ($class === ShipItDestinationRepo::class) {
-      return ShipItRepo::typedOpen(
+      return await ShipItRepo::genTypedOpen(
         $class,
         $manifest->getDestinationSharedLock(),
         $manifest->getDestinationPath(),
@@ -302,8 +303,8 @@ final class ShipItSync {
     );
   }
 
-  private function findLastSyncedCommit(): string {
-    $dest = $this->getRepo(ShipItDestinationRepo::class);
+  private async function genFindLastSyncedCommit(): Awaitable<string> {
+    $dest = await $this->genRepo(ShipItDestinationRepo::class);
 
     $src_commit = $dest->findLastSourceCommit(
       $this->syncConfig->getDestinationRoots(),

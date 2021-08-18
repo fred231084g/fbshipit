@@ -178,7 +178,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
   ): Awaitable<void> {
     $logger = new ShipItVerboseLogger($manifest->isVerboseEnabled());
 
-    $source = ShipItRepo::typedOpen(
+    $source = await ShipItRepo::genTypedOpen(
       ShipItSourceRepo::class,
       $manifest->getSourceSharedLock(),
       $manifest->getSourcePath(),
@@ -264,7 +264,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       ShipItScopedFlock::getLockFilePathForRepoPath($export_dir->getPath()),
     );
     try {
-      $exported_repo = ShipItRepo::typedOpen(
+      $exported_repo = await ShipItRepo::genTypedOpen(
         ShipItSourceRepo::class,
         $export_lock,
         $export_dir->getPath(),
@@ -316,7 +316,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       ShipItScopedFlock::getLockFilePathForRepoPath($output_dir),
     );
     try {
-      $filtered_repo = ShipItRepo::typedOpen(
+      $filtered_repo = await ShipItRepo::genTypedOpen(
         ShipItDestinationRepo::class,
         $output_lock,
         $output_dir,

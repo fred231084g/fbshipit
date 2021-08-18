@@ -123,7 +123,7 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
     \Facebook\ShipIt\ShipItManifest $manifest,
   ): Awaitable<void> {
     list($changeset, $destination_base_rev) =
-      $this->getSourceChangsetAndDestinationBaseRevision($manifest);
+      await $this->genSourceChangsetAndDestinationBaseRevision($manifest);
     if ($this->applyToTarget is nonnull) {
       $destination_base_rev = $this->applyToTarget;
     }
@@ -134,9 +134,9 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
     );
   }
 
-  private function getSourceChangsetAndDestinationBaseRevision(
+  private async function genSourceChangsetAndDestinationBaseRevision(
     ShipItManifest $manifest,
-  ): (ShipItChangeset, ?string) {
+  ): Awaitable<(ShipItChangeset, ?string)> {
     $pr_number = null;
     $expected_head_rev = $this->expectedHeadRev;
     if ($this->skipPullRequest) {
@@ -156,8 +156,8 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
       $manifest->getSourceSharedLock(),
       $manifest->getSourcePath(),
     );
-    $source_repo->setBranch($manifest->getSourceBranch());
-    return $source_repo->getChangesetAndBaseRevisionForPullRequest(
+    await $source_repo->genSetBranch($manifest->getSourceBranch());
+    return await $source_repo->genChangesetAndBaseRevisionForPullRequest(
       $pr_number,
       $expected_head_rev,
       $manifest->getSourceBranch(),
@@ -170,7 +170,7 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
     ShipItChangeset $changeset,
     ?string $base_rev,
   ): Awaitable<void> {
-    $destination_repo = ImportItRepo::open(
+    $destination_repo = await ImportItRepo::genOpen(
       $manifest->getDestinationSharedLock(),
       $manifest->getDestinationPath(),
       $manifest->getDestinationBranch(),
@@ -179,7 +179,7 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
       ShipItLogger::out(
         "  Updating destination branch to new base revision...\n",
       );
-      $destination_repo->updateBranchTo($base_rev);
+      await $destination_repo->genUpdateBranchTo($base_rev);
     }
     invariant(
       $destination_repo is ShipItDestinationRepo,

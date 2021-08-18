@@ -25,12 +25,12 @@ final class FakeShipItRepo extends ShipItRepo {
   }
 
   <<__Override>>
-  protected function setBranch(string $_branch): bool {
+  protected async function genSetBranch(string $_branch): Awaitable<bool> {
     return true;
   }
 
   <<__Override>>
-  public function updateBranchTo(string $_base_rev): void {}
+  public async function genUpdateBranchTo(string $_base_rev): Awaitable<void> {}
 
   <<__Override>>
   public function clean(): void {}

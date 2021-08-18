@@ -26,7 +26,7 @@ class ShipItRepoHG
   const string COMMIT_SEPARATOR = '-~-~-~';
 
   <<__Override>>
-  public function setBranch(string $branch): bool {
+  public async function genSetBranch(string $branch): Awaitable<bool> {
     $this->branch = $branch;
     try {
       $this->hgCommand('root');
@@ -37,7 +37,7 @@ class ShipItRepoHG
   }
 
   <<__Override>>
-  public function updateBranchTo(string $base_rev): void {
+  public async function genUpdateBranchTo(string $base_rev): Awaitable<void> {
     $branch = $this->branch;
     if ($branch === null) {
       throw new ShipItRepoHGException($this, 'setBranch must be called first.');

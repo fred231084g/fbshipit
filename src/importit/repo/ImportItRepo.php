@@ -29,19 +29,19 @@ abstract class ImportItRepo {
   /**
    * Factory
    */
-  public static function open(
+  public static async function genOpen(
     \Facebook\ShipIt\IShipItLock $lock,
     string $path,
     string $branch,
-  ): \Facebook\ShipIt\ShipItRepo {
+  ): Awaitable<\Facebook\ShipIt\ShipItRepo> {
     if (PHP\file_exists($path.'/.git')) {
       $repo = new ImportItRepoGIT($lock, $path);
-      $repo->setBranch($branch);
+      await $repo->genSetBranch($branch);
       return $repo;
     }
     if (PHP\file_exists($path.'/.hg')) {
       $repo = new ImportItRepoHG($lock, $path);
-      $repo->setBranch('master');
+      await $repo->genSetBranch('master');
       return $repo;
     }
     throw new ImportItRepoException(

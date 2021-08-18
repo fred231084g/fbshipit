@@ -85,12 +85,13 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
       )
     )
       ->genRun();
+    $repo = await ShipItRepo::genOpen(
+      new ShipItDummyLock(),
+      $submodule_dir->getPath(),
+      'master',
+    );
     $submodule_first_id = (
-      await ShipItRepo::open(
-        new ShipItDummyLock(),
-        $submodule_dir->getPath(),
-        'master',
-      )
+      await $repo
         ->genHeadChangeset()
     )
       ?->getID();
@@ -115,14 +116,12 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
       )
     )
       ->genRun();
-    $submodule_second_id = (
-      await ShipItRepo::open(
-        new ShipItDummyLock(),
-        $submodule_dir->getPath(),
-        'master',
-      )
-        ->genHeadChangeset()
-    )
+    $repo = await ShipItRepo::genOpen(
+      new ShipItDummyLock(),
+      $submodule_dir->getPath(),
+      'master',
+    );
+    $submodule_second_id = (await $repo->genHeadChangeset())
       ?->getID();
     invariant($submodule_second_id !== null, 'impossible');
 
@@ -215,24 +214,26 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
       )
     )
       ->genRun();
-    $changeset = await ShipItRepo::open(
+    $repo = await ShipItRepo::genOpen(
       new ShipItDummyLock(),
       $source_dir->getPath(),
       'master',
-    )
-      ->genHeadChangeset();
+    );
+    $changeset = await $repo->genHeadChangeset();
     invariant($changeset !== null, 'impossible');
-    await ShipItRepoGIT::typedOpen(
+    $repo = await ShipItRepoGIT::genTypedOpen(
       ShipItRepoGIT::class,
       new ShipItDummyLock(),
       $dest_dir->getPath(),
       'master',
-    )
-      ->genCommitPatch(ImportItSubmoduleFilter::moveSubmoduleCommitToTextFile(
+    );
+    await $repo->genCommitPatch(
+      ImportItSubmoduleFilter::moveSubmoduleCommitToTextFile(
         $changeset,
         'submodule-test',
         'rev.txt',
-      ));
+      ),
+    );
 
     // Now we can finally check stuff!
     \expect(\file_get_contents($dest_dir->getPath().'/rev.txt'))->toBePHPEqual(

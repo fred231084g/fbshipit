@@ -65,9 +65,9 @@ abstract class ShipItRepo {
   /**
    * Implement to allow changing branches
    */
-  protected abstract function setBranch(string $branch): bool;
+  protected abstract function genSetBranch(string $branch): Awaitable<bool>;
 
-  public abstract function updateBranchTo(string $base_rev): void;
+  public abstract function genUpdateBranchTo(string $base_rev): Awaitable<void>;
 
   /**
    * Cleans our checkout.
@@ -92,13 +92,13 @@ abstract class ShipItRepo {
    */
   public abstract function getOrigin(): string;
 
-  public static function typedOpen<Trepo as ShipItRepo>(
+  public static async function genTypedOpen<Trepo as ShipItRepo>(
     classname<Trepo> $interface,
     IShipItLock $lock,
     string $path,
     string $branch,
-  ): Trepo {
-    $repo = ShipItRepo::open($lock, $path, $branch);
+  ): Awaitable<Trepo> {
+    $repo = await ShipItRepo::genOpen($lock, $path, $branch);
     invariant(
       \is_a($repo, $interface),
       '%s is a %s, needed a %s',
@@ -113,19 +113,19 @@ abstract class ShipItRepo {
   /**
    * Factory
    */
-  public static function open(
+  public static async function genOpen(
     IShipItLock $lock,
     string $path,
     string $branch,
-  ): ShipItRepo {
+  ): Awaitable<ShipItRepo> {
     if (PHP\file_exists($path.'/.git')) {
       $repo = new ShipItRepoGIT($lock, $path);
-      $repo->setBranch($branch);
+      await $repo->genSetBranch($branch);
       return $repo;
     }
     if (PHP\file_exists($path.'/.hg')) {
       $repo = new ShipItRepoHG($lock, $path);
-      $repo->setBranch($branch);
+      await $repo->genSetBranch($branch);
       return $repo;
     }
     throw new ShipItRepoException(

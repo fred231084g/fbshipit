@@ -38,14 +38,14 @@ class ShipItRepoGIT
   }
 
   <<__Override>>
-  public function setBranch(string $branch): bool {
+  public async function genSetBranch(string $branch): Awaitable<bool> {
     $this->branch = $branch;
     $this->gitCommand('checkout', $branch);
     return true;
   }
 
   <<__Override>>
-  public function updateBranchTo(string $base_rev): void {
+  public async function genUpdateBranchTo(string $base_rev): Awaitable<void> {
     if (Str\is_empty($this->branch)) {
       throw new ShipItRepoGITException(
         $this,
@@ -330,7 +330,8 @@ class ShipItRepoGIT
           // Cleanup from submodule auth
           try {
             $this->gitCommand('restore', '.gitmodules');
-          } catch (ShipItShellCommandException $_) {}
+          } catch (ShipItShellCommandException $_) {
+          }
         }
       }
     }
@@ -508,14 +509,7 @@ class ShipItRepoGIT
     $command = Vec\concat($command, $roots);
     $this->gitCommand(...$command);
 
-    (
-      new ShipItShellCommand(
-        $dest->getPath(),
-        'tar',
-        'xf',
-        $archive_name,
-      )
-    )
+    (new ShipItShellCommand($dest->getPath(), 'tar', 'xf', $archive_name))
       ->runSynchronously();
 
     (
@@ -566,11 +560,18 @@ class ShipItRepoGIT
     $configs = dict(PHP\parse_ini_string($configs) as KeyedContainer<_, _>)
       |> Dict\filter_keys($$, ($key) ==> {
         return Str\slice($key as string, 0, 10) === 'submodule.' &&
-          (Str\slice($key as string, -5) === '.path' || Str\slice($key as string, -4) === '.url');
+          (
+            Str\slice($key as string, -5) === '.path' ||
+            Str\slice($key as string, -4) === '.url'
+          );
       });
     return Vec\keys($configs)
       |> Vec\filter($$, $key ==> Str\slice($key as string, -4) === '.url')
-      |> Vec\map($$, $key ==> Str\slice($key as string, 10, Str\length($key as string) - 10 - 4))
+      |> Vec\map(
+        $$,
+        $key ==>
+          Str\slice($key as string, 10, Str\length($key as string) - 10 - 4),
+      )
       |> Vec\map(
         $$,
         $name ==> shape(

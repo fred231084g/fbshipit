@@ -72,7 +72,7 @@ final class SyncTrackingTest extends ShellTest {
       )
     )->genRun();
     $repo = new ShipItRepoGIT(new ShipItDummyLock(), $path);
-    $repo->setBranch('master');
+    await $repo->genSetBranch('master');
     return $repo;
   }
 
@@ -107,7 +107,7 @@ final class SyncTrackingTest extends ShellTest {
     )->genRun();
 
     $repo = new ShipItRepoHG(new ShipItDummyLock(), $path);
-    $repo->setBranch('master');
+    await $repo->genSetBranch('master');
     \expect($repo->findLastSourceCommit(keyset[]))->toEqual($fake_commit_id);
   }
 

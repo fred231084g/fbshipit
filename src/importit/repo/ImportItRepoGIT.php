@@ -25,15 +25,15 @@ final class ImportItRepoGIT extends \Facebook\ShipIt\ShipItRepoGIT {
    * possibly return a revision that this PR is based on in the destination
    * repository.
    */
-  public function getChangesetAndBaseRevisionForPullRequest(
+  public async function genChangesetAndBaseRevisionForPullRequest(
     ?string $pr_number,
     string $expected_head_rev,
     string $source_default_branch,
     bool $use_latest_base_revision,
-  ): (ShipItChangeset, ?string) {
+  ): Awaitable<(ShipItChangeset, ?string)> {
     $lock = $this->getSharedLock()->getExclusive();
     try {
-      return $this->getChangesetAndBaseRevisionForPullRequestLocked(
+      return await $this->genChangesetAndBaseRevisionForPullRequestLocked(
         $pr_number,
         $expected_head_rev,
         $source_default_branch,
@@ -44,12 +44,12 @@ final class ImportItRepoGIT extends \Facebook\ShipIt\ShipItRepoGIT {
     }
   }
 
-  private function getChangesetAndBaseRevisionForPullRequestLocked(
+  private async function genChangesetAndBaseRevisionForPullRequestLocked(
     ?string $pr_number,
     string $expected_head_rev,
     string $source_default_branch,
     bool $use_latest_base_revision,
-  ): (ShipItChangeset, ?string) {
+  ): Awaitable<(ShipItChangeset, ?string)> {
     if ($pr_number === null) {
       $actual_head_rev = Str\trim(
         $this->gitCommand('rev-parse', $expected_head_rev),
@@ -88,7 +88,7 @@ final class ImportItRepoGIT extends \Facebook\ShipIt\ShipItRepoGIT {
       $actual_head_rev,
     );
     $this->gitCommand('checkout', '-B', $branch_name, $merge_base);
-    $this->setBranch($branch_name);
+    await $this->genSetBranch($branch_name);
     $this->gitPipeCommand(
       $diff,
       'apply',

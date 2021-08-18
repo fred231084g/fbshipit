@@ -17,10 +17,10 @@ namespace Facebook\ImportIt;
  */
 final class ImportItRepoHG extends \Facebook\ShipIt\ShipItRepoHG {
   <<__Override>>
-  public function setBranch(string $branch): bool {
+  public async function genSetBranch(string $branch): Awaitable<bool> {
     // This class creates a bookmark and uses it to keep track of where it is.
     // So if $branch is `master`, that can cause trouble. Easiest solution is
     // to alphavary the name.
-    return parent::setBranch($branch."_importit");
+    return await parent::genSetBranch($branch."_importit");
   }
 }

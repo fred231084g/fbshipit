@@ -37,7 +37,7 @@ final class NewlinesTest extends ShellTest {
     );
 
     $repo = new ShipItRepoHG(new ShipItDummyLock(), $temp_dir->getPath());
-    $repo->setBranch('master');
+    await $repo->genSetBranch('master');
     $changeset = $repo->getChangesetFromID('.');
     $changeset = \expect($changeset)->toNotBeNull();
 
@@ -58,7 +58,7 @@ final class NewlinesTest extends ShellTest {
     );
 
     $repo = new ShipItRepoGIT(new ShipItDummyLock(), $temp_dir->getPath());
-    $repo->setBranch('master');
+    await $repo->genSetBranch('master');
     $changeset = $repo->getChangesetFromID('HEAD');
     $changeset = \expect($changeset)->toNotBeNull();
 
@@ -113,8 +113,8 @@ final class NewlinesTest extends ShellTest {
 
     );
     $hg_repo = new ShipItRepoHG(new ShipItDummyLock(), $hg_dir->getPath());
-    $git_repo->setBranch('--orphan=master');
-    $hg_repo->setBranch('master');
+    await $git_repo->genSetBranch('--orphan=master');
+    await $hg_repo->genSetBranch('master');
     $repos = vec[
       $git_repo,
       $hg_repo,

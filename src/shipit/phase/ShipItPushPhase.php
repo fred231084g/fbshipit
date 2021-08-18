@@ -33,7 +33,7 @@ final class ShipItPushPhase extends ShipItPhase {
   protected async function genRunImpl(
     ShipItManifest $manifest,
   ): Awaitable<void> {
-    $repo = ShipItRepo::open(
+    $repo = await ShipItRepo::genOpen(
       $manifest->getDestinationSharedLock(),
       $manifest->getDestinationPath(),
       $manifest->getDestinationBranch(),

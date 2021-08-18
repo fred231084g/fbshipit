@@ -59,7 +59,7 @@ final class ShipItPushLfsPhase extends ShipItPhase {
         break;
     }
     // FIXME LFS syncing only supported for internal->external
-    ShipItRepo::open($lock, $local_path, $branch)
+    (await ShipItRepo::genOpen($lock, $local_path, $branch))
       ->pushLfs($this->getLfsPullEndpoint(), await $this->genLfsPushEndpoint());
   }
 

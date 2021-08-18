@@ -74,12 +74,13 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
+    $repo = await ShipItRepo::genOpen(
+      new ShipItDummyLock(),
+      $submodule_dir->getPath(),
+      'master',
+    );
     $submodule_id = (
-      await ShipItRepo::open(
-        new ShipItDummyLock(),
-        $submodule_dir->getPath(),
-        'master',
-      )
+      await $repo
         ->genHeadChangeset()
     )
       ?->getID();
@@ -121,11 +122,12 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
-    $changeset = await ShipItRepo::open(
+    $temp_repo = await ShipItRepo::genOpen(
       new ShipItDummyLock(),
       $source_dir->getPath(),
       'master',
-    )
+    );
+    $changeset = await $temp_repo
       ->genHeadChangeset();
     invariant($changeset !== null, 'impossible');
     $changeset = ShipItSubmoduleFilter::useSubmoduleCommitFromTextFile(
@@ -150,7 +152,7 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
-    $repo = ShipItRepoGIT::typedOpen(
+    $repo = await ShipItRepoGIT::genTypedOpen(
       ShipItRepoGIT::class,
       new ShipItDummyLock(),
       $dest_dir->getPath(),
@@ -185,14 +187,12 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
-    $submodule_id = (
-      await ShipItRepo::open(
-        new ShipItDummyLock(),
-        $submodule_dir->getPath(),
-        'master',
-      )
-        ->genHeadChangeset()
-    )
+    $temp_repo = await ShipItRepo::genOpen(
+      new ShipItDummyLock(),
+      $submodule_dir->getPath(),
+      'master',
+    );
+    $submodule_id = (await $temp_repo->genHeadChangeset())
       ?->getID();
     invariant($submodule_id !== null, 'impossible');
     PHP\file_put_contents(
@@ -213,12 +213,12 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
-    $changeset = await ShipItRepo::open(
+    $temp_repo = await ShipItRepo::genOpen(
       new ShipItDummyLock(),
       $source_dir->getPath(),
       'master',
-    )
-      ->genHeadChangeset();
+    );
+    $changeset = await $temp_repo->genHeadChangeset();
     invariant($changeset !== null, 'impossible');
     $changeset = ShipItSubmoduleFilter::useSubmoduleCommitFromTextFile(
       $changeset,
@@ -255,12 +255,12 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
-    $changeset = await ShipItRepo::open(
+    $temp_repo = await ShipItRepo::genOpen(
       new ShipItDummyLock(),
       $source_dir->getPath(),
       'master',
-    )
-      ->genHeadChangeset();
+    );
+    $changeset = await $temp_repo->genHeadChangeset();
     invariant($changeset !== null, 'impossible');
     $changeset = ShipItSubmoduleFilter::useSubmoduleCommitFromTextFile(
       $changeset,

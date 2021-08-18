@@ -133,7 +133,7 @@ final class SymlinkTest extends ShellTest {
         ->genRun();
     }
 
-    $repo = ShipItRepo::typedOpen(
+    $repo = await ShipItRepo::genTypedOpen(
       $repo_type,
       new ShipItDummyLock(),
       $temp_dir->getPath(),

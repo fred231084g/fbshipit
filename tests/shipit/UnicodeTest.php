@@ -88,7 +88,7 @@ final class UnicodeTest extends ShellTest {
     await $this->genInitGitRepo($tempdir);
 
     $repo = new ShipItRepoGIT(new ShipItDummyLock(), $tempdir->getPath());
-    $repo->setBranch('master');
+    await $repo->genSetBranch('master');
     await $repo->genCommitPatch($changeset);
 
     \expect(\file_get_contents($tempdir->getPath().'/unicode-example.txt'))
@@ -106,7 +106,7 @@ final class UnicodeTest extends ShellTest {
     await $this->genInitMercurialRepo($tempdir);
 
     $repo = new ShipItRepoHG(new ShipItDummyLock(), $tempdir->getPath());
-    $repo->setBranch('master');
+    await $repo->genSetBranch('master');
     await $repo->genCommitPatch($changeset);
 
     \expect(\file_get_contents($tempdir->getPath().'/unicode-example.txt'))
@@ -135,7 +135,7 @@ final class UnicodeTest extends ShellTest {
       ->genRun();
 
     $repo = new ShipItRepoGIT(new ShipItDummyLock(), $tempdir->getPath());
-    $repo->setBranch('master');
+    await $repo->genSetBranch('master');
     $changeset = $repo->getChangesetFromID('HEAD');
     \expect($changeset->getMessage())
       ->toEqual(Str\trim($this->getExpectedContent()));
@@ -162,7 +162,7 @@ final class UnicodeTest extends ShellTest {
       ->genRun();
 
     $repo = new ShipItRepoHG(new ShipItDummyLock(), $tempdir->getPath());
-    $repo->setBranch('master');
+    await $repo->genSetBranch('master');
     $changeset = $repo->getChangesetFromID('.');
     \expect($changeset?->getMessage())->toEqual(
       Str\trim($this->getExpectedContent()),
