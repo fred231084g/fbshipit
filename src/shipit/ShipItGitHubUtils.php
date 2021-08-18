@@ -31,10 +31,10 @@ abstract class ShipItGitHubUtils {
    * This is used by ::initializeRepo().
    */
   const string GIT_HTTPS_URL_PREFIX = 'https://';
-  public abstract static function getCredentialsForProject(
+  public abstract static function genCredentialsForProject(
     string $organization,
     string $project,
-  ): ShipItGitHubCredentials;
+  ): Awaitable<ShipItGitHubCredentials>;
 
   /**
    * Configure the user and origin for a repository, cloning if necessary.
@@ -42,13 +42,13 @@ abstract class ShipItGitHubUtils {
    * - requires getCredentialsForProject() to be implemented
    * - configures 'origin' to be authenticated HTTPS
    */
-  final public static function initializeRepo(
+  final public static async function genInitializeRepo(
     string $organization,
     string $project,
     string $local_path,
     ShipItTransport $transport,
     ?ShipItGitHubCredentials $credentials,
-  ): void {
+  ): Awaitable<void> {
     $git_config = (string $key, string $value) ==>
       new ShipItShellCommand($local_path, 'git', 'config', $key, $value);
 
@@ -79,12 +79,12 @@ abstract class ShipItGitHubUtils {
         $origin = self::authHttpsRemoteUrl($origin, $transport, $credentials);
         self::cloneAndVerifyRepo($origin, $local_path);
 
-        $git_config('user.name', $credentials['name'])->runSynchronously();
-        $git_config('user.email', $credentials['email'])->runSynchronously();
+        await $git_config('user.name', $credentials['name'])->genRun();
+        await $git_config('user.email', $credentials['email'])->genRun();
         break;
     }
 
-    $git_config('remote.origin.url', $origin)->runSynchronously();
+    await $git_config('remote.origin.url', $origin)->genRun();
   }
 
   public static function authHttpsRemoteUrl(

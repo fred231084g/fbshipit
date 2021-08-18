@@ -149,7 +149,8 @@ final class ShipItSync {
       }
 
       try {
-        $dest->commitPatch(
+        // @lint-ignore AWAIT_IN_LOOP These need to be committed one at a time
+        await $dest->genCommitPatch(
           $changeset,
           $this->syncConfig->getShouldDoSubmodules(),
         );

@@ -48,7 +48,7 @@ final class SubmoduleTest extends ShellTest {
     \expect($new_pos)->toBePHPEqual(48);
   }
 
-  public function testCommitPatchWithSubmodule(): void {
+  public async function testCommitPatchWithSubmodule(): Awaitable<void> {
     // First create a repo that we'll use as our submodule.
     $submodule_dir = new ShipItTempDir('submodule');
     (new ShipItShellCommand($submodule_dir->getPath(), 'git', 'init'))
@@ -151,7 +151,7 @@ final class SubmoduleTest extends ShellTest {
       $dest_dir->getPath(),
       'master',
     );
-    $repo->commitPatch($changeset);
+    await $repo->genCommitPatch($changeset);
 
     // Now we can finally check stuff!
     \expect(PHP\file_exists($dest_dir->getPath().'/submodule-test'))
@@ -213,7 +213,7 @@ final class SubmoduleTest extends ShellTest {
       'rev.txt',
       'submodule-test',
     );
-    $repo->commitPatch($changeset);
+    await $repo->genCommitPatch($changeset);
 
     \expect(PHP\file_exists($dest_dir->getPath().'/submodule-test'))
       ->toBeTrue('Subrepo should be a directory.');
@@ -252,7 +252,7 @@ final class SubmoduleTest extends ShellTest {
       'rev.txt',
       'submodule-test',
     );
-    $repo->commitPatch($changeset);
+    await $repo->genCommitPatch($changeset);
 
     \expect(PHP\file_exists($dest_dir->getPath().'/submodule-test'))
       ->toBeFalse('Subrepo should no longer exist.');

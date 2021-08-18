@@ -25,7 +25,7 @@ final class NewlinesTest extends ShellTest {
     );
   }
 
-  public function testMercurialSource(): void {
+  public async function testMercurialSource(): Awaitable<void> {
     $temp_dir = new ShipItTempDir('mercurial-newline-test');
 
     $this->createTestFiles($temp_dir);
@@ -45,10 +45,10 @@ final class NewlinesTest extends ShellTest {
     $changeset = \expect($changeset)->toNotBeNull();
 
     $this->assertContainsCorrectNewLines($changeset);
-    $this->assertCreatesCorrectNewLines($changeset);
+    await $this->genAssertCreatesCorrectNewLines($changeset);
   }
 
-  public function testGitSource(): void {
+  public async function testGitSource(): Awaitable<void> {
     $temp_dir = new ShipItTempDir('git-newline-test');
 
     $this->createTestFiles($temp_dir);
@@ -69,7 +69,7 @@ final class NewlinesTest extends ShellTest {
     $changeset = \expect($changeset)->toNotBeNull();
 
     $this->assertContainsCorrectNewLines($changeset);
-    $this->assertCreatesCorrectNewLines($changeset);
+    await $this->genAssertCreatesCorrectNewLines($changeset);
   }
 
   private function createTestFiles(ShipItTempDir $temp_dir): void {
@@ -99,9 +99,9 @@ final class NewlinesTest extends ShellTest {
     self::configureHg($temp_dir);
   }
 
-  private function assertCreatesCorrectNewLines(
+  private async function genAssertCreatesCorrectNewLines(
     ShipItChangeset $changeset,
-  ): void {
+  ): Awaitable<void> {
     $git_dir = new ShipItTempDir('newline-output-test-git');
     $this->initGitRepo($git_dir);
     $hg_dir = new ShipItTempDir('newline-output-test-hg');
@@ -116,7 +116,8 @@ final class NewlinesTest extends ShellTest {
     ];
 
     foreach ($repos as $repo) {
-      $repo->commitPatch($changeset);
+      // @lint-ignore AWAIT_IN_LOOP These need to be committed one at a time
+      await $repo->genCommitPatch($changeset);
 
       \expect(\file_get_contents($repo->getPath().'/unix.txt'))->toEqual(
         self::UNIX_TXT,

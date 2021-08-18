@@ -15,10 +15,10 @@ final class DemoGitHubUtils extends ShipItGitHubUtils {
   static string $committerEmail = "demo@example.com";
 
   <<__Override>>
-  public static function getCredentialsForProject(
+  public static async function genCredentialsForProject(
     string $org,
     string $proj,
-  ): ShipItGitHubCredentials {
+  ): Awaitable<ShipItGitHubCredentials> {
     return shape(
       'name' => self::$committerName,
       'user' => self::$committerUser,

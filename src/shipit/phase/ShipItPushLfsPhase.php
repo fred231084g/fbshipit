@@ -60,10 +60,10 @@ final class ShipItPushLfsPhase extends ShipItPhase {
     }
     // FIXME LFS syncing only supported for internal->external
     ShipItRepo::open($lock, $local_path, $branch)
-      ->pushLfs($this->getLfsPullEndpoint(), $this->getLfsPushEndpoint());
+      ->pushLfs($this->getLfsPullEndpoint(), await $this->genLfsPushEndpoint());
   }
 
-  private function getLfsPushEndpoint(): string {
+  private async function genLfsPushEndpoint(): Awaitable<string> {
     $github_utils_class = $this->gitHubUtilsClass;
     $pushUrl = 'https://github.com/'.
       $this->organization.
@@ -74,7 +74,7 @@ final class ShipItPushLfsPhase extends ShipItPhase {
     $auth_url = ShipItGitHubUtils::authHttpsRemoteUrl(
       $pushUrl,
       ShipItTransport::HTTPS,
-      $github_utils_class::getCredentialsForProject(
+      await $github_utils_class::genCredentialsForProject(
         $this->organization,
         $this->project,
       ),

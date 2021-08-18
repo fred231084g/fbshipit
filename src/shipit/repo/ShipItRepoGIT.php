@@ -262,10 +262,10 @@ class ShipItRepoGIT
   /**
    * Commit a standardized patch to the repo
    */
-  public function commitPatch(
+  public async function genCommitPatch(
     ShipItChangeset $patch,
     bool $do_submodules = true,
-  ): string {
+  ): Awaitable<string> {
     if (C\is_empty($patch->getDiffs())) {
       // This is an empty commit, which `git am` does not handle properly.
       $this->gitCommand(
@@ -318,7 +318,8 @@ class ShipItRepoGIT
         }
         // FIXME: FB-specific
         try {
-          // @oss-disable: FBGitHubUtils::configureSubmodule(
+          // @lint-ignore AWAIT_IN_LOOP We need to do this serially
+          // @oss-disable: await FBGitHubUtils::genConfigureSubmodule(
             // @oss-disable: $match['org'],
             // @oss-disable: $match['project'],
             // @oss-disable: $this->getPath(),

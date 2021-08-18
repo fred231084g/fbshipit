@@ -38,7 +38,7 @@ final class MIMETest extends ShellTest {
       $tempdir->getPath(),
       'master',
     );
-    $repo->commitPatch($changeset);
+    await $repo->genCommitPatch($changeset);
 
     \expect(\file_get_contents($tempdir->getPath().'/example.txt'))
       ->toEqual("If you can see this it worked\n");

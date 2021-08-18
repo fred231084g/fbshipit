@@ -77,7 +77,7 @@ final class UnicodeTest extends ShellTest {
     );
   }
 
-  public function testCreatedFileWithGit(): void {
+  public async function testCreatedFileWithGit(): Awaitable<void> {
     $changeset = ShipItRepoGIT::getChangesetFromExportedPatch(
       \file_get_contents(__DIR__.'/git-diffs/unicode.header'),
       \file_get_contents(__DIR__.'/git-diffs/unicode.patch'),
@@ -92,13 +92,13 @@ final class UnicodeTest extends ShellTest {
       $tempdir->getPath(),
       'master',
     );
-    $repo->commitPatch($changeset);
+    await $repo->genCommitPatch($changeset);
 
     \expect(\file_get_contents($tempdir->getPath().'/unicode-example.txt'))
       ->toEqual($this->getExpectedContent());
   }
 
-  public function testCreatedFileWithMercurial(): void {
+  public async function testCreatedFileWithMercurial(): Awaitable<void> {
     $changeset = ShipItRepoGIT::getChangesetFromExportedPatch(
       \file_get_contents(__DIR__.'/git-diffs/unicode.header'),
       \file_get_contents(__DIR__.'/git-diffs/unicode.patch'),
@@ -113,7 +113,7 @@ final class UnicodeTest extends ShellTest {
       $tempdir->getPath(),
       'master',
     );
-    $repo->commitPatch($changeset);
+    await $repo->genCommitPatch($changeset);
 
     \expect(\file_get_contents($tempdir->getPath().'/unicode-example.txt'))
       ->toEqual($this->getExpectedContent());

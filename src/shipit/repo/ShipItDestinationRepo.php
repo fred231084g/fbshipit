@@ -30,10 +30,10 @@ interface ShipItDestinationRepo {
   /**
    * Commit a standardized patch to the repo
    */
-  public function commitPatch(
+  public function genCommitPatch(
     ShipItChangeset $patch,
     bool $do_submodules = true,
-  ): string;
+  ): Awaitable<string>;
 
   /**
    * push local changes to the upstream

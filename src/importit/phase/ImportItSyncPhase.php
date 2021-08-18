@@ -127,7 +127,7 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
     if ($this->applyToTarget is nonnull) {
       $destination_base_rev = $this->applyToTarget;
     }
-    $this->applyPatchToDestination(
+    await $this->genApplyPatchToDestination(
       $manifest,
       $changeset,
       $destination_base_rev,
@@ -165,11 +165,11 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
     );
   }
 
-  private function applyPatchToDestination(
+  private async function genApplyPatchToDestination(
     ShipItManifest $manifest,
     ShipItChangeset $changeset,
     ?string $base_rev,
-  ): void {
+  ): Awaitable<void> {
     $destination_repo = ImportItRepo::open(
       $manifest->getDestinationSharedLock(),
       $manifest->getDestinationPath(),
@@ -194,7 +194,7 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
     ShipItLogger::out("  Exporting...\n");
     $this->maybeSavePatch($destination_repo, $changeset);
     try {
-      $rev = $destination_repo->commitPatch(
+      $rev = await $destination_repo->genCommitPatch(
         $changeset,
         $this->shouldDoSubmodules,
       );

@@ -131,10 +131,10 @@ class ShipItRepoHG
     return ShipItSync::getTrackingDataFromString($log);
   }
 
-  public function commitPatch(
+  public async function genCommitPatch(
     ShipItChangeset $patch,
     bool $_do_submodules = true, // Not relevant for hg
-  ): string {
+  ): Awaitable<string> {
     if (C\is_empty($patch->getDiffs())) {
       // This is an empty commit, which `hg patch` does not handle properly.
       $this->hgCommand(

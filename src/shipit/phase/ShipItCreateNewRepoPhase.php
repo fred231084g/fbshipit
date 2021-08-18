@@ -323,7 +323,8 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
         '--orphan='.$manifest->getDestinationBranch(),
       );
       foreach ($changesets as $changeset) {
-        $filtered_repo->commitPatch($changeset, $do_submodules);
+        // @lint-ignore AWAIT_IN_LOOP These need to be committed one at a time
+        await $filtered_repo->genCommitPatch($changeset, $do_submodules);
       }
 
       // Now that we've filtered and committed all files into disparate chunks,

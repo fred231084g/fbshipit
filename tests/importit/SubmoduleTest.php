@@ -213,13 +213,13 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
       ShipItRepo::open(new ShipItDummyLock(), $source_dir->getPath(), 'master')
         ->getHeadChangeset();
     invariant($changeset !== null, 'impossible');
-    ShipItRepoGIT::typedOpen(
+    await ShipItRepoGIT::typedOpen(
       ShipItRepoGIT::class,
       new ShipItDummyLock(),
       $dest_dir->getPath(),
       'master',
     )
-      ->commitPatch(ImportItSubmoduleFilter::moveSubmoduleCommitToTextFile(
+      ->genCommitPatch(ImportItSubmoduleFilter::moveSubmoduleCommitToTextFile(
         $changeset,
         'submodule-test',
         'rev.txt',

@@ -93,12 +93,12 @@ final class ShipItGitHubInitPhase extends ShipItPhase {
 
     $credentials = null;
     if ($this->transport !== ShipItTransport::SSH && !$this->anonymousHttps) {
-      $credentials = $class::getCredentialsForProject(
+      $credentials = await $class::genCredentialsForProject(
         $this->organization,
         $this->project,
       );
     }
-    $class::initializeRepo(
+    await $class::genInitializeRepo(
       $this->organization,
       $this->project,
       $local_path,

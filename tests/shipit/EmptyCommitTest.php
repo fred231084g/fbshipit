@@ -17,7 +17,7 @@ use namespace HH\Lib\Str; // @oss-enable
 
 <<\Oncalls('open_source')>>
 final class EmptyCommitTest extends ShellTest {
-  public function testSourceGitDestGit(): void {
+  public async function testSourceGitDestGit(): Awaitable<void> {
     list($source_dir, $rev) = $this->getSourceGitRepoAndRev();
     $source_repo = ShipItRepo::typedOpen(
       ShipItSourceRepo::class,
@@ -46,7 +46,7 @@ final class EmptyCommitTest extends ShellTest {
       $dest_path->getPath(),
       'master',
     );
-    $new_rev = $dest_repo->commitPatch($changeset);
+    $new_rev = await $dest_repo->genCommitPatch($changeset);
     invariant($dest_repo is ShipItSourceRepo, 'impossible');
     $new_changeset = $dest_repo->getChangesetFromID($new_rev);
     invariant($new_changeset !== null, 'impossible');
@@ -54,7 +54,7 @@ final class EmptyCommitTest extends ShellTest {
       ->toBeEmpty('Expected zero diffs in source changeset.');
   }
 
-  public function testSourceGitDestHg(): void {
+  public async function testSourceGitDestHg(): Awaitable<void> {
     list($source_dir, $rev) = $this->getSourceGitRepoAndRev();
     $source_repo = ShipItRepo::typedOpen(
       ShipItSourceRepo::class,
@@ -83,7 +83,7 @@ final class EmptyCommitTest extends ShellTest {
       $dest_path->getPath(),
       'master',
     );
-    $new_rev = $dest_repo->commitPatch($changeset);
+    $new_rev = await $dest_repo->genCommitPatch($changeset);
     invariant($dest_repo is ShipItSourceRepo, 'impossible');
     $new_changeset = $dest_repo->getChangesetFromID($new_rev);
     invariant($new_changeset !== null, 'impossible');
@@ -91,7 +91,7 @@ final class EmptyCommitTest extends ShellTest {
       ->toBeEmpty('Expected zero diffs in source changeset.');
   }
 
-  public function testSourceHgDestGit(): void {
+  public async function testSourceHgDestGit(): Awaitable<void> {
     list($source_dir, $rev) = $this->getSourceHgRepoAndRev();
     $source_repo = ShipItRepo::typedOpen(
       ShipItSourceRepo::class,
@@ -120,7 +120,7 @@ final class EmptyCommitTest extends ShellTest {
       $dest_path->getPath(),
       'master',
     );
-    $new_rev = $dest_repo->commitPatch($changeset);
+    $new_rev = await $dest_repo->genCommitPatch($changeset);
     invariant($dest_repo is ShipItSourceRepo, 'impossible');
     $new_changeset = $dest_repo->getChangesetFromID($new_rev);
     invariant($new_changeset !== null, 'impossible');
@@ -128,7 +128,7 @@ final class EmptyCommitTest extends ShellTest {
       ->toBeEmpty('Expected zero diffs in source changeset.');
   }
 
-  public function testSourceHgDestHg(): void {
+  public async function testSourceHgDestHg(): Awaitable<void> {
     list($source_dir, $rev) = $this->getSourceHgRepoAndRev();
     $source_repo = ShipItRepo::typedOpen(
       ShipItSourceRepo::class,
@@ -157,7 +157,7 @@ final class EmptyCommitTest extends ShellTest {
       $dest_path->getPath(),
       'master',
     );
-    $new_rev = $dest_repo->commitPatch($changeset);
+    $new_rev = await $dest_repo->genCommitPatch($changeset);
     invariant($dest_repo is ShipItSourceRepo, 'impossible');
     $new_changeset = $dest_repo->getChangesetFromID($new_rev);
     invariant($new_changeset !== null, 'impossible');
