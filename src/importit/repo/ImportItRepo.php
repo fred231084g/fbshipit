@@ -35,10 +35,14 @@ abstract class ImportItRepo {
     string $branch,
   ): \Facebook\ShipIt\ShipItRepo {
     if (PHP\file_exists($path.'/.git')) {
-      return new ImportItRepoGIT($lock, $path, $branch);
+      $repo = new ImportItRepoGIT($lock, $path);
+      $repo->setBranch($branch);
+      return $repo;
     }
     if (PHP\file_exists($path.'/.hg')) {
-      return new ImportItRepoHG($lock, $path, $branch);
+      $repo = new ImportItRepoHG($lock, $path);
+      $repo->setBranch('master');
+      return $repo;
     }
     throw new ImportItRepoException(
       null,

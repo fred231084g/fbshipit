@@ -155,8 +155,8 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
     $source_repo = new ImportItRepoGIT(
       $manifest->getSourceSharedLock(),
       $manifest->getSourcePath(),
-      $manifest->getSourceBranch(),
     );
+    $source_repo->setBranch($manifest->getSourceBranch());
     return $source_repo->getChangesetAndBaseRevisionForPullRequest(
       $pr_number,
       $expected_head_rev,

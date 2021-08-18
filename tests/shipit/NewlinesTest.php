@@ -36,11 +36,8 @@ final class NewlinesTest extends ShellTest {
       vec['hg', 'commit', '-Am', 'add files'],
     );
 
-    $repo = new ShipItRepoHG(
-      new ShipItDummyLock(),
-      $temp_dir->getPath(),
-      'master',
-    );
+    $repo = new ShipItRepoHG(new ShipItDummyLock(), $temp_dir->getPath());
+    $repo->setBranch('master');
     $changeset = $repo->getChangesetFromID('.');
     $changeset = \expect($changeset)->toNotBeNull();
 
@@ -60,11 +57,8 @@ final class NewlinesTest extends ShellTest {
       vec['git', 'commit', '-m', 'add files'],
     );
 
-    $repo = new ShipItRepoGIT(
-      new ShipItDummyLock(),
-      $temp_dir->getPath(),
-      'master',
-    );
+    $repo = new ShipItRepoGIT(new ShipItDummyLock(), $temp_dir->getPath());
+    $repo->setBranch('master');
     $changeset = $repo->getChangesetFromID('HEAD');
     $changeset = \expect($changeset)->toNotBeNull();
 
@@ -113,13 +107,17 @@ final class NewlinesTest extends ShellTest {
     await $this->genInitGitRepo($git_dir);
     $hg_dir = new ShipItTempDir('newline-output-test-hg');
     await $this->genInitMercurialRepo($hg_dir);
+    $git_repo = new ShipItRepoGIT(
+      new ShipItDummyLock(),
+      $git_dir->getPath(),
+
+    );
+    $hg_repo = new ShipItRepoHG(new ShipItDummyLock(), $hg_dir->getPath());
+    $git_repo->setBranch('--orphan=master');
+    $hg_repo->setBranch('master');
     $repos = vec[
-      new ShipItRepoGIT(
-        new ShipItDummyLock(),
-        $git_dir->getPath(),
-        '--orphan=master',
-      ),
-      new ShipItRepoHG(new ShipItDummyLock(), $hg_dir->getPath(), 'master'),
+      $git_repo,
+      $hg_repo,
     ];
 
     foreach ($repos as $repo) {

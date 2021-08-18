@@ -71,7 +71,9 @@ final class SyncTrackingTest extends ShellTest {
         $message,
       )
     )->genRun();
-    return new ShipItRepoGIT(new ShipItDummyLock(), $path, 'master');
+    $repo = new ShipItRepoGIT(new ShipItDummyLock(), $path);
+    $repo->setBranch('master');
+    return $repo;
   }
 
   public async function testLastSourceCommitWithGit(): Awaitable<void> {
@@ -104,7 +106,8 @@ final class SyncTrackingTest extends ShellTest {
       new ShipItShellCommand($path, 'hg', 'commit', '-A', '-m', $message)
     )->genRun();
 
-    $repo = new ShipItRepoHG(new ShipItDummyLock(), $path, 'master');
+    $repo = new ShipItRepoHG(new ShipItDummyLock(), $path);
+    $repo->setBranch('master');
     \expect($repo->findLastSourceCommit(keyset[]))->toEqual($fake_commit_id);
   }
 

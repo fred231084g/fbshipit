@@ -34,10 +34,7 @@ abstract class ShipItRepo {
   public function __construct(
     private IShipItLock $lock,
     protected string $path,
-    string $branch,
-  ) {
-    $this->setBranch($branch);
-  }
+  ) {}
 
   /**
    * Get the ShipItChangeset of the HEAD revision in the current branch.
@@ -122,10 +119,14 @@ abstract class ShipItRepo {
     string $branch,
   ): ShipItRepo {
     if (PHP\file_exists($path.'/.git')) {
-      return new ShipItRepoGIT($lock, $path, $branch);
+      $repo = new ShipItRepoGIT($lock, $path);
+      $repo->setBranch($branch);
+      return $repo;
     }
     if (PHP\file_exists($path.'/.hg')) {
-      return new ShipItRepoHG($lock, $path, $branch);
+      $repo = new ShipItRepoHG($lock, $path);
+      $repo->setBranch($branch);
+      return $repo;
     }
     throw new ShipItRepoException(
       null,

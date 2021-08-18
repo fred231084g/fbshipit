@@ -28,7 +28,10 @@ final class RenameFileTest extends ShellTest {
    */
   public async function testRenameFile(): Awaitable<void> {
     $temp_dir = new ShipItTempDir('rename-file-test');
-    PHP\file_put_contents($temp_dir->getPath().'/initial.txt', 'my content here');
+    PHP\file_put_contents(
+      $temp_dir->getPath().'/initial.txt',
+      'my content here',
+    );
 
     await self::genExecSteps($temp_dir->getPath(), vec['hg', 'init']);
     self::configureHg($temp_dir);
@@ -41,11 +44,8 @@ final class RenameFileTest extends ShellTest {
       vec['hg', 'commit', '-Am', 'moved file'],
     );
 
-    $repo = new ShipItRepoHG(
-      new ShipItDummyLock(),
-      $temp_dir->getPath(),
-      'master',
-    );
+    $repo = new ShipItRepoHG(new ShipItDummyLock(), $temp_dir->getPath());
+    $repo->setBranch('master');
     $changeset = $repo->getChangesetFromID('.');
     $changeset = \expect($changeset)->toNotBeNull();
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */

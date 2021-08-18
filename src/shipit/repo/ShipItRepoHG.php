@@ -25,25 +25,14 @@ class ShipItRepoHG
   private ?string $branch;
   const string COMMIT_SEPARATOR = '-~-~-~';
 
-  public function __construct(
-    IShipItLock $lock,
-    string $path,
-    string $branch,
-  ): void {
-    parent::__construct($lock, $path, $branch);
-
+  <<__Override>>
+  public function setBranch(string $branch): bool {
+    $this->branch = $branch;
     try {
-      // $this->path will be set by here as it is the first thing to
-      // set on the constructor call. So it can be used in hgCommand, etc.
       $this->hgCommand('root');
     } catch (ShipItRepoException $_ex) {
       throw new ShipItRepoHGException($this, "{$this->path} is not a HG repo");
     }
-  }
-
-  <<__Override>>
-  public function setBranch(string $branch): bool {
-    $this->branch = $branch;
     return true;
   }
 

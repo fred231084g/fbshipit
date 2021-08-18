@@ -16,7 +16,7 @@ namespace Facebook\ShipIt;
 final class FakeShipItRepo extends ShipItRepo {
   public function __construct(private ?ShipItChangeset $headChangeset = null) {
     $tempdir = new ShipItTempDir('FakeShipItRepo');
-    parent::__construct(new ShipItDummyLock(), $tempdir->getPath(), '');
+    parent::__construct(new ShipItDummyLock(), $tempdir->getPath());
   }
 
   <<__Override>>

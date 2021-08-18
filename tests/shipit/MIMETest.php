@@ -36,8 +36,8 @@ final class MIMETest extends ShellTest {
     $repo = new ShipItRepoGIT(
       new ShipItDummyLock(),
       $tempdir->getPath(),
-      'master',
     );
+    $repo->setBranch('master');
     await $repo->genCommitPatch($changeset);
 
     \expect(\file_get_contents($tempdir->getPath().'/example.txt'))
