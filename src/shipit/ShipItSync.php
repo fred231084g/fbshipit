@@ -100,7 +100,7 @@ final class ShipItSync {
     $changesets = await $this->genFilteredChangesets();
     if (C\is_empty($changesets)) {
       ShipItLogger::out("  No new commits to sync.\n");
-      $this->maybeLogStats(vec[], vec[]);
+      await $this->genMaybeLogStats(vec[], vec[]);
       return;
     }
 
@@ -112,7 +112,8 @@ final class ShipItSync {
     $verbose = $this->manifest->isVerboseEnabled();
     $dest = $this->getRepo(ShipItDestinationRepo::class);
 
-    $changesets = $this->syncConfig->postFilterChangesets($changesets, $dest);
+    $changesets = await $this->syncConfig
+      ->genPostFilterChangesets($changesets, $dest);
 
     $changesets_applied = vec[];
     $changesets_skipped = vec[];
@@ -181,7 +182,7 @@ final class ShipItSync {
       }
     }
 
-    $this->maybeLogStats($changesets_applied, $changesets_skipped);
+    await $this->genMaybeLogStats($changesets_applied, $changesets_skipped);
   }
 
   /**
@@ -189,10 +190,10 @@ final class ShipItSync {
    *
    * @param $changesets_applied the changesets that were applied.
    */
-  private function maybeLogStats(
+  private async function genMaybeLogStats(
     vec<ShipItChangeset> $changesets_applied,
     vec<ShipItChangeset> $changesets_skipped,
-  ): void {
+  ): Awaitable<void> {
     $filename = $this->syncConfig->getStatsFilename();
     if ($filename === null) {
       return;
@@ -208,12 +209,12 @@ final class ShipItSync {
       );
       $filename = $filename.'/'.$namesafe_branch.'.json';
     }
-    $source_changeset = $this
+    $source_changeset = await $this
       ->getRepo(ShipItSourceRepo::class)
-      ->getHeadChangeset();
-    $destination_changeset = $this
+      ->genHeadChangeset();
+    $destination_changeset = await $this
       ->getRepo(ShipItDestinationRepo::class)
-      ->getHeadChangeset();
+      ->genHeadChangeset();
     PHP\file_put_contents(
       $filename,
       \json_encode(dict[

@@ -180,7 +180,7 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
         $manifest->getSourcePath(),
         $manifest->getSourceBranch(),
       );
-      $changeset = $repo->getHeadChangeset();
+      $changeset = await $repo->genHeadChangeset();
       if ($changeset === null) {
         throw new ShipItException('Could not find source id.');
       }

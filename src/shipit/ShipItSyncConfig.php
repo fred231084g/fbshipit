@@ -20,7 +20,7 @@ final class ShipItSyncConfig {
   const type TPostFilterChangesetsFn = (function(
     vec<ShipItChangeset>,
     ShipItRepo,
-  ): vec<ShipItChangeset>);
+  ): Awaitable<vec<ShipItChangeset>>);
 
   private ?string $firstCommit = null;
   private keyset<string> $skippedSourceCommits = keyset[];
@@ -102,15 +102,15 @@ final class ShipItSyncConfig {
     return $this->genFilter;
   }
 
-  public function postFilterChangesets(
+  public async function genPostFilterChangesets(
     vec<ShipItChangeset> $changesets,
     ShipItRepo $dest,
-  ): vec<ShipItChangeset> {
+  ): Awaitable<vec<ShipItChangeset>> {
     $post_filter_changesets = $this->postFilterChangesets;
     if ($post_filter_changesets === null) {
       return $changesets;
     }
-    return $post_filter_changesets($changesets, $dest);
+    return await $post_filter_changesets($changesets, $dest);
   }
 
   public function getStatsFilename(): ?string {

@@ -74,12 +74,14 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
-    $submodule_id = ShipItRepo::open(
-      new ShipItDummyLock(),
-      $submodule_dir->getPath(),
-      'master',
+    $submodule_id = (
+      await ShipItRepo::open(
+        new ShipItDummyLock(),
+        $submodule_dir->getPath(),
+        'master',
+      )
+        ->genHeadChangeset()
     )
-      ->getHeadChangeset()
       ?->getID();
     invariant($submodule_id !== null, 'impossible');
 
@@ -119,9 +121,12 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
-    $changeset =
-      ShipItRepo::open(new ShipItDummyLock(), $source_dir->getPath(), 'master')
-        ->getHeadChangeset();
+    $changeset = await ShipItRepo::open(
+      new ShipItDummyLock(),
+      $source_dir->getPath(),
+      'master',
+    )
+      ->genHeadChangeset();
     invariant($changeset !== null, 'impossible');
     $changeset = ShipItSubmoduleFilter::useSubmoduleCommitFromTextFile(
       $changeset,
@@ -180,12 +185,14 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
-    $submodule_id = ShipItRepo::open(
-      new ShipItDummyLock(),
-      $submodule_dir->getPath(),
-      'master',
+    $submodule_id = (
+      await ShipItRepo::open(
+        new ShipItDummyLock(),
+        $submodule_dir->getPath(),
+        'master',
+      )
+        ->genHeadChangeset()
     )
-      ->getHeadChangeset()
       ?->getID();
     invariant($submodule_id !== null, 'impossible');
     PHP\file_put_contents(
@@ -206,9 +213,12 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
-    $changeset =
-      ShipItRepo::open(new ShipItDummyLock(), $source_dir->getPath(), 'master')
-        ->getHeadChangeset();
+    $changeset = await ShipItRepo::open(
+      new ShipItDummyLock(),
+      $source_dir->getPath(),
+      'master',
+    )
+      ->genHeadChangeset();
     invariant($changeset !== null, 'impossible');
     $changeset = ShipItSubmoduleFilter::useSubmoduleCommitFromTextFile(
       $changeset,
@@ -245,9 +255,12 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
-    $changeset =
-      ShipItRepo::open(new ShipItDummyLock(), $source_dir->getPath(), 'master')
-        ->getHeadChangeset();
+    $changeset = await ShipItRepo::open(
+      new ShipItDummyLock(),
+      $source_dir->getPath(),
+      'master',
+    )
+      ->genHeadChangeset();
     invariant($changeset !== null, 'impossible');
     $changeset = ShipItSubmoduleFilter::useSubmoduleCommitFromTextFile(
       $changeset,

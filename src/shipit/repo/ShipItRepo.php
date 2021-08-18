@@ -39,7 +39,7 @@ abstract class ShipItRepo {
   /**
    * Get the ShipItChangeset of the HEAD revision in the current branch.
    */
-  public abstract function getHeadChangeset(): ?ShipItChangeset;
+  public abstract function genHeadChangeset(): Awaitable<?ShipItChangeset>;
 
   protected function getSharedLock(): IShipItLock {
     return $this->lock;

@@ -20,7 +20,7 @@ final class FakeShipItRepo extends ShipItRepo {
   }
 
   <<__Override>>
-  public function getHeadChangeset(): ?ShipItChangeset {
+  public async function genHeadChangeset(): Awaitable<?ShipItChangeset> {
     return $this->headChangeset;
   }
 

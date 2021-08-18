@@ -47,7 +47,7 @@ class ShipItRepoHG
   }
 
   <<__Override>>
-  public function getHeadChangeset(): ?ShipItChangeset {
+  public async function genHeadChangeset(): Awaitable<?ShipItChangeset> {
     $branch = $this->branch;
     if ($branch === null) {
       throw new ShipItRepoHGException($this, "setBranch must be called first.");

@@ -85,12 +85,14 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
       )
     )
       ->genRun();
-    $submodule_first_id = ShipItRepo::open(
-      new ShipItDummyLock(),
-      $submodule_dir->getPath(),
-      'master',
+    $submodule_first_id = (
+      await ShipItRepo::open(
+        new ShipItDummyLock(),
+        $submodule_dir->getPath(),
+        'master',
+      )
+        ->genHeadChangeset()
     )
-      ->getHeadChangeset()
       ?->getID();
     invariant($submodule_first_id !== null, 'impossible');
     await (
@@ -113,12 +115,14 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
       )
     )
       ->genRun();
-    $submodule_second_id = ShipItRepo::open(
-      new ShipItDummyLock(),
-      $submodule_dir->getPath(),
-      'master',
+    $submodule_second_id = (
+      await ShipItRepo::open(
+        new ShipItDummyLock(),
+        $submodule_dir->getPath(),
+        'master',
+      )
+        ->genHeadChangeset()
     )
-      ->getHeadChangeset()
       ?->getID();
     invariant($submodule_second_id !== null, 'impossible');
 
@@ -211,9 +215,12 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
       )
     )
       ->genRun();
-    $changeset =
-      ShipItRepo::open(new ShipItDummyLock(), $source_dir->getPath(), 'master')
-        ->getHeadChangeset();
+    $changeset = await ShipItRepo::open(
+      new ShipItDummyLock(),
+      $source_dir->getPath(),
+      'master',
+    )
+      ->genHeadChangeset();
     invariant($changeset !== null, 'impossible');
     await ShipItRepoGIT::typedOpen(
       ShipItRepoGIT::class,

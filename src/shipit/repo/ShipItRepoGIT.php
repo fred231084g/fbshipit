@@ -56,7 +56,7 @@ class ShipItRepoGIT
   }
 
   <<__Override>>
-  public function getHeadChangeset(): ?ShipItChangeset {
+  public async function genHeadChangeset(): Awaitable<?ShipItChangeset> {
     $rev = $this->gitCommand('rev-parse', $this->branch);
 
     $rev = Str\trim($rev);

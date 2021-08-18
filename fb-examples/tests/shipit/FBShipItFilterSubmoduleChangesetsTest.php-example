@@ -146,17 +146,20 @@ Test Plan:',
     \expect($merged_changesets)->toBePHPEqual($changesets);
   }
 
-  public function testShouldSkipUpdateSubmodules(): void {
+  public async function testShouldSkipUpdateSubmodules(): Awaitable<void> {
     $dest_head = self::getSubmodulesChangeset()
       ->withTimestamp(\volatile_time());
     $repo = new FakeShipItRepo($dest_head);
     $changesets = vec[self::getSubmodulesChangeset()];
     $config_object = static::getConfigObject();
-    \expect($config_object->shouldSkipUpdateSubmodules($changesets, $repo))
+    \expect(
+      await $config_object->genShouldSkipUpdateSubmodules($changesets, $repo),
+    )
       ->toBeTrue();
   }
 
-  public function testShouldSkipUpdateSubmodulesNothingToSkip(): void {
+  public async function testShouldSkipUpdateSubmodulesNothingToSkip(
+  ): Awaitable<void> {
     $dest_head = self::getSubmodulesChangeset()
       ->withTimestamp(\volatile_time());
     $repo = new FakeShipItRepo($dest_head);
@@ -166,11 +169,14 @@ Test Plan:',
       self::getSubmodulesChangeset()->withAuthor(''),
     ];
     $config_object = static::getConfigObject();
-    \expect($config_object->shouldSkipUpdateSubmodules($changesets, $repo))
+    \expect(
+      await $config_object->genShouldSkipUpdateSubmodules($changesets, $repo),
+    )
       ->toBeFalse();
   }
 
-  public function testShouldSkipUpdateSubmodulesNoDoubleCommit(): void {
+  public async function testShouldSkipUpdateSubmodulesNoDoubleCommit(
+  ): Awaitable<void> {
     $dest_head = self::getSubmodulesChangeset()
       ->withTimestamp(\volatile_time())
       // destination head is not a submodule update
@@ -178,28 +184,33 @@ Test Plan:',
     $repo = new FakeShipItRepo($dest_head);
     $changesets = vec[self::getSubmodulesChangeset()];
     $config_object = static::getConfigObject();
-    \expect($config_object->shouldSkipUpdateSubmodules($changesets, $repo))
+    \expect(
+      await $config_object->genShouldSkipUpdateSubmodules($changesets, $repo),
+    )
       ->toBeFalse();
   }
 
-  public function testShouldSkipUpdateSubmodulesRateLimit(): void {
+  public async function testShouldSkipUpdateSubmodulesRateLimit(
+  ): Awaitable<void> {
     $dest_head = self::getSubmodulesChangeset()
       // no submodule commits shipped in the last week
       ->withTimestamp(\volatile_time() - \Time::SEC_IN_WEEK);
     $repo = new FakeShipItRepo($dest_head);
     $changesets = vec[self::getSubmodulesChangeset()];
     $config_object = static::getConfigObject();
-    \expect($config_object->shouldSkipUpdateSubmodules($changesets, $repo))
+    \expect(
+      await $config_object->genShouldSkipUpdateSubmodules($changesets, $repo),
+    )
       ->toBeFalse();
   }
 
-  public function testPostFilterChangesets(): void {
+  public async function testPostFilterChangesets(): Awaitable<void> {
     $dest_head = self::getSubmodulesChangeset()
       ->withTimestamp(\volatile_time());
     $repo = new FakeShipItRepo($dest_head);
     $changesets = vec[self::getSubmodulesChangeset()];
     $config_object = static::getConfigObject();
-    \expect($config_object->postFilterChangesets($changesets, $repo))
+    \expect(await $config_object->genPostFilterChangesets($changesets, $repo))
       ->toBePHPEqual(vec[]);
   }
 
