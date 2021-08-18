@@ -105,20 +105,21 @@ final class SymlinkTest extends ShellTest {
    *
    */
   <<DataProvider('getFileToFromSymlinkExamples')>>
-  public function testFileToFromSymlink(
+  public async function testFileToFromSymlink(
     classname<ShipItSourceRepo> $repo_type,
     vec<vec<string>> $steps,
     SymlinkTestOperation $first_op,
     SymlinkTestOperation $second_op,
     string $rev,
-  ): void {
+  ): Awaitable<void> {
     // make sure we don't pick up any user configs in git
     $home_dir = new ShipItTempDir('fake-home-for-git');
     $name = 'FBShipIt';
     $email = 'fbshipit@example.com';
     $temp_dir = new ShipItTempDir('symlink-test');
     foreach ($steps as $step) {
-      (new ShipItShellCommand($temp_dir->getPath(), ...$step))
+      // @lint-ignore AWAIT_IN_LOOP These need to be run serially
+      await (new ShipItShellCommand($temp_dir->getPath(), ...$step))
         ->setEnvironmentVariables(dict[
           'HG_PLAIN' => '1',
           'GIT_CONFIG_NOSYSTEM' => '1',
@@ -129,7 +130,7 @@ final class SymlinkTest extends ShellTest {
           'GIT_COMMITTER_EMAIL' => $email,
           'HGUSER' => $name.' <'.$email.'>',
         ])
-        ->runSynchronously();
+        ->genRun();
     }
 
     $repo = ShipItRepo::typedOpen(

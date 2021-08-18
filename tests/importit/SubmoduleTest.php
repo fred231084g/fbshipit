@@ -62,11 +62,11 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
   public async function testImportCommitPatchWithSubmodule(): Awaitable<void> {
     // First create a repo that we'll use as our submodule.
     $submodule_dir = new ShipItTempDir('submodule');
-    (new ShipItShellCommand($submodule_dir->getPath(), 'git', 'init'))
-      ->runSynchronously();
-    self::configureGit($submodule_dir);
+    await (new ShipItShellCommand($submodule_dir->getPath(), 'git', 'init'))
+      ->genRun();
+    await self::genConfigureGit($submodule_dir);
     PHP\file_put_contents($submodule_dir->getPath().'/somefile', '');
-    (
+    await (
       new ShipItShellCommand(
         $submodule_dir->getPath(),
         'git',
@@ -74,8 +74,8 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
         'somefile',
       )
     )
-      ->runSynchronously();
-    (
+      ->genRun();
+    await (
       new ShipItShellCommand(
         $submodule_dir->getPath(),
         'git',
@@ -84,7 +84,7 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
         'only commit to submodule repo',
       )
     )
-      ->runSynchronously();
+      ->genRun();
     $submodule_first_id = ShipItRepo::open(
       new ShipItDummyLock(),
       $submodule_dir->getPath(),
@@ -93,7 +93,7 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
       ->getHeadChangeset()
       ?->getID();
     invariant($submodule_first_id !== null, 'impossible');
-    (
+    await (
       new ShipItShellCommand(
         $submodule_dir->getPath(),
         'git',
@@ -102,8 +102,8 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
         'otherfile',
       )
     )
-      ->runSynchronously();
-    (
+      ->genRun();
+    await (
       new ShipItShellCommand(
         $submodule_dir->getPath(),
         'git',
@@ -112,7 +112,7 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
         'move file in submodule repo',
       )
     )
-      ->runSynchronously();
+      ->genRun();
     $submodule_second_id = ShipItRepo::open(
       new ShipItDummyLock(),
       $submodule_dir->getPath(),
@@ -124,9 +124,9 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
 
     // Setup the destination repo (what we import to).
     $dest_dir = new ShipItTempDir('dest-repo');
-    (new ShipItShellCommand($dest_dir->getPath(), 'git', 'init'))
-      ->runSynchronously();
-    self::configureGit($dest_dir);
+    await (new ShipItShellCommand($dest_dir->getPath(), 'git', 'init'))
+      ->genRun();
+    await self::genConfigureGit($dest_dir);
     PHP\file_put_contents(
       $dest_dir->getPath().'/rev.txt',
       'Subproject commit '.$submodule_first_id."\n",
@@ -138,7 +138,7 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
          url='.
       $submodule_dir->getPath(),
     );
-    (
+    await (
       new ShipItShellCommand(
         $dest_dir->getPath(),
         'git',
@@ -147,8 +147,8 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
         '.gitmodules',
       )
     )
-      ->runSynchronously();
-    (
+      ->genRun();
+    await (
       new ShipItShellCommand(
         $dest_dir->getPath(),
         'git',
@@ -157,13 +157,13 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
         'add new submodule',
       )
     )
-      ->runSynchronously();
+      ->genRun();
 
     // Setup the source repo (what we import from).
     $source_dir = new ShipItTempDir('source-dir');
-    (new ShipItShellCommand($source_dir->getPath(), 'git', 'init'))
-      ->runSynchronously();
-    self::configureGit($source_dir);
+    await (new ShipItShellCommand($source_dir->getPath(), 'git', 'init'))
+      ->genRun();
+    await self::genConfigureGit($source_dir);
     $source_dir =
       await \Facebook\ShipIt\ShipItCreateNewRepoPhase::genCreateNewGitRepo(
         (
@@ -187,9 +187,11 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
           'email' => 'someone@example.com',
         ),
       );
-    (new ShipItShellCommand($source_dir->getPath(), 'git', 'submodule', 'init'))
-      ->runSynchronously();
-    (
+    await (
+      new ShipItShellCommand($source_dir->getPath(), 'git', 'submodule', 'init')
+    )
+      ->genRun();
+    await (
       new ShipItShellCommand(
         $source_dir->getPath().'/submodule-test',
         'git',
@@ -197,8 +199,8 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
         $submodule_second_id,
       )
     )
-      ->runSynchronously();
-    (
+      ->genRun();
+    await (
       new ShipItShellCommand(
         $source_dir->getPath(),
         'git',
@@ -208,7 +210,7 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
         'update submodule',
       )
     )
-      ->runSynchronously();
+      ->genRun();
     $changeset =
       ShipItRepo::open(new ShipItDummyLock(), $source_dir->getPath(), 'master')
         ->getHeadChangeset();

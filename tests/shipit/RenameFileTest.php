@@ -26,14 +26,14 @@ final class RenameFileTest extends ShellTest {
    * from fbonly/foo' in the diff, but as fbonly/foo isn't on github, that's
    * not enough information.
    */
-  public function testRenameFile(): void {
+  public async function testRenameFile(): Awaitable<void> {
     $temp_dir = new ShipItTempDir('rename-file-test');
     PHP\file_put_contents($temp_dir->getPath().'/initial.txt', 'my content here');
 
-    self::execSteps($temp_dir->getPath(), vec['hg', 'init']);
+    await self::genExecSteps($temp_dir->getPath(), vec['hg', 'init']);
     self::configureHg($temp_dir);
 
-    self::execSteps(
+    await self::genExecSteps(
       $temp_dir->getPath(),
       vec['hg', 'commit', '-Am', 'initial commit'],
       vec['hg', 'mv', 'initial.txt', 'moved.txt'],

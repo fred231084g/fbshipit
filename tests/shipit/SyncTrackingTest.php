@@ -24,8 +24,8 @@ final class SyncTrackingTest extends ShellTest {
     $path = $this->tempDir->getPath();
 
     // Prepare an empty repo
-    (new ShipItShellCommand($path, 'git', 'init'))->runSynchronously();
-    (
+    await (new ShipItShellCommand($path, 'git', 'init'))->genRun();
+    await (
       new ShipItShellCommand(
         $path,
         'git',
@@ -33,8 +33,8 @@ final class SyncTrackingTest extends ShellTest {
         'user.name',
         'FBShipIt Unit Test',
       )
-    )->runSynchronously();
-    (
+    )->genRun();
+    await (
       new ShipItShellCommand(
         $path,
         'git',
@@ -42,7 +42,7 @@ final class SyncTrackingTest extends ShellTest {
         'user.email',
         'fbshipit@example.com',
       )
-    )->runSynchronously();
+    )->genRun();
   }
 
   <<__Override>>
@@ -55,10 +55,12 @@ final class SyncTrackingTest extends ShellTest {
       ->withCommitMarkerPrefix(true);
   }
 
-  private function getGITRepoWithCommit(string $message): ShipItRepoGIT {
+  private async function genGITRepoWithCommit(
+    string $message,
+  ): Awaitable<ShipItRepoGIT> {
     // Add a tracked commit
     $path = \expect($this->tempDir?->getPath())->toNotBeNull();
-    (
+    await (
       new ShipItShellCommand(
         $path,
         'git',
@@ -68,27 +70,27 @@ final class SyncTrackingTest extends ShellTest {
         '-m',
         $message,
       )
-    )->runSynchronously();
+    )->genRun();
     return new ShipItRepoGIT(new ShipItDummyLock(), $path, 'master');
   }
 
-  public function testLastSourceCommitWithGit(): void {
+  public async function testLastSourceCommitWithGit(): Awaitable<void> {
     $fake_commit_id = ShipItTempDir::randomHex(16);
     $message = ShipItSync::addTrackingData(
       $this->getManifest(),
       (new ShipItChangeset())->withID($fake_commit_id),
     )->getMessage();
     \expect($message)->toContainSubstring('fbshipit');
-    $repo = $this->getGITRepoWithCommit($message);
+    $repo = await $this->genGITRepoWithCommit($message);
     \expect($repo->findLastSourceCommit(keyset[]))->toEqual($fake_commit_id);
   }
 
-  public function testLastSourceCommitWithMercurial(): void {
+  public async function testLastSourceCommitWithMercurial(): Awaitable<void> {
     $tempdir = new ShipItTempDir('hg-sync-test');
     $path = $tempdir->getPath();
 
     // Prepare an empty repo
-    (new ShipItShellCommand($path, 'hg', 'init'))->runSynchronously();
+    await (new ShipItShellCommand($path, 'hg', 'init'))->genRun();
     self::configureHg($tempdir);
 
     // Add a tracked commit
@@ -97,16 +99,16 @@ final class SyncTrackingTest extends ShellTest {
       $this->getManifest(),
       (new ShipItChangeset())->withID($fake_commit_id),
     )->getMessage();
-    (new ShipItShellCommand($path, 'touch', 'testfile'))->runSynchronously();
-    (
+    await (new ShipItShellCommand($path, 'touch', 'testfile'))->genRun();
+    await (
       new ShipItShellCommand($path, 'hg', 'commit', '-A', '-m', $message)
-    )->runSynchronously();
+    )->genRun();
 
     $repo = new ShipItRepoHG(new ShipItDummyLock(), $path, 'master');
     \expect($repo->findLastSourceCommit(keyset[]))->toEqual($fake_commit_id);
   }
 
-  public function testLastSourceCommitMultipleMarkers(): void {
+  public async function testLastSourceCommitMultipleMarkers(): Awaitable<void> {
     $fake_commit_id_1 = ShipItTempDir::randomHex(16);
     $fake_commit_id_2 = ShipItTempDir::randomHex(16);
     $message_1 = ShipItSync::addTrackingData(
@@ -117,35 +119,36 @@ final class SyncTrackingTest extends ShellTest {
       $this->getManifest(),
       (new ShipItChangeset())->withID($fake_commit_id_2),
     )->getMessage();
-    $repo = $this->getGITRepoWithCommit($message_1."\n\n".$message_2);
+    $repo = await $this->genGITRepoWithCommit($message_1."\n\n".$message_2);
     \expect($repo->findLastSourceCommit(keyset[]))->toEqual($fake_commit_id_2);
   }
 
-  public function testLastSourceCommitWithWhitespace(): void {
+  public async function testLastSourceCommitWithWhitespace(): Awaitable<void> {
     $fake_commit_id = ShipItTempDir::randomHex(16);
     $message = ShipItSync::addTrackingData(
       $this->getManifest(),
       (new ShipItChangeset())->withID($fake_commit_id),
     )->getMessage();
-    $repo = $this->getGITRepoWithCommit($message." ");
+    $repo = await $this->genGITRepoWithCommit($message." ");
     \expect($repo->findLastSourceCommit(keyset[]))->toEqual($fake_commit_id);
   }
 
-  public function testLastSourceCommitMissingWhitespace(): void {
+  public async function testLastSourceCommitMissingWhitespace(
+  ): Awaitable<void> {
     $fake_commit_id = ShipItTempDir::randomHex(16);
     $message = "fbshipit-source-id:".$fake_commit_id;
-    $repo = $this->getGITRepoWithCommit($message);
+    $repo = await $this->genGITRepoWithCommit($message);
     \expect($repo->findLastSourceCommit(keyset[]))->toEqual($fake_commit_id);
   }
 
-  public function testLastSourceCommitWithoutPrefix(): void {
+  public async function testLastSourceCommitWithoutPrefix(): Awaitable<void> {
     $fake_commit_id = ShipItTempDir::randomHex(16);
     $message = ShipItSync::addTrackingData(
       $this->getManifest()->withCommitMarkerPrefix(false),
       (new ShipItChangeset())->withID($fake_commit_id),
     )->getMessage();
     \expect($message)->toNotContainSubstring('fbshipit');
-    $repo = $this->getGITRepoWithCommit($message);
+    $repo = await $this->genGITRepoWithCommit($message);
     \expect($repo->findLastSourceCommit(keyset[]))->toEqual($fake_commit_id);
   }
 

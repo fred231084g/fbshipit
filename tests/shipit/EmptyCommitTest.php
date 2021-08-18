@@ -18,7 +18,7 @@ use namespace HH\Lib\Str; // @oss-enable
 <<\Oncalls('open_source')>>
 final class EmptyCommitTest extends ShellTest {
   public async function testSourceGitDestGit(): Awaitable<void> {
-    list($source_dir, $rev) = $this->getSourceGitRepoAndRev();
+    list($source_dir, $rev) = await $this->genSourceGitRepoAndRev();
     $source_repo = ShipItRepo::typedOpen(
       ShipItSourceRepo::class,
       new ShipItDummyLock(),
@@ -39,7 +39,7 @@ final class EmptyCommitTest extends ShellTest {
       ->toBeEmpty('Expected zero diffs in source changeset.');
 
     $dest_path = new ShipItTempDir('destination-git-repo');
-    $this->initGitRepo($dest_path);
+    await $this->genInitGitRepo($dest_path);
     $dest_repo = ShipItRepo::typedOpen(
       ShipItDestinationRepo::class,
       new ShipItDummyLock(),
@@ -55,7 +55,7 @@ final class EmptyCommitTest extends ShellTest {
   }
 
   public async function testSourceGitDestHg(): Awaitable<void> {
-    list($source_dir, $rev) = $this->getSourceGitRepoAndRev();
+    list($source_dir, $rev) = await $this->genSourceGitRepoAndRev();
     $source_repo = ShipItRepo::typedOpen(
       ShipItSourceRepo::class,
       new ShipItDummyLock(),
@@ -76,7 +76,7 @@ final class EmptyCommitTest extends ShellTest {
       ->toBeEmpty('Expected zero diffs in source changeset.');
 
     $dest_path = new ShipItTempDir('destination-hg-repo');
-    $this->initMercurialRepo($dest_path);
+    await $this->genInitMercurialRepo($dest_path);
     $dest_repo = ShipItRepo::typedOpen(
       ShipItDestinationRepo::class,
       new ShipItDummyLock(),
@@ -92,7 +92,7 @@ final class EmptyCommitTest extends ShellTest {
   }
 
   public async function testSourceHgDestGit(): Awaitable<void> {
-    list($source_dir, $rev) = $this->getSourceHgRepoAndRev();
+    list($source_dir, $rev) = await $this->genSourceHgRepoAndRev();
     $source_repo = ShipItRepo::typedOpen(
       ShipItSourceRepo::class,
       new ShipItDummyLock(),
@@ -113,7 +113,7 @@ final class EmptyCommitTest extends ShellTest {
       ->toBeEmpty('Expected zero diffs in source changeset.');
 
     $dest_path = new ShipItTempDir('destination-git-repo');
-    $this->initGitRepo($dest_path);
+    await $this->genInitGitRepo($dest_path);
     $dest_repo = ShipItRepo::typedOpen(
       ShipItDestinationRepo::class,
       new ShipItDummyLock(),
@@ -129,7 +129,7 @@ final class EmptyCommitTest extends ShellTest {
   }
 
   public async function testSourceHgDestHg(): Awaitable<void> {
-    list($source_dir, $rev) = $this->getSourceHgRepoAndRev();
+    list($source_dir, $rev) = await $this->genSourceHgRepoAndRev();
     $source_repo = ShipItRepo::typedOpen(
       ShipItSourceRepo::class,
       new ShipItDummyLock(),
@@ -150,7 +150,7 @@ final class EmptyCommitTest extends ShellTest {
       ->toBeEmpty('Expected zero diffs in source changeset.');
 
     $dest_path = new ShipItTempDir('destination-hg-repo');
-    $this->initMercurialRepo($dest_path);
+    await $this->genInitMercurialRepo($dest_path);
     $dest_repo = ShipItRepo::typedOpen(
       ShipItDestinationRepo::class,
       new ShipItDummyLock(),
@@ -165,10 +165,11 @@ final class EmptyCommitTest extends ShellTest {
       ->toBeEmpty('Expected zero diffs in source changeset.');
   }
 
-  private function getSourceGitRepoAndRev(): (ShipItTempDir, string) {
+  private async function genSourceGitRepoAndRev(
+  ): Awaitable<(ShipItTempDir, string)> {
     $dir = new ShipItTempDir('source-git-repo');
-    $this->initGitRepo($dir);
-    (
+    await $this->genInitGitRepo($dir);
+    await (
       new ShipItShellCommand(
         $dir->getPath(),
         'git',
@@ -178,21 +179,26 @@ final class EmptyCommitTest extends ShellTest {
         'This is an empty commit.',
       )
     )
-      ->runSynchronously();
+      ->genRun();
     return tuple(
       $dir,
       Str\trim(
-        (new ShipItShellCommand($dir->getPath(), 'git', 'rev-parse', 'HEAD'))
-          ->runSynchronously()
+        (
+          await (
+            new ShipItShellCommand($dir->getPath(), 'git', 'rev-parse', 'HEAD')
+          )
+            ->genRun()
+        )
           ->getStdOut(),
       ),
     );
   }
 
-  private function getSourceHgRepoAndRev(): (ShipItTempDir, string) {
+  private async function genSourceHgRepoAndRev(
+  ): Awaitable<(ShipItTempDir, string)> {
     $dir = new ShipItTempDir('source-hg-repo');
-    $this->initMercurialRepo($dir);
-    (
+    await $this->genInitMercurialRepo($dir);
+    await (
       new ShipItShellCommand(
         $dir->getPath(),
         'hg',
@@ -203,21 +209,25 @@ final class EmptyCommitTest extends ShellTest {
         'This is an empty commit.',
       )
     )
-      ->runSynchronously();
+      ->genRun();
     return tuple(
       $dir,
       Str\trim(
-        (new ShipItShellCommand($dir->getPath(), 'hg', 'id', '--id'))
-          ->runSynchronously()
+        (
+          await (new ShipItShellCommand($dir->getPath(), 'hg', 'id', '--id'))
+            ->genRun()
+        )
           ->getStdOut(),
       ),
     );
   }
 
-  private function initGitRepo(ShipItTempDir $tempdir): void {
+  private async function genInitGitRepo(
+    ShipItTempDir $tempdir,
+  ): Awaitable<void> {
     $path = $tempdir->getPath();
-    (new ShipItShellCommand($path, 'git', 'init'))->runSynchronously();
-    (
+    await (new ShipItShellCommand($path, 'git', 'init'))->genRun();
+    await (
       new ShipItShellCommand(
         $path,
         'git',
@@ -225,8 +235,8 @@ final class EmptyCommitTest extends ShellTest {
         'user.name',
         'FBShipIt Unit Test',
       )
-    )->runSynchronously();
-    (
+    )->genRun();
+    await (
       new ShipItShellCommand(
         $path,
         'git',
@@ -234,8 +244,8 @@ final class EmptyCommitTest extends ShellTest {
         'user.email',
         'fbshipit@example.com',
       )
-    )->runSynchronously();
-    (
+    )->genRun();
+    await (
       new ShipItShellCommand(
         $path,
         'git',
@@ -244,14 +254,16 @@ final class EmptyCommitTest extends ShellTest {
         '-m',
         'initial commit',
       )
-    )->runSynchronously();
+    )->genRun();
   }
 
-  private function initMercurialRepo(ShipItTempDir $tempdir): void {
+  private async function genInitMercurialRepo(
+    ShipItTempDir $tempdir,
+  ): Awaitable<void> {
     $path = $tempdir->getPath();
-    (new ShipItShellCommand($path, 'hg', 'init'))->runSynchronously();
+    await (new ShipItShellCommand($path, 'hg', 'init'))->genRun();
     self::configureHg($tempdir);
-    (
+    await (
       new ShipItShellCommand(
         $path,
         'hg',
@@ -262,6 +274,6 @@ final class EmptyCommitTest extends ShellTest {
         'initial commit',
       )
     )
-      ->runSynchronously();
+      ->genRun();
   }
 }

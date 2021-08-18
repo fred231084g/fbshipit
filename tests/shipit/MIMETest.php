@@ -18,11 +18,11 @@ final class MIMETest extends ShellTest {
     $changeset = \expect($changeset)->toNotBeNull();
 
     $tempdir = new ShipItTempDir('needs-mime-git');
-    (
+    await (
       new ShipItShellCommand($tempdir->getPath(), 'git', 'init')
-    )->runSynchronously();
-    self::configureGit($tempdir);
-    (
+    )->genRun();
+    await self::genConfigureGit($tempdir);
+    await (
       new ShipItShellCommand(
         $tempdir->getPath(),
         'git',
@@ -31,7 +31,7 @@ final class MIMETest extends ShellTest {
         '-m',
         'initial commit',
       )
-    )->runSynchronously();
+    )->genRun();
 
     $repo = new ShipItRepoGIT(
       new ShipItDummyLock(),

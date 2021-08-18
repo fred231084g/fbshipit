@@ -29,9 +29,9 @@ final class NewlinesTest extends ShellTest {
     $temp_dir = new ShipItTempDir('mercurial-newline-test');
 
     $this->createTestFiles($temp_dir);
-    $this->initMercurialRepo($temp_dir);
+    await $this->genInitMercurialRepo($temp_dir);
 
-    self::execSteps(
+    await self::genExecSteps(
       $temp_dir->getPath(),
       vec['hg', 'commit', '-Am', 'add files'],
     );
@@ -52,9 +52,9 @@ final class NewlinesTest extends ShellTest {
     $temp_dir = new ShipItTempDir('git-newline-test');
 
     $this->createTestFiles($temp_dir);
-    $this->initGitRepo($temp_dir);
+    await $this->genInitGitRepo($temp_dir);
 
-    self::execSteps(
+    await self::genExecSteps(
       $temp_dir->getPath(),
       vec['git', 'add', '.'],
       vec['git', 'commit', '-m', 'add files'],
@@ -74,7 +74,10 @@ final class NewlinesTest extends ShellTest {
 
   private function createTestFiles(ShipItTempDir $temp_dir): void {
     PHP\file_put_contents($temp_dir->getPath().'/unix.txt', self::UNIX_TXT);
-    PHP\file_put_contents($temp_dir->getPath().'/windows.txt', self::WINDOWS_TXT);
+    PHP\file_put_contents(
+      $temp_dir->getPath().'/windows.txt',
+      self::WINDOWS_TXT,
+    );
   }
 
   private function assertContainsCorrectNewLines(
@@ -89,13 +92,17 @@ final class NewlinesTest extends ShellTest {
     \expect($map['unix.txt'])->toNotContainSubstring("\r\n");
   }
 
-  private function initGitRepo(ShipItTempDir $temp_dir): void {
-    self::execSteps($temp_dir->getPath(), vec['git', 'init']);
-    self::configureGit($temp_dir);
+  private async function genInitGitRepo(
+    ShipItTempDir $temp_dir,
+  ): Awaitable<void> {
+    await self::genExecSteps($temp_dir->getPath(), vec['git', 'init']);
+    await self::genConfigureGit($temp_dir);
   }
 
-  private function initMercurialRepo(ShipItTempDir $temp_dir): void {
-    self::execSteps($temp_dir->getPath(), vec['hg', 'init']);
+  private async function genInitMercurialRepo(
+    ShipItTempDir $temp_dir,
+  ): Awaitable<void> {
+    await self::genExecSteps($temp_dir->getPath(), vec['hg', 'init']);
     self::configureHg($temp_dir);
   }
 
@@ -103,9 +110,9 @@ final class NewlinesTest extends ShellTest {
     ShipItChangeset $changeset,
   ): Awaitable<void> {
     $git_dir = new ShipItTempDir('newline-output-test-git');
-    $this->initGitRepo($git_dir);
+    await $this->genInitGitRepo($git_dir);
     $hg_dir = new ShipItTempDir('newline-output-test-hg');
-    $this->initMercurialRepo($hg_dir);
+    await $this->genInitMercurialRepo($hg_dir);
     $repos = vec[
       new ShipItRepoGIT(
         new ShipItDummyLock(),

@@ -15,18 +15,21 @@ namespace Facebook\ShipIt;
 abstract class ShellTest extends \Facebook\HackTest\HackTest { // @oss-enable
 // @oss-disable: abstract class ShellTest extends \HackTest {
 
-  protected static function execSteps(
+  protected static async function genExecSteps(
     string $cwd,
     Container<string> ...$steps
-  ): void {
+  ): Awaitable<void> {
     foreach ($steps as $step) {
-      (new ShipItShellCommand($cwd, ...$step))->setOutputToScreen()
-        ->runSynchronously();
+      // @lint-ignore AWAIT_IN_LOOP These need to be run serially
+      await (new ShipItShellCommand($cwd, ...$step))->setOutputToScreen()
+        ->genRun();
     }
   }
 
-  protected static function configureGit(ShipItTempDir $temp_dir): void {
-    self::execSteps(
+  protected static async function genConfigureGit(
+    ShipItTempDir $temp_dir,
+  ): Awaitable<void> {
+    await self::genExecSteps(
       $temp_dir->getPath(),
       vec['git', 'config', 'user.name', 'FBShipIt Unit Test'],
       vec['git', 'config', 'user.email', 'fbshipit@example.com'],

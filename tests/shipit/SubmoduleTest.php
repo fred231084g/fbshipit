@@ -51,11 +51,11 @@ final class SubmoduleTest extends ShellTest {
   public async function testCommitPatchWithSubmodule(): Awaitable<void> {
     // First create a repo that we'll use as our submodule.
     $submodule_dir = new ShipItTempDir('submodule');
-    (new ShipItShellCommand($submodule_dir->getPath(), 'git', 'init'))
-      ->runSynchronously();
-    self::configureGit($submodule_dir);
+    await (new ShipItShellCommand($submodule_dir->getPath(), 'git', 'init'))
+      ->genRun();
+    await self::genConfigureGit($submodule_dir);
     PHP\file_put_contents($submodule_dir->getPath().'/somefile', '');
-    (
+    await (
       new ShipItShellCommand(
         $submodule_dir->getPath(),
         'git',
@@ -63,8 +63,8 @@ final class SubmoduleTest extends ShellTest {
         'somefile',
       )
     )
-      ->runSynchronously();
-    (
+      ->genRun();
+    await (
       new ShipItShellCommand(
         $submodule_dir->getPath(),
         'git',
@@ -73,7 +73,7 @@ final class SubmoduleTest extends ShellTest {
         'only commit to submodule repo',
       )
     )
-      ->runSynchronously();
+      ->genRun();
     $submodule_id = ShipItRepo::open(
       new ShipItDummyLock(),
       $submodule_dir->getPath(),
@@ -85,9 +85,9 @@ final class SubmoduleTest extends ShellTest {
 
     // Setup the source repo.
     $source_dir = new ShipItTempDir('source-repo');
-    (new ShipItShellCommand($source_dir->getPath(), 'git', 'init'))
-      ->runSynchronously();
-    self::configureGit($source_dir);
+    await (new ShipItShellCommand($source_dir->getPath(), 'git', 'init'))
+      ->genRun();
+    await self::genConfigureGit($source_dir);
     PHP\file_put_contents(
       $source_dir->getPath().'/rev.txt',
       'Subproject commit '.$submodule_id,
@@ -99,7 +99,7 @@ final class SubmoduleTest extends ShellTest {
          url='.
       $submodule_dir->getPath(),
     );
-    (
+    await (
       new ShipItShellCommand(
         $source_dir->getPath(),
         'git',
@@ -108,8 +108,8 @@ final class SubmoduleTest extends ShellTest {
         '.gitmodules',
       )
     )
-      ->runSynchronously();
-    (
+      ->genRun();
+    await (
       new ShipItShellCommand(
         $source_dir->getPath(),
         'git',
@@ -118,7 +118,7 @@ final class SubmoduleTest extends ShellTest {
         'add new submodule',
       )
     )
-      ->runSynchronously();
+      ->genRun();
     $changeset =
       ShipItRepo::open(new ShipItDummyLock(), $source_dir->getPath(), 'master')
         ->getHeadChangeset();
@@ -131,10 +131,10 @@ final class SubmoduleTest extends ShellTest {
 
     // Setup the destination repo, and apply the changeset.
     $dest_dir = new ShipItTempDir('dest-repo');
-    (new ShipItShellCommand($dest_dir->getPath(), 'git', 'init'))
-      ->runSynchronously();
-    self::configureGit($dest_dir);
-    (
+    await (new ShipItShellCommand($dest_dir->getPath(), 'git', 'init'))
+      ->genRun();
+    await self::genConfigureGit($dest_dir);
+    await (
       new ShipItShellCommand(
         $dest_dir->getPath(),
         'git',
@@ -144,7 +144,7 @@ final class SubmoduleTest extends ShellTest {
         'initial commit',
       )
     )
-      ->runSynchronously();
+      ->genRun();
     $repo = ShipItRepoGIT::typedOpen(
       ShipItRepoGIT::class,
       new ShipItDummyLock(),
@@ -160,7 +160,7 @@ final class SubmoduleTest extends ShellTest {
       ->toBeTrue('Subrepo should be checked out at the correct revision.');
 
     // Make an update to the submodule, and ensure that that works.
-    (
+    await (
       new ShipItShellCommand(
         $submodule_dir->getPath(),
         'git',
@@ -169,8 +169,8 @@ final class SubmoduleTest extends ShellTest {
         'otherfile',
       )
     )
-      ->runSynchronously();
-    (
+      ->genRun();
+    await (
       new ShipItShellCommand(
         $submodule_dir->getPath(),
         'git',
@@ -179,7 +179,7 @@ final class SubmoduleTest extends ShellTest {
         'move file in submodule repo',
       )
     )
-      ->runSynchronously();
+      ->genRun();
     $submodule_id = ShipItRepo::open(
       new ShipItDummyLock(),
       $submodule_dir->getPath(),
@@ -192,9 +192,11 @@ final class SubmoduleTest extends ShellTest {
       $source_dir->getPath().'/rev.txt',
       'Subproject commit '.$submodule_id,
     );
-    (new ShipItShellCommand($source_dir->getPath(), 'git', 'add', 'rev.txt'))
-      ->runSynchronously();
-    (
+    await (
+      new ShipItShellCommand($source_dir->getPath(), 'git', 'add', 'rev.txt')
+    )
+      ->genRun();
+    await (
       new ShipItShellCommand(
         $source_dir->getPath(),
         'git',
@@ -203,7 +205,7 @@ final class SubmoduleTest extends ShellTest {
         'update submodule',
       )
     )
-      ->runSynchronously();
+      ->genRun();
     $changeset =
       ShipItRepo::open(new ShipItDummyLock(), $source_dir->getPath(), 'master')
         ->getHeadChangeset();
@@ -223,7 +225,7 @@ final class SubmoduleTest extends ShellTest {
       ->toBeTrue('Subrepo should be checked out at the correct revision.');
 
     // Now ensure that removing the submodule works correctly.
-    (
+    await (
       new ShipItShellCommand(
         $source_dir->getPath(),
         'git',
@@ -232,8 +234,8 @@ final class SubmoduleTest extends ShellTest {
         'rev.txt',
       )
     )
-      ->runSynchronously();
-    (
+      ->genRun();
+    await (
       new ShipItShellCommand(
         $source_dir->getPath(),
         'git',
@@ -242,7 +244,7 @@ final class SubmoduleTest extends ShellTest {
         'remove submodule',
       )
     )
-      ->runSynchronously();
+      ->genRun();
     $changeset =
       ShipItRepo::open(new ShipItDummyLock(), $source_dir->getPath(), 'master')
         ->getHeadChangeset();

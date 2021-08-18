@@ -21,15 +21,15 @@ use type Facebook\HackTest\DataProvider; // @oss-enable
 final class PathsWithSpacesTest extends ShellTest {
   const FILE_NAME = 'foo bar/herp derp.txt';
 
-  public static function exampleRepos(
-  ): dict<classname<ShipItRepo>, vec<ShipItTempDir>> {
+  public static async function genExampleRepos(
+  ): Awaitable<dict<classname<ShipItRepo>, vec<ShipItTempDir>>> {
     return dict[
-      ShipItRepoGIT::class => vec[self::createGitExample()],
-      ShipItRepoHG::class => vec[self::createHGExample()],
+      ShipItRepoGIT::class => vec[await self::genCreateGitExample()],
+      ShipItRepoHG::class => vec[await self::genCreateHGExample()],
     ];
   }
 
-  <<DataProvider('exampleRepos')>>
+  <<DataProvider('genExampleRepos')>>
   public function testPathWithSpace(ShipItTempDir $temp_dir): void {
     $repo = ShipItRepo::open(new ShipItDummyLock(), $temp_dir->getPath(), '.');
     $head = $repo->getHeadChangeset();
@@ -40,13 +40,13 @@ final class PathsWithSpacesTest extends ShellTest {
     \expect($paths)->toBePHPEqual(vec[self::FILE_NAME]);
   }
 
-  private static function createGitExample(): ShipItTempDir {
+  private static async function genCreateGitExample(): Awaitable<ShipItTempDir> {
     $temp_dir = new ShipItTempDir(__FUNCTION__);
     $path = $temp_dir->getPath();
-    self::execSteps($path, vec['git', 'init']);
-    self::configureGit($temp_dir);
+    await self::genExecSteps($path, vec['git', 'init']);
+    await self::genConfigureGit($temp_dir);
     PHP\mkdir($path.'/'.PHP\dirname(self::FILE_NAME), 0755, /* recursive = */ true);
-    self::execSteps(
+    await self::genExecSteps(
       $path,
       vec['touch', self::FILE_NAME],
       vec['git', 'add', '.'],
@@ -56,13 +56,13 @@ final class PathsWithSpacesTest extends ShellTest {
     return $temp_dir;
   }
 
-  private static function createHGExample(): ShipItTempDir {
+  private static async function genCreateHGExample(): Awaitable<ShipItTempDir> {
     $temp_dir = new ShipItTempDir(__FUNCTION__);
     $path = $temp_dir->getPath();
-    self::execSteps($path, vec['hg', 'init']);
+    await self::genExecSteps($path, vec['hg', 'init']);
     self::configureHg($temp_dir);
     PHP\mkdir($path.'/'.PHP\dirname(self::FILE_NAME), 0755, /* recursive = */ true);
-    self::execSteps(
+    await self::genExecSteps(
       $path,
       vec['touch', self::FILE_NAME],
       vec['hg', 'commit', '-Am', 'initial commit'],

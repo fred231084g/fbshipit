@@ -16,44 +16,44 @@ use namespace HH\Lib\Str; // @oss-enable
 
 <<\Oncalls('open_source')>>
 final class ShipItShellCommandTest extends ShellTest {
-  public function testExitCodeZero(): void {
-    $result = (new ShipItShellCommand('/', 'true'))->runSynchronously();
+  public async function testExitCodeZero(): Awaitable<void> {
+    $result = await (new ShipItShellCommand('/', 'true'))->genRun();
     \expect($result->getExitCode())->toEqual(0);
   }
 
-  public function testExitOneException(): void {
+  public async function testExitOneException(): Awaitable<void> {
     try {
-      (new ShipItShellCommand('/', 'false'))->runSynchronously();
+      await (new ShipItShellCommand('/', 'false'))->genRun();
       self::fail('Expected exception');
     } catch (ShipItShellCommandException $e) {
       \expect($e->getExitCode())->toEqual(1);
     }
   }
 
-  public function testExitOneWithoutException(): void {
-    $result = (new ShipItShellCommand('/', 'false'))
+  public async function testExitOneWithoutException(): Awaitable<void> {
+    $result = await (new ShipItShellCommand('/', 'false'))
       ->setNoExceptions()
-      ->runSynchronously();
+      ->genRun();
     \expect($result->getExitCode())->toEqual(1);
   }
 
-  public function testStdIn(): void {
-    $result = (new ShipItShellCommand('/', 'cat'))
+  public async function testStdIn(): Awaitable<void> {
+    $result = await (new ShipItShellCommand('/', 'cat'))
       ->setStdIn('Hello, world.')
-      ->runSynchronously();
+      ->genRun();
     \expect($result->getStdOut())->toEqual('Hello, world.');
     \expect($result->getStdErr())->toEqual('');
   }
 
-  public function testSettingEnvironmentVariable(): void {
+  public async function testSettingEnvironmentVariable(): Awaitable<void> {
     $herp = ShipItTempDir::randomHex(16);
-    $result = (new ShipItShellCommand('/', 'env'))
+    $result = await (new ShipItShellCommand('/', 'env'))
       ->setEnvironmentVariables(dict['HERP' => $herp])
-      ->runSynchronously();
+      ->genRun();
     \expect($result->getStdOut())->toContainSubstring('HERP='.$herp);
   }
 
-  public function testInheritingEnvironmentVariable(): void {
+  public async function testInheritingEnvironmentVariable(): Awaitable<void> {
     $to_try = keyset[
       // Need to keep SSH/Kerberos environment variables to be able to access
       // repositories
@@ -67,9 +67,11 @@ final class ShipItShellCommandTest extends ShellTest {
       'PATH',
     ];
 
-    $output = (new ShipItShellCommand('/', 'env'))
-      ->setEnvironmentVariables(dict[])
-      ->runSynchronously()
+    $output = (
+      await (new ShipItShellCommand('/', 'env'))
+        ->setEnvironmentVariables(dict[])
+        ->genRun()
+    )
       ->getStdOut();
 
     $matched_any = false;
@@ -83,82 +85,91 @@ final class ShipItShellCommandTest extends ShellTest {
     \expect($matched_any)->toBeTrue('No acceptable variables found');
   }
 
-  public function testWorkingDirectory(): void {
+  public async function testWorkingDirectory(): Awaitable<void> {
     \expect(
-      (new ShipItShellCommand('/', 'pwd'))
-        ->runSynchronously()
+      (
+        await (new ShipItShellCommand('/', 'pwd'))
+          ->genRun()
+      )
         ->getStdOut()
         |> Str\trim($$),
     )->toEqual('/');
 
     $tmp = PHP\sys_get_temp_dir();
     \expect(
-      (new ShipItShellCommand($tmp, 'pwd'))
-        ->runSynchronously()
+      (
+        await (new ShipItShellCommand($tmp, 'pwd'))
+          ->genRun()
+      )
         ->getStdOut()
         |> Str\trim($$),
     )->toContainSubstring(Str\trim($tmp, '/'));
   }
 
-  public function testMultipleArguments(): void {
-    $output = (new ShipItShellCommand('/', 'echo', 'foo', 'bar'))
-      ->runSynchronously()
+  public async function testMultipleArguments(): Awaitable<void> {
+    $output = (
+      await (new ShipItShellCommand('/', 'echo', 'foo', 'bar'))
+        ->genRun()
+    )
       ->getStdOut();
     \expect($output)->toEqual("foo bar\n");
   }
 
-  public function testEscaping(): void {
-    $output = (new ShipItShellCommand('/', 'echo', 'foo', '$FOO'))
-      ->setEnvironmentVariables(dict['FOO' => 'variable value'])
-      ->runSynchronously()
+  public async function testEscaping(): Awaitable<void> {
+    $output = (
+      await (new ShipItShellCommand('/', 'echo', 'foo', '$FOO'))
+        ->setEnvironmentVariables(dict['FOO' => 'variable value'])
+        ->genRun()
+    )
       ->getStdOut();
     \expect($output)->toEqual("foo \$FOO\n");
   }
 
-  public function testFailureHandlerNotCalledWhenNoFailure(): void {
-    (new ShipItShellCommand('/', 'true'))
+  public async function testFailureHandlerNotCalledWhenNoFailure(
+  ): Awaitable<void> {
+    await (new ShipItShellCommand('/', 'true'))
       ->setFailureHandler($_ ==> {
         throw new \Exception("handler called");
       })
-      ->runSynchronously();
+      ->genRun();
     // no exception
   }
 
-  public function testFailureHandlerCalledOnFailure(): void {
-    \expect(() ==> {
-      (new ShipItShellCommand('/', 'false'))
+  public async function testFailureHandlerCalledOnFailure(): Awaitable<void> {
+    \expect(async () ==> {
+      await (new ShipItShellCommand('/', 'false'))
         ->setFailureHandler($_ ==> {
           throw new \Exception("handler called");
         })
-        ->runSynchronously();
+        ->genRun();
     })->toThrow(\Exception::class);
   }
 
-  public function testNoRetriesByDefault(): void {
+  public async function testNoRetriesByDefault(): Awaitable<void> {
     $file = PHP\tempnam(PHP\sys_get_temp_dir(), __CLASS__) as string;
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     \unlink($file);
-    $result = (new ShipItShellCommand('/', 'test', '-e', $file))
+    $result = await (new ShipItShellCommand('/', 'test', '-e', $file))
       ->setFailureHandler($_ ==> PHP\touch($file))
       ->setNoExceptions()
-      ->runSynchronously();
+      ->genRun();
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     \unlink($file);
     \expect($result->getExitCode())->toEqual(1);
   }
 
-  public function testRetries(): void {
+  public async function testRetries(): Awaitable<void> {
     $file = PHP\tempnam(PHP\sys_get_temp_dir(), __CLASS__) as string;
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     \unlink($file);
-    $result = (new ShipItShellCommand('/', 'test', '-e', $file))
+    $result = await (new ShipItShellCommand('/', 'test', '-e', $file))
       ->setFailureHandler($_ ==> PHP\touch($file))
       ->setNoExceptions()
       ->setRetries(1)
-      ->runSynchronously();
+      ->genRun();
     if (PHP\file_exists($file)) {
       /* HH_IGNORE_ERROR[2049] __PHPStdLib */
       /* HH_IGNORE_ERROR[4107] __PHPStdLib */
@@ -167,18 +178,20 @@ final class ShipItShellCommandTest extends ShellTest {
     \expect($result->getExitCode())->toEqual(0);
   }
 
-  public function testRetriesNotUsedOnSuccess(): void {
+  public async function testRetriesNotUsedOnSuccess(): Awaitable<void> {
     $file = PHP\tempnam(PHP\sys_get_temp_dir(), __CLASS__) as string;
     // rm will fail if ran twice with same arg
     if (Str\contains(PHP\php_uname('s'), 'Darwin')) {
       // MacOS doesn't have GNU rm
-      $result = (new ShipItShellCommand('/', 'rm', $file))
+      $result = await (new ShipItShellCommand('/', 'rm', $file))
         ->setRetries(1)
-        ->runSynchronously();
+        ->genRun();
     } else {
-      $result = (new ShipItShellCommand('/', 'rm', '--preserve-root', $file))
+      $result = await (
+        new ShipItShellCommand('/', 'rm', '--preserve-root', $file)
+      )
         ->setRetries(1)
-        ->runSynchronously();
+        ->genRun();
     }
     if (PHP\file_exists($file)) {
       /* HH_IGNORE_ERROR[2049] __PHPStdLib */

@@ -85,7 +85,7 @@ final class UnicodeTest extends ShellTest {
     $changeset = \expect($changeset)->toNotBeNull();
 
     $tempdir = new ShipItTempDir('unicode-test-git');
-    $this->initGitRepo($tempdir);
+    await $this->genInitGitRepo($tempdir);
 
     $repo = new ShipItRepoGIT(
       new ShipItDummyLock(),
@@ -106,7 +106,7 @@ final class UnicodeTest extends ShellTest {
     $changeset = \expect($changeset)->toNotBeNull();
 
     $tempdir = new ShipItTempDir('unicode-test-hg');
-    $this->initMercurialRepo($tempdir);
+    await $this->genInitMercurialRepo($tempdir);
 
     $repo = new ShipItRepoHG(
       new ShipItDummyLock(),
@@ -119,15 +119,15 @@ final class UnicodeTest extends ShellTest {
       ->toEqual($this->getExpectedContent());
   }
 
-  public function testCreatingCommitWithGit(): void {
+  public async function testCreatingCommitWithGit(): Awaitable<void> {
     $tempdir = new ShipItTempDir('unicode-test');
     $path = $tempdir->getPath();
-    $this->initGitRepo($tempdir);
+    await $this->genInitGitRepo($tempdir);
 
     PHP\file_put_contents($tempdir->getPath().'/foo', 'bar');
 
-    (new ShipItShellCommand($path, 'git', 'add', 'foo'))->runSynchronously();
-    (
+    await (new ShipItShellCommand($path, 'git', 'add', 'foo'))->genRun();
+    await (
       new ShipItShellCommand(
         $path,
         'git',
@@ -138,7 +138,7 @@ final class UnicodeTest extends ShellTest {
     )->setEnvironmentVariables(dict[
       'LC_ALL' => 'en_US.UTF-8',
     ])
-      ->runSynchronously();
+      ->genRun();
 
     $repo = new ShipItRepoGIT(
       new ShipItDummyLock(),
@@ -150,14 +150,14 @@ final class UnicodeTest extends ShellTest {
       ->toEqual(Str\trim($this->getExpectedContent()));
   }
 
-  public function testCreatingCommitWithHG(): void {
+  public async function testCreatingCommitWithHG(): Awaitable<void> {
     $tempdir = new ShipItTempDir('unicode-test');
     $path = $tempdir->getPath();
-    $this->initMercurialRepo($tempdir);
+    await $this->genInitMercurialRepo($tempdir);
 
     PHP\file_put_contents($tempdir->getPath().'/foo', 'bar');
 
-    (
+    await (
       new ShipItShellCommand(
         $path,
         'hg',
@@ -168,7 +168,7 @@ final class UnicodeTest extends ShellTest {
     )->setEnvironmentVariables(dict[
       'LC_ALL' => 'en_US.UTF-8',
     ])
-      ->runSynchronously();
+      ->genRun();
 
     $repo = new ShipItRepoHG(
       new ShipItDummyLock(),
@@ -181,10 +181,12 @@ final class UnicodeTest extends ShellTest {
     );
   }
 
-  private function initGitRepo(ShipItTempDir $tempdir): void {
+  private async function genInitGitRepo(
+    ShipItTempDir $tempdir,
+  ): Awaitable<void> {
     $path = $tempdir->getPath();
-    (new ShipItShellCommand($path, 'git', 'init'))->runSynchronously();
-    (
+    await (new ShipItShellCommand($path, 'git', 'init'))->genRun();
+    await (
       new ShipItShellCommand(
         $path,
         'git',
@@ -192,8 +194,8 @@ final class UnicodeTest extends ShellTest {
         'user.name',
         'FBShipIt Unit Test',
       )
-    )->runSynchronously();
-    (
+    )->genRun();
+    await (
       new ShipItShellCommand(
         $path,
         'git',
@@ -201,8 +203,8 @@ final class UnicodeTest extends ShellTest {
         'user.email',
         'fbshipit@example.com',
       )
-    )->runSynchronously();
-    (
+    )->genRun();
+    await (
       new ShipItShellCommand(
         $path,
         'git',
@@ -211,12 +213,14 @@ final class UnicodeTest extends ShellTest {
         '-m',
         'initial commit',
       )
-    )->runSynchronously();
+    )->genRun();
   }
 
-  private function initMercurialRepo(ShipItTempDir $tempdir): void {
+  private async function genInitMercurialRepo(
+    ShipItTempDir $tempdir,
+  ): Awaitable<void> {
     $path = $tempdir->getPath();
-    (new ShipItShellCommand($path, 'hg', 'init'))->runSynchronously();
+    await (new ShipItShellCommand($path, 'hg', 'init'))->genRun();
     self::configureHg($tempdir);
   }
 }
