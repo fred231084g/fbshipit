@@ -38,7 +38,7 @@ final class NewlinesTest extends ShellTest {
 
     $repo = new ShipItRepoHG(new ShipItDummyLock(), $temp_dir->getPath());
     await $repo->genSetBranch('master');
-    $changeset = $repo->getChangesetFromID('.');
+    $changeset = await $repo->genChangesetFromID('.');
     $changeset = \expect($changeset)->toNotBeNull();
 
     $this->assertContainsCorrectNewLines($changeset);
@@ -59,7 +59,7 @@ final class NewlinesTest extends ShellTest {
 
     $repo = new ShipItRepoGIT(new ShipItDummyLock(), $temp_dir->getPath());
     await $repo->genSetBranch('master');
-    $changeset = $repo->getChangesetFromID('HEAD');
+    $changeset = await $repo->genChangesetFromID('HEAD');
     $changeset = \expect($changeset)->toNotBeNull();
 
     $this->assertContainsCorrectNewLines($changeset);

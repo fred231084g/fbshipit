@@ -31,8 +31,9 @@ final class ShipItSync {
     if ($rev === null) {
       $src = await $this->genRepo(ShipItSourceRepo::class);
 
-      $rev = $src->findNextCommit(
-        await $this->genFindLastSyncedCommit(),
+      $last_synced_commit = await $this->genFindLastSyncedCommit();
+      $rev = await $src->genFindNextCommit(
+        $last_synced_commit,
         $config->getSourceRoots(),
       );
     }
@@ -47,14 +48,16 @@ final class ShipItSync {
     $changesets = vec[];
     $rev = await $this->genFirstSourceID();
     while ($rev !== null) {
-      $changeset = $src->getChangesetFromID($rev);
+      // @lint-ignore AWAIT_IN_LOOP We need to do this serially
+      $changeset = await $src->genChangesetFromID($rev);
 
       if (!$changeset) {
         throw new ShipItException("Unable to get patch for $rev");
       }
 
       $changesets[] = $changeset;
-      $rev = $src->findNextCommit($rev, $config->getSourceRoots());
+      // @lint-ignore AWAIT_IN_LOOP We need to do this serially
+      $rev = await $src->genFindNextCommit($rev, $config->getSourceRoots());
     }
     return $changesets;
   }

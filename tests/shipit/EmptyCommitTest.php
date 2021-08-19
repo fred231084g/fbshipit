@@ -25,15 +25,15 @@ final class EmptyCommitTest extends ShellTest {
       $source_dir->getPath(),
       'master',
     );
-    \expect($source_repo->getNativeHeaderFromID($rev))->toNotBePHPEqual(
+    \expect(await $source_repo->genNativeHeaderFromID($rev))->toNotBePHPEqual(
       '',
       'Expecting a patch header for an empty commit.',
     );
-    \expect($source_repo->getNativePatchFromID($rev))->toBePHPEqual(
+    \expect(await $source_repo->genNativePatchFromID($rev))->toBePHPEqual(
       '',
       'Expecting no patch for an empty commit.',
     );
-    $changeset = $source_repo->getChangesetFromID($rev);
+    $changeset = await $source_repo->genChangesetFromID($rev);
     invariant($changeset !== null, 'impossible');
     \expect(vec($changeset->getDiffs()))
       ->toBeEmpty('Expected zero diffs in source changeset.');
@@ -48,7 +48,7 @@ final class EmptyCommitTest extends ShellTest {
     );
     $new_rev = await $dest_repo->genCommitPatch($changeset);
     invariant($dest_repo is ShipItSourceRepo, 'impossible');
-    $new_changeset = $dest_repo->getChangesetFromID($new_rev);
+    $new_changeset = await $dest_repo->genChangesetFromID($new_rev);
     invariant($new_changeset !== null, 'impossible');
     \expect(vec($new_changeset->getDiffs()))
       ->toBeEmpty('Expected zero diffs in source changeset.');
@@ -62,15 +62,15 @@ final class EmptyCommitTest extends ShellTest {
       $source_dir->getPath(),
       'master',
     );
-    \expect($source_repo->getNativeHeaderFromID($rev))->toNotBePHPEqual(
+    \expect(await $source_repo->genNativeHeaderFromID($rev))->toNotBePHPEqual(
       '',
       'Expecting a patch header for an empty commit.',
     );
-    \expect($source_repo->getNativePatchFromID($rev))->toBePHPEqual(
+    \expect(await $source_repo->genNativePatchFromID($rev))->toBePHPEqual(
       '',
       'Expecting no patch for an empty commit.',
     );
-    $changeset = $source_repo->getChangesetFromID($rev);
+    $changeset = await $source_repo->genChangesetFromID($rev);
     invariant($changeset !== null, 'impossible');
     \expect(vec($changeset->getDiffs()))
       ->toBeEmpty('Expected zero diffs in source changeset.');
@@ -85,7 +85,7 @@ final class EmptyCommitTest extends ShellTest {
     );
     $new_rev = await $dest_repo->genCommitPatch($changeset);
     invariant($dest_repo is ShipItSourceRepo, 'impossible');
-    $new_changeset = $dest_repo->getChangesetFromID($new_rev);
+    $new_changeset = await $dest_repo->genChangesetFromID($new_rev);
     invariant($new_changeset !== null, 'impossible');
     \expect(vec($new_changeset->getDiffs()))
       ->toBeEmpty('Expected zero diffs in source changeset.');
@@ -99,15 +99,15 @@ final class EmptyCommitTest extends ShellTest {
       $source_dir->getPath(),
       'master',
     );
-    \expect($source_repo->getNativeHeaderFromID($rev))->toNotBePHPEqual(
+    \expect(await $source_repo->genNativeHeaderFromID($rev))->toNotBePHPEqual(
       '',
       'Expecting a patch header for an empty commit.',
     );
-    \expect($source_repo->getNativePatchFromID($rev))->toBePHPEqual(
+    \expect(await $source_repo->genNativePatchFromID($rev))->toBePHPEqual(
       '',
       'Expecting no patch for an empty commit.',
     );
-    $changeset = $source_repo->getChangesetFromID($rev);
+    $changeset = await $source_repo->genChangesetFromID($rev);
     invariant($changeset !== null, 'impossible');
     \expect(vec($changeset->getDiffs()))
       ->toBeEmpty('Expected zero diffs in source changeset.');
@@ -122,7 +122,7 @@ final class EmptyCommitTest extends ShellTest {
     );
     $new_rev = await $dest_repo->genCommitPatch($changeset);
     invariant($dest_repo is ShipItSourceRepo, 'impossible');
-    $new_changeset = $dest_repo->getChangesetFromID($new_rev);
+    $new_changeset = await $dest_repo->genChangesetFromID($new_rev);
     invariant($new_changeset !== null, 'impossible');
     \expect(vec($new_changeset->getDiffs()))
       ->toBeEmpty('Expected zero diffs in source changeset.');
@@ -136,15 +136,15 @@ final class EmptyCommitTest extends ShellTest {
       $source_dir->getPath(),
       'master',
     );
-    \expect($source_repo->getNativeHeaderFromID($rev))->toNotBePHPEqual(
+    \expect(await $source_repo->genNativeHeaderFromID($rev))->toNotBePHPEqual(
       '',
       'Expecting a patch header for an empty commit.',
     );
-    \expect($source_repo->getNativePatchFromID($rev))->toBePHPEqual(
+    \expect(await $source_repo->genNativePatchFromID($rev))->toBePHPEqual(
       '',
       'Expecting no patch for an empty commit.',
     );
-    $changeset = $source_repo->getChangesetFromID($rev);
+    $changeset = await $source_repo->genChangesetFromID($rev);
     invariant($changeset !== null, 'impossible');
     \expect(vec($changeset->getDiffs()))
       ->toBeEmpty('Expected zero diffs in source changeset.');
@@ -159,7 +159,7 @@ final class EmptyCommitTest extends ShellTest {
     );
     $new_rev = await $dest_repo->genCommitPatch($changeset);
     invariant($dest_repo is ShipItSourceRepo, 'impossible');
-    $new_changeset = $dest_repo->getChangesetFromID($new_rev);
+    $new_changeset = await $dest_repo->genChangesetFromID($new_rev);
     invariant($new_changeset !== null, 'impossible');
     \expect(vec($new_changeset->getDiffs()))
       ->toBeEmpty('Expected zero diffs in source changeset.');

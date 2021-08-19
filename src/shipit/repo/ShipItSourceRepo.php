@@ -19,15 +19,17 @@ interface ShipItSourceRepo {
    *
    * @param $roots list of paths that contain synced commits.
    */
-  public function findNextCommit(
+  public function genFindNextCommit(
     string $commit,
     keyset<string> $roots,
-  ): ?string;
+  ): Awaitable<?string>;
 
   /**
    * Get a standardized representation of the specified revision
    */
-  public function getChangesetFromID(string $revision): ?ShipItChangeset;
+  public function genChangesetFromID(
+    string $revision,
+  ): Awaitable<?ShipItChangeset>;
 
   /**
    * Raw patch file that one might get from git show/hg export.  No header data
@@ -35,7 +37,7 @@ interface ShipItSourceRepo {
    *
    * Useful for testing.
    */
-  public function getNativePatchFromID(string $revision): string;
+  public function genNativePatchFromID(string $revision): Awaitable<string>;
 
   /**
    * Raw metadata containing information like the commit message, author, and
@@ -43,7 +45,7 @@ interface ShipItSourceRepo {
    *
    * Useful for testing.
    */
-  public function getNativeHeaderFromID(string $revision): string;
+  public function genNativeHeaderFromID(string $revision): Awaitable<string>;
 
   /**
    * Get a standardized representation of the string diff. This should be the
@@ -60,9 +62,9 @@ interface ShipItSourceRepo {
   /**
    * Create a directory containing the specified paths.
    */
-  public function export(
+  public function genExport(
     keyset<string> $roots,
     bool $do_submodules,
     ?string $rev = null, // defaults to the current revision
-  ): shape('tempDir' => ShipItTempDir, 'revision' => string);
+  ): Awaitable<shape('tempDir' => ShipItTempDir, 'revision' => string)>;
 }

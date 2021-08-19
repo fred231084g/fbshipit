@@ -63,7 +63,7 @@ class ShipItRepoGIT
     if (Str\trim($rev) === '') {
       return null;
     }
-    return $this->getChangesetFromID($rev);
+    return await $this->genChangesetFromID($rev);
   }
 
   public async function genFindLastSourceCommit(
@@ -80,10 +80,10 @@ class ShipItRepoGIT
     return ShipItSync::getTrackingDataFromString($log);
   }
 
-  public function findNextCommit(
+  public async function genFindNextCommit(
     string $revision,
     keyset<string> $roots,
-  ): ?string {
+  ): Awaitable<?string> {
     $log = $this->gitCommand(
       'log',
       $revision.'..',
@@ -147,7 +147,9 @@ class ShipItRepoGIT
     return $changeset;
   }
 
-  public function getNativePatchFromID(string $revision): string {
+  public async function genNativePatchFromID(
+    string $revision,
+  ): Awaitable<string> {
     return $this->gitCommand(
       'format-patch',
       '--no-renames',
@@ -161,8 +163,10 @@ class ShipItRepoGIT
     );
   }
 
-  public function getNativeHeaderFromID(string $revision): string {
-    $patch = $this->getNativePatchFromID($revision);
+  public async function genNativeHeaderFromID(
+    string $revision,
+  ): Awaitable<string> {
+    $patch = await $this->genNativePatchFromID($revision);
     return $this->getNativeHeaderFromIDWithPatch($revision, $patch);
   }
 
@@ -192,8 +196,10 @@ class ShipItRepoGIT
     throw new ShipItRepoGITException($this, 'Could not extract patch header.');
   }
 
-  public function getChangesetFromID(string $revision): ShipItChangeset {
-    $patch = $this->getNativePatchFromID($revision);
+  public async function genChangesetFromID(
+    string $revision,
+  ): Awaitable<ShipItChangeset> {
+    $patch = await $this->genNativePatchFromID($revision);
     $header = $this->getNativeHeaderFromIDWithPatch($revision, $patch);
     $changeset = self::getChangesetFromExportedPatch($header, $patch);
     $changeset = $changeset->withID($revision);
@@ -492,11 +498,11 @@ class ShipItRepoGIT
     $this->gitCommand('push', 'origin', 'HEAD:'.$this->branch);
   }
 
-  public function export(
+  public async function genExport(
     keyset<string> $roots,
     bool $do_submodules,
     ?string $rev = null,
-  ): shape('tempDir' => ShipItTempDir, 'revision' => string) {
+  ): Awaitable<shape('tempDir' => ShipItTempDir, 'revision' => string)> {
     if ($rev === null) {
       $rev = Str\trim($this->gitCommand('rev-parse', 'HEAD'));
     }

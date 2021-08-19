@@ -140,7 +140,7 @@ final class SymlinkTest extends ShellTest {
       'master',
     );
 
-    $changeset = $repo->getChangesetFromID($rev);
+    $changeset = await $repo->genChangesetFromID($rev);
     $changeset = \expect($changeset)->toNotBeNull();
     \expect($changeset->isValid())->toBeTrue();
 

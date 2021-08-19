@@ -71,13 +71,13 @@ class ShipItRepoHG
         "{$log} doesn't look like a valid"." hg changeset id",
       );
     }
-    return $this->getChangesetFromID($log);
+    return await $this->genChangesetFromID($log);
   }
 
-  public function findNextCommit(
+  public async function genFindNextCommit(
     string $revision,
     keyset<string> $roots,
-  ): ?string {
+  ): Awaitable<?string> {
     $branch = $this->branch;
     if ($branch === null) {
       throw new ShipItRepoHGException($this, "setBranch must be called first.");
@@ -143,7 +143,7 @@ class ShipItRepoHG
       $diff = self::renderPatch($patch);
       $this->hgPipeCommand($diff, 'patch', '-');
     }
-    $id = $this->getChangesetFromID('.')?->getID();
+    $id = (await $this->genChangesetFromID('.'))?->getID();
     invariant($id !== null, 'Unexpeceted null SHA!');
     return $id;
   }
@@ -242,7 +242,9 @@ class ShipItRepoHG
       ->withMessage(Str\trim($message));
   }
 
-  public function getNativePatchFromID(string $revision): string {
+  public async function genNativePatchFromID(
+    string $revision,
+  ): Awaitable<string> {
     return $this->hgCommand(
       'log',
       '--config',
@@ -256,7 +258,9 @@ class ShipItRepoHG
     );
   }
 
-  public function getNativeHeaderFromID(string $revision): string {
+  public async function genNativeHeaderFromID(
+    string $revision,
+  ): Awaitable<string> {
     return $this->hgCommand(
       'log',
       '--config',
@@ -276,9 +280,11 @@ class ShipItRepoHG
     );
   }
 
-  public function getChangesetFromID(string $revision): ?ShipItChangeset {
-    $header = $this->getNativeHeaderFromID($revision);
-    $patch = $this->getNativePatchFromID($revision);
+  public async function genChangesetFromID(
+    string $revision,
+  ): Awaitable<?ShipItChangeset> {
+    $header = await $this->genNativeHeaderFromID($revision);
+    $patch = await $this->genNativePatchFromID($revision);
     $changeset = $this->getChangesetFromNativePatch($revision, $header, $patch);
     return $changeset;
   }
@@ -493,11 +499,11 @@ class ShipItRepoHG
     );
   }
 
-  public function export(
+  public async function genExport(
     keyset<string> $roots,
     bool $_do_submodules, // Not relevant for hg
     ?string $rev = null,
-  ): shape('tempDir' => ShipItTempDir, 'revision' => string) {
+  ): Awaitable<shape('tempDir' => ShipItTempDir, 'revision' => string)> {
     $branch = $this->branch;
     if ($branch === null) {
       throw new ShipItRepoHGException($this, 'setBranch must be called first.');

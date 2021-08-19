@@ -114,7 +114,7 @@ final class ImportItRepoGIT extends \Facebook\ShipIt\ShipItRepoGIT {
     );
 
     $rev = Str\trim($this->gitCommand('rev-parse', 'HEAD'));
-    $changeset = $this->getChangesetFromID($rev);
+    $changeset = await $this->genChangesetFromID($rev);
     if ($use_latest_base_revision) {
       $base_revision = null;
     } else {

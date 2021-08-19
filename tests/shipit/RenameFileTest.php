@@ -46,7 +46,7 @@ final class RenameFileTest extends ShellTest {
 
     $repo = new ShipItRepoHG(new ShipItDummyLock(), $temp_dir->getPath());
     await $repo->genSetBranch('master');
-    $changeset = $repo->getChangesetFromID('.');
+    $changeset = await $repo->genChangesetFromID('.');
     $changeset = \expect($changeset)->toNotBeNull();
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */

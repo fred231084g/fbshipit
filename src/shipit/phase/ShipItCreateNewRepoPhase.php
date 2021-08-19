@@ -186,7 +186,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     );
 
     $logger->out("  Exporting...");
-    $export = $source->export(
+    $export = await $source->genExport(
       $manifest->getSourceRoots(),
       $do_submodules,
       $revision,
@@ -287,9 +287,14 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
         if ($manifest->isVerboseEnabled()) {
           $logger->out("    Processing %s", $current_commit);
         }
-        $changesets[] =
-          $exported_repo->getChangesetFromID($current_commit)?->withID($rev);
-        $current_commit = $exported_repo->findNextCommit(
+        $changesets[] = (
+          // @lint-ignore AWAIT_IN_LOOP We need to do this serially
+          await $exported_repo
+            ->genChangesetFromID($current_commit)
+        )
+          ?->withID($rev);
+        // @lint-ignore AWAIT_IN_LOOP We need to do this serially
+        $current_commit = await $exported_repo->genFindNextCommit(
           $current_commit,
           keyset[],
         );

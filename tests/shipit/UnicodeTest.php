@@ -136,7 +136,7 @@ final class UnicodeTest extends ShellTest {
 
     $repo = new ShipItRepoGIT(new ShipItDummyLock(), $tempdir->getPath());
     await $repo->genSetBranch('master');
-    $changeset = $repo->getChangesetFromID('HEAD');
+    $changeset = await $repo->genChangesetFromID('HEAD');
     \expect($changeset->getMessage())
       ->toEqual(Str\trim($this->getExpectedContent()));
   }
@@ -163,7 +163,7 @@ final class UnicodeTest extends ShellTest {
 
     $repo = new ShipItRepoHG(new ShipItDummyLock(), $tempdir->getPath());
     await $repo->genSetBranch('master');
-    $changeset = $repo->getChangesetFromID('.');
+    $changeset = await $repo->genChangesetFromID('.');
     \expect($changeset?->getMessage())->toEqual(
       Str\trim($this->getExpectedContent()),
     );
