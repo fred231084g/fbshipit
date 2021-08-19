@@ -47,6 +47,7 @@ final class ShipItCleanPhase extends ShipItPhase {
         $branch = $manifest->getDestinationBranch();
         break;
     }
-    (await ShipItRepo::genOpen($lock, $local_path, $branch))->clean();
+    $repo = await ShipItRepo::genOpen($lock, $local_path, $branch);
+    await $repo->genClean();
   }
 }

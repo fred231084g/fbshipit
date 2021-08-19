@@ -33,19 +33,19 @@ final class FakeShipItRepo extends ShipItRepo {
   public async function genUpdateBranchTo(string $_base_rev): Awaitable<void> {}
 
   <<__Override>>
-  public function clean(): void {}
+  public async function genClean(): Awaitable<void> {}
 
   <<__Override>>
-  public function pull(): void {}
+  public async function genPull(): Awaitable<void> {}
 
   <<__Override>>
-  public function pushLfs(
+  public async function genPushLfs(
     string $_pull_endpoint,
     string $_push_endpoint,
-  ): void {}
+  ): Awaitable<void> {}
 
   <<__Override>>
-  public function getOrigin(): string {
+  public async function genOrigin(): Awaitable<string> {
     return '';
   }
 

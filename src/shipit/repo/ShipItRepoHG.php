@@ -372,20 +372,20 @@ class ShipItRepoHG
   }
 
   <<__Override>>
-  public function clean(): void {
+  public async function genClean(): Awaitable<void> {
     $this->hgCommand('purge', '--all');
   }
 
   <<__Override>>
-  public function pushLfs(
+  public async function genPushLfs(
     string $_pull_endpoint,
     string $_push_endpoint,
-  ): void {
+  ): Awaitable<void> {
     throw new ShipItRepoHGException($this, "push lfs not implemented for hg");
   }
 
   <<__Override>>
-  public function pull(): void {
+  public async function genPull(): Awaitable<void> {
     if (ShipItRepo::$verbose & ShipItRepo::VERBOSE_FETCH) {
       ShipItLogger::err("** Updating checkout in %s\n", $this->path);
     }
@@ -393,7 +393,7 @@ class ShipItRepoHG
   }
 
   <<__Override>>
-  public function getOrigin(): string {
+  public async function genOrigin(): Awaitable<string> {
     return Str\trim($this->hgCommand('config', 'paths.default'));
   }
 

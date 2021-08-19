@@ -438,12 +438,15 @@ class ShipItRepoGIT
   }
 
   <<__Override>>
-  public function clean(): void {
+  public async function genClean(): Awaitable<void> {
     $this->gitCommand('clean', '-x', '-f', '-f', '-d');
   }
 
   <<__Override>>
-  public function pushLfs(string $pull_endpoint, string $push_endpoint): void {
+  public async function genPushLfs(
+    string $pull_endpoint,
+    string $push_endpoint,
+  ): Awaitable<void> {
     invariant(
       PHP\file_exists($this->getPath().'/.gitattributes'),
       '.gitattributes not exists, cowardly refusing to pull lfs',
@@ -463,7 +466,7 @@ class ShipItRepoGIT
   }
 
   <<__Override>>
-  public function pull(): void {
+  public async function genPull(): Awaitable<void> {
     if (ShipItRepo::$verbose & ShipItRepo::VERBOSE_FETCH) {
       ShipItLogger::err("** Updating checkout in %s\n", $this->path);
     }
@@ -479,7 +482,7 @@ class ShipItRepoGIT
   }
 
   <<__Override>>
-  public function getOrigin(): string {
+  public async function genOrigin(): Awaitable<string> {
     return Str\trim($this->gitCommand('remote', 'get-url', 'origin'));
   }
 

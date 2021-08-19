@@ -72,25 +72,25 @@ abstract class ShipItRepo {
   /**
    * Cleans our checkout.
    */
-  public abstract function clean(): void;
+  public abstract function genClean(): Awaitable<void>;
 
   /**
    * Updates our checkout
    */
-  public abstract function pull(): void;
+  public abstract function genPull(): Awaitable<void>;
 
   /**
    * push lfs support
    */
-  public abstract function pushLfs(
+  public abstract function genPushLfs(
     string $lfs_pull_endpoint,
     string $lfs_push_endpoint,
-  ): void;
+  ): Awaitable<void>;
 
   /**
    * Get the origin of the checkout.
    */
-  public abstract function getOrigin(): string;
+  public abstract function genOrigin(): Awaitable<string>;
 
   public static async function genTypedOpen<Trepo as ShipItRepo>(
     classname<Trepo> $interface,
