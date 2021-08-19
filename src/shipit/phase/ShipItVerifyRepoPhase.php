@@ -95,7 +95,9 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
         $manifest->getDestinationPath(),
         $manifest->getDestinationBranch(),
       );
-      $this->verifySourceCommit = $repo->findLastSourceCommit(keyset[]);
+      $this->verifySourceCommit = await $repo->genFindLastSourceCommit(
+        keyset[],
+      );
     }
     $clean_dir = await ShipItCreateNewRepoPhase::genCreateNewGitRepo(
       $manifest,

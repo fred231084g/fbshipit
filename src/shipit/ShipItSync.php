@@ -306,7 +306,7 @@ final class ShipItSync {
   private async function genFindLastSyncedCommit(): Awaitable<string> {
     $dest = await $this->genRepo(ShipItDestinationRepo::class);
 
-    $src_commit = $dest->findLastSourceCommit(
+    $src_commit = await $dest->genFindLastSourceCommit(
       $this->syncConfig->getDestinationRoots(),
     );
     if ($src_commit === null) {

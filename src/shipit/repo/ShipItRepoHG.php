@@ -105,7 +105,9 @@ class ShipItRepoHG
     return $log;
   }
 
-  public function findLastSourceCommit(keyset<string> $roots): ?string {
+  public async function genFindLastSourceCommit(
+    keyset<string> $roots,
+  ): Awaitable<?string> {
     $log = $this->hgCommand(
       'log',
       '--limit',
@@ -166,7 +168,7 @@ class ShipItRepoHG
     return $ret;
   }
 
-  public function push(): void {
+  public async function genPush(): Awaitable<void> {
     $branch = $this->branch;
     if ($branch === null) {
       throw new ShipItRepoHGException($this, 'setBranch must be called first.');

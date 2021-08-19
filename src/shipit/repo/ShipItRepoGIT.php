@@ -66,7 +66,9 @@ class ShipItRepoGIT
     return $this->getChangesetFromID($rev);
   }
 
-  public function findLastSourceCommit(keyset<string> $roots): ?string {
+  public async function genFindLastSourceCommit(
+    keyset<string> $roots,
+  ): Awaitable<?string> {
     $log = $this->gitCommand(
       'log',
       '-1',
@@ -486,7 +488,7 @@ class ShipItRepoGIT
     return Str\trim($this->gitCommand('remote', 'get-url', 'origin'));
   }
 
-  public function push(): void {
+  public async function genPush(): Awaitable<void> {
     $this->gitCommand('push', 'origin', 'HEAD:'.$this->branch);
   }
 

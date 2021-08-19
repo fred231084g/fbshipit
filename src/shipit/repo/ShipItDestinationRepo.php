@@ -20,7 +20,9 @@ interface ShipItDestinationRepo {
    *
    * @param $roots list of paths that contain synced commits.
    */
-  public function findLastSourceCommit(keyset<string> $roots): ?string;
+  public function genFindLastSourceCommit(
+    keyset<string> $roots,
+  ): Awaitable<?string>;
 
   /**
    * Generate a text patch ready for committing
@@ -38,5 +40,5 @@ interface ShipItDestinationRepo {
   /**
    * push local changes to the upstream
    */
-  public function push(): void;
+  public function genPush(): Awaitable<void>;
 }

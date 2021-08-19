@@ -45,6 +45,6 @@ final class ShipItPushPhase extends ShipItPhase {
       \get_class($repo),
       ShipItDestinationRepo::class,
     );
-    $repo->push();
+    await $repo->genPush();
   }
 }
