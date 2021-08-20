@@ -151,7 +151,7 @@ final class ShipItShellCommandTest extends ShellTest {
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     \unlink($file);
     $result = await (new ShipItShellCommand('/', 'test', '-e', $file))
-      ->setFailureHandler($_ ==> PHP\touch($file))
+      ->setFailureHandler(async $_ ==> PHP\touch($file))
       ->setNoExceptions()
       ->genRun();
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
@@ -166,7 +166,7 @@ final class ShipItShellCommandTest extends ShellTest {
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
     \unlink($file);
     $result = await (new ShipItShellCommand('/', 'test', '-e', $file))
-      ->setFailureHandler($_ ==> PHP\touch($file))
+      ->setFailureHandler(async $_ ==> PHP\touch($file))
       ->setNoExceptions()
       ->setRetries(1)
       ->genRun();

@@ -47,9 +47,9 @@ final class DemoSourceRepoInitPhase extends ShipItPhase {
     await (new ShipItShellCommand($local_parent_path, ...$command))
       ->setRetries(2)
       ->setFailureHandler(
-        $_ ==> (
+        async $_ ==> await (
           new ShipItShellCommand($local_parent_path, 'rm', '-rf', $local_path)
-        )->runSynchronously(),
+        )->genRun(),
       )
       ->genRun();
   }

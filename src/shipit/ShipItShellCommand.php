@@ -15,7 +15,9 @@ namespace Facebook\ShipIt;
 use namespace HH\Lib\{Dict, Str, Vec}; // @oss-enable
 
 final class ShipItShellCommand {
-  const type TFailureHandler = (function(ShipItShellCommandResult): void);
+  const type TFailureHandler = (function(
+    ShipItShellCommandResult,
+  ): Awaitable<void>);
   private vec<string> $command;
 
   private dict<string, string> $environmentVariables = dict[];
@@ -63,22 +65,18 @@ final class ShipItShellCommand {
   }
 
   public function setFailureHandler<TIgnored>(
-    (function(ShipItShellCommandResult): TIgnored) $handler,
+    (function(ShipItShellCommandResult): Awaitable<TIgnored>) $handler,
   ): this {
     // Wrap so that the function returns void instead of TIgnored
     $this->failureHandler = (
-      (ShipItShellCommandResult $result) ==> {
-        $handler($result);
+      async (ShipItShellCommandResult $result) ==> {
+        await $handler($result);
       }
     );
     return $this;
   }
 
   public async function genRun(): Awaitable<ShipItShellCommandResult> {
-    return $this->runSynchronously();
-  }
-
-  public function runSynchronously(): ShipItShellCommandResult {
     $max_tries = $this->retries + 1;
     $tries_remaining = $max_tries;
     invariant(
@@ -89,7 +87,8 @@ final class ShipItShellCommand {
 
     while ($tries_remaining > 1) {
       try {
-        $result = $this->runOnceSynchronously();
+        // @lint-ignore AWAIT_IN_LOOP We need to do this serially
+        $result = await $this->genRunOnce();
         // Handle case when $this->throwForNonZeroExit === false
         if ($result->getExitCode() !== 0) {
           throw new ShipItShellCommandException(
@@ -103,7 +102,7 @@ final class ShipItShellCommand {
         continue;
       }
     }
-    return $this->runOnceSynchronously();
+    return await $this->genRunOnce();
   }
 
   private function getCommandAsString(): string {
@@ -111,7 +110,7 @@ final class ShipItShellCommand {
       |> Str\join($$, ' ');
   }
 
-  private function runOnceSynchronously(): ShipItShellCommandResult {
+  private async function genRunOnce(): Awaitable<ShipItShellCommandResult> {
     $fds = dict[
       0 => vec['pipe', 'r'],
       1 => vec['pipe', 'w'],
@@ -219,7 +218,7 @@ final class ShipItShellCommand {
     if ($exitcode !== 0) {
       $handler = $this->failureHandler;
       if ($handler) {
-        $handler($result);
+        await $handler($result);
       }
       if ($this->throwForNonZeroExit) {
         throw new ShipItShellCommandException($command, $result);
