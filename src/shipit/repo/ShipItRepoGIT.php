@@ -40,7 +40,7 @@ class ShipItRepoGIT
   <<__Override>>
   public async function genSetBranch(string $branch): Awaitable<bool> {
     $this->branch = $branch;
-    $this->gitCommand('checkout', $branch);
+    await $this->genGitCommand('checkout', $branch);
     return true;
   }
 
@@ -52,12 +52,12 @@ class ShipItRepoGIT
         'setBranch must be called first.',
       );
     }
-    $this->gitCommand('checkout', '-B', $this->branch, $base_rev);
+    await $this->genGitCommand('checkout', '-B', $this->branch, $base_rev);
   }
 
   <<__Override>>
   public async function genHeadChangeset(): Awaitable<?ShipItChangeset> {
-    $rev = $this->gitCommand('rev-parse', $this->branch);
+    $rev = await $this->genGitCommand('rev-parse', $this->branch);
 
     $rev = Str\trim($rev);
     if (Str\trim($rev) === '') {
@@ -69,7 +69,7 @@ class ShipItRepoGIT
   public async function genFindLastSourceCommit(
     keyset<string> $roots,
   ): Awaitable<?string> {
-    $log = $this->gitCommand(
+    $log = await $this->genGitCommand(
       'log',
       '-1',
       '--grep',
@@ -84,7 +84,7 @@ class ShipItRepoGIT
     string $revision,
     keyset<string> $roots,
   ): Awaitable<?string> {
-    $log = $this->gitCommand(
+    $log = await $this->genGitCommand(
       'log',
       $revision.'..',
       '--ancestry-path',
@@ -150,7 +150,7 @@ class ShipItRepoGIT
   public async function genNativePatchFromID(
     string $revision,
   ): Awaitable<string> {
-    return $this->gitCommand(
+    return await $this->genGitCommand(
       'format-patch',
       '--no-renames',
       '--no-stat',
@@ -167,14 +167,14 @@ class ShipItRepoGIT
     string $revision,
   ): Awaitable<string> {
     $patch = await $this->genNativePatchFromID($revision);
-    return $this->getNativeHeaderFromIDWithPatch($revision, $patch);
+    return await $this->genNativeHeaderFromIDWithPatch($revision, $patch);
   }
 
-  private function getNativeHeaderFromIDWithPatch(
+  private async function genNativeHeaderFromIDWithPatch(
     string $revision,
     string $patch,
-  ): string {
-    $full_patch = $this->gitCommand(
+  ): Awaitable<string> {
+    $full_patch = await $this->genGitCommand(
       'format-patch',
       '--always',
       '--no-renames',
@@ -200,7 +200,7 @@ class ShipItRepoGIT
     string $revision,
   ): Awaitable<ShipItChangeset> {
     $patch = await $this->genNativePatchFromID($revision);
-    $header = $this->getNativeHeaderFromIDWithPatch($revision, $patch);
+    $header = await $this->genNativeHeaderFromIDWithPatch($revision, $patch);
     $changeset = self::getChangesetFromExportedPatch($header, $patch);
     $changeset = $changeset->withID($revision);
     return $changeset;
@@ -276,7 +276,7 @@ class ShipItRepoGIT
   ): Awaitable<string> {
     if (C\is_empty($patch->getDiffs())) {
       // This is an empty commit, which `git am` does not handle properly.
-      $this->gitCommand(
+      await $this->genGitCommand(
         'commit',
         '--allow-empty',
         '--author',
@@ -286,32 +286,38 @@ class ShipItRepoGIT
         '-m',
         self::getCommitMessage($patch),
       );
-      return $this->getHEADSha();
+      return await $this->genHEADSha();
     }
 
     $diff = self::renderPatch($patch);
     try {
-      $this->gitPipeCommand($diff, 'am', '--keep-non-patch', '--keep-cr');
+      await $this->genGitPipeCommand(
+        $diff,
+        'am',
+        '--keep-non-patch',
+        '--keep-cr',
+      );
     } catch (ShipItRepoGITException $e) {
       // If we are trying to git am on a non-git repo, for example
-      $this->gitCommand('am', '--abort');
+      await $this->genGitCommand('am', '--abort');
       throw $e;
     } catch (ShipItRepoException $e) {
-      $this->gitCommand('am', '--abort');
+      await $this->genGitCommand('am', '--abort');
       throw $e;
     } catch (ShipItShellCommandException $e) {
-      $this->gitCommand('am', '--abort');
+      await $this->genGitCommand('am', '--abort');
       throw $e;
     }
 
     if ($do_submodules) {
-      $submodules = $this->getSubmodules();
+      $submodules = await $this->genSubmodules();
     } else {
       $submodules = vec[];
     }
     foreach ($submodules as $submodule) {
       try {
-        $this->prepareSubmoduleForPatch($submodule);
+        // @lint-ignore AWAIT_IN_LOOP We need to do this serially
+        await $this->genPrepareSubmoduleForPatch($submodule);
       } catch (ShipItShellCommandException $e) {
         // HACK: try once again with GitHub HTTPS authentication.
         // Since most submodules in use don't need auth, it's least disruptive
@@ -333,24 +339,26 @@ class ShipItRepoGIT
             // @oss-disable: $this->getPath(),
             // @oss-disable: $submodule,
           // @oss-disable: );
-          $this->prepareSubmoduleForPatch($submodule);
+          // @lint-ignore AWAIT_IN_LOOP We need to do this serially
+          await $this->genPrepareSubmoduleForPatch($submodule);
         } finally {
           // Cleanup from submodule auth
           try {
-            $this->gitCommand('restore', '.gitmodules');
+            // @lint-ignore AWAIT_IN_LOOP We need to do this serially
+            await $this->genGitCommand('restore', '.gitmodules');
           } catch (ShipItShellCommandException $_) {
           }
         }
       }
     }
     // DANGER ZONE!  Cleanup any removed submodules.
-    $this->gitCommand('clean', '-f', '-f', '-d');
-    return $this->getHEADSha();
+    await $this->genGitCommand('clean', '-f', '-f', '-d');
+    return await $this->genHEADSha();
   }
 
-  private function prepareSubmoduleForPatch(
+  private async function genPrepareSubmoduleForPatch(
     self::TSubmoduleSpec $submodule,
-  ): void {
+  ): Awaitable<void> {
     // If a submodule has changed, then we need to actually update to the
     // new version. + before commit hash represents changed submdoule.
     // - before commit hash represents an uninitialized submodule. Make
@@ -358,7 +366,7 @@ class ShipItRepoGIT
     // status since the first character will tell us whether submodule
     // changed.
     $sm_status = Str\trim_left(
-      $this->gitCommand('submodule', 'status', $submodule['path']),
+      await $this->genGitCommand('submodule', 'status', $submodule['path']),
     );
     if ($sm_status === '') {
       // If the path exists, we know we are adding a submodule.
@@ -367,8 +375,8 @@ class ShipItRepoGIT
         \file_get_contents($full_path),
         Str\length('Subproject commit '),
       ));
-      $this->gitCommand('rm', $submodule['path']);
-      $this->gitCommand(
+      await $this->genGitCommand('rm', $submodule['path']);
+      await $this->genGitCommand(
         'submodule',
         'add',
         '-f',
@@ -377,21 +385,21 @@ class ShipItRepoGIT
         $submodule['url'],
         $submodule['path'],
       );
-      (new ShipItShellCommand($full_path, 'git', 'checkout', $sha))
-        ->runSynchronously();
-      $this->gitCommand('add', $submodule['path']);
+      await (new ShipItShellCommand($full_path, 'git', 'checkout', $sha))
+        ->genRun();
+      await $this->genGitCommand('add', $submodule['path']);
       // Preserve any whitespace in the .gitmodules file.
-      $this->gitCommand('checkout', 'HEAD', '.gitmodules');
-      $this->gitCommand('commit', '--amend', '--no-edit');
+      await $this->genGitCommand('checkout', 'HEAD', '.gitmodules');
+      await $this->genGitCommand('commit', '--amend', '--no-edit');
     } else if ($sm_status[0] === '+') {
-      $this->gitCommand(
+      await $this->genGitCommand(
         'submodule',
         'update',
         '--recursive',
         $submodule['path'],
       );
     } else if ($sm_status[0] === '-') {
-      $this->gitCommand(
+      await $this->genGitCommand(
         'submodule',
         'update',
         '--init',
@@ -401,7 +409,10 @@ class ShipItRepoGIT
     }
   }
 
-  protected function gitPipeCommand(?string $stdin, string ...$args): string {
+  protected async function genGitPipeCommand(
+    ?string $stdin,
+    string ...$args
+  ): Awaitable<string> {
     if (!PHP\file_exists("{$this->path}/.git")) {
       throw new ShipItRepoGITException($this, $this->path." is not a GIT repo");
     }
@@ -417,14 +428,17 @@ class ShipItRepoGIT
     if ($stdin !== null) {
       $command->setStdIn($stdin);
     }
-    return $command->runSynchronously()->getStdOut();
+    return (await $command->genRun())->getStdOut();
   }
 
-  protected function gitCommand(string ...$args): string {
-    return $this->gitPipeCommand(null, ...$args);
+  protected async function genGitCommand(string ...$args): Awaitable<string> {
+    return await $this->genGitPipeCommand(null, ...$args);
   }
 
-  public static function cloneRepo(string $origin, string $path): void {
+  public static async function genCloneRepo(
+    string $origin,
+    string $path,
+  ): Awaitable<void> {
     invariant(
       !PHP\file_exists($path),
       '%s already exists, cowardly refusing to overwrite',
@@ -440,14 +454,14 @@ class ShipItRepoGIT
       ShipItLogger::err("** Cloning %s to %s\n", $origin, $path);
     }
 
-    (
+    await (
       new ShipItShellCommand($parent_path, 'git', 'clone', $origin, $path)
-    )->runSynchronously();
+    )->genRun();
   }
 
   <<__Override>>
   public async function genClean(): Awaitable<void> {
-    $this->gitCommand('clean', '-x', '-f', '-f', '-d');
+    await $this->genGitCommand('clean', '-x', '-f', '-f', '-d');
   }
 
   <<__Override>>
@@ -465,12 +479,22 @@ class ShipItRepoGIT
       !PHP\file_exists($this->getPath().'/.lfsconfig'),
       '.lfsconfig exists, needs to strip it in your config',
     );
-    $this->gitCommand('lfs', 'install', '--local');
-    $this->gitCommand('config', '--local', 'lfs.url', $pull_endpoint);
-    $this->gitCommand('config', '--local', 'lfs.fetchrecentcommitsdays', '7');
-    $this->gitCommand('lfs', 'fetch', '--recent');
-    $this->gitCommand('config', '--local', 'lfs.pushurl', $push_endpoint);
-    $this->gitCommand('lfs', 'push', 'origin', $this->branch);
+    await $this->genGitCommand('lfs', 'install', '--local');
+    await $this->genGitCommand('config', '--local', 'lfs.url', $pull_endpoint);
+    await $this->genGitCommand(
+      'config',
+      '--local',
+      'lfs.fetchrecentcommitsdays',
+      '7',
+    );
+    await $this->genGitCommand('lfs', 'fetch', '--recent');
+    await $this->genGitCommand(
+      'config',
+      '--local',
+      'lfs.pushurl',
+      $push_endpoint,
+    );
+    await $this->genGitCommand('lfs', 'push', 'origin', $this->branch);
   }
 
   <<__Override>>
@@ -480,22 +504,22 @@ class ShipItRepoGIT
     }
 
     try {
-      $this->gitCommand('am', '--abort');
+      await $this->genGitCommand('am', '--abort');
     } catch (ShipItShellCommandException $_e) {
       // ignore
     }
 
-    $this->gitCommand('fetch', 'origin');
-    $this->gitCommand('reset', '--hard', 'origin/'.$this->branch);
+    await $this->genGitCommand('fetch', 'origin');
+    await $this->genGitCommand('reset', '--hard', 'origin/'.$this->branch);
   }
 
   <<__Override>>
   public async function genOrigin(): Awaitable<string> {
-    return Str\trim($this->gitCommand('remote', 'get-url', 'origin'));
+    return Str\trim(await $this->genGitCommand('remote', 'get-url', 'origin'));
   }
 
   public async function genPush(): Awaitable<void> {
-    $this->gitCommand('push', 'origin', 'HEAD:'.$this->branch);
+    await $this->genGitCommand('push', 'origin', 'HEAD:'.$this->branch);
   }
 
   public async function genExport(
@@ -504,7 +528,7 @@ class ShipItRepoGIT
     ?string $rev = null,
   ): Awaitable<shape('tempDir' => ShipItTempDir, 'revision' => string)> {
     if ($rev === null) {
-      $rev = Str\trim($this->gitCommand('rev-parse', 'HEAD'));
+      $rev = Str\trim(await $this->genGitCommand('rev-parse', 'HEAD'));
     }
 
     $dest = new ShipItTempDir('git-export');
@@ -518,23 +542,26 @@ class ShipItRepoGIT
       $rev,
     ];
     $command = Vec\concat($command, $roots);
-    $this->gitCommand(...$command);
+    await $this->genGitCommand(...$command);
 
-    (new ShipItShellCommand($dest->getPath(), 'tar', 'xf', $archive_name))
-      ->runSynchronously();
+    await (new ShipItShellCommand($dest->getPath(), 'tar', 'xf', $archive_name))
+      ->genRun();
 
-    (
-      new ShipItShellCommand($this->path, 'rm', $archive_name)
-    )->runSynchronously();
+    await (new ShipItShellCommand($this->path, 'rm', $archive_name))->genRun();
 
     if ($do_submodules) {
-      $submodules = $this->getSubmodules($roots);
+      $submodules = await $this->genSubmodules($roots);
     } else {
       $submodules = vec[];
     }
     // If we have any submodules, we'll need to set them up manually.
     foreach ($submodules as $submodule) {
-      $status = $this->gitCommand('submodule', 'status', $submodule['path']);
+      // @lint-ignore AWAIT_IN_LOOP We need to do this serially
+      $status = await $this->genGitCommand(
+        'submodule',
+        'status',
+        $submodule['path'],
+      );
       $sha = $status
         // Strip any -, +, or U at the start of the status (see the man page for
         // git-submodule).
@@ -551,13 +578,15 @@ class ShipItRepoGIT
     return shape('tempDir' => $dest, 'revision' => $rev);
   }
 
-  protected function getHEADSha(): string {
-    return Str\trim($this->gitCommand('log', '-1', "--pretty=format:%H"));
+  protected async function genHEADSha(): Awaitable<string> {
+    return Str\trim(
+      await $this->genGitCommand('log', '-1', "--pretty=format:%H"),
+    );
   }
 
-  private function getSubmodules(
+  private async function genSubmodules(
     ?keyset<string> $roots = null,
-  ): vec<self::TSubmoduleSpec> {
+  ): Awaitable<vec<self::TSubmoduleSpec>> {
     // The gitmodules file is in the repo root, so if this application is for
     // a set of source roots that does not contain the entire repository then
     // there are no relevant submodules.
@@ -567,7 +596,12 @@ class ShipItRepoGIT
     if (!PHP\file_exists($this->getPath().'/.gitmodules')) {
       return vec[];
     }
-    $configs = $this->gitCommand('config', '-f', '.gitmodules', '--list');
+    $configs = await $this->genGitCommand(
+      'config',
+      '-f',
+      '.gitmodules',
+      '--list',
+    );
     $configs = dict(PHP\parse_ini_string($configs) as KeyedContainer<_, _>)
       |> Dict\filter_keys($$, ($key) ==> {
         return Str\slice($key as string, 0, 10) === 'submodule.' &&

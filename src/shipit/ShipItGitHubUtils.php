@@ -64,7 +64,7 @@ abstract class ShipItGitHubUtils {
           $project,
         );
 
-        self::cloneAndVerifyRepo($origin, $local_path);
+        await self::genCloneAndVerifyRepo($origin, $local_path);
         break;
       case ShipItTransport::HTTPS:
         $origin = Str\format(
@@ -73,11 +73,11 @@ abstract class ShipItGitHubUtils {
           $project,
         );
         if ($credentials === null) {
-          self::cloneAndVerifyRepo($origin, $local_path);
+          await self::genCloneAndVerifyRepo($origin, $local_path);
           break;
         }
         $origin = self::authHttpsRemoteUrl($origin, $transport, $credentials);
-        self::cloneAndVerifyRepo($origin, $local_path);
+        await self::genCloneAndVerifyRepo($origin, $local_path);
 
         await $git_config('user.name', $credentials['name'])->genRun();
         await $git_config('user.email', $credentials['email'])->genRun();
@@ -120,12 +120,12 @@ abstract class ShipItGitHubUtils {
     return $remote_url;
   }
 
-  private static function cloneAndVerifyRepo(
+  private static async function genCloneAndVerifyRepo(
     string $origin,
     string $local_path,
-  ): void {
+  ): Awaitable<void> {
     if (!PHP\file_exists($local_path)) {
-      ShipItRepoGIT::cloneRepo($origin, $local_path);
+      await ShipItRepoGIT::genCloneRepo($origin, $local_path);
     }
     invariant(
       PHP\file_exists($local_path.'/.git'),

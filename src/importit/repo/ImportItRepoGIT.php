@@ -52,7 +52,7 @@ final class ImportItRepoGIT extends \Facebook\ShipIt\ShipItRepoGIT {
   ): Awaitable<(ShipItChangeset, ?string)> {
     if ($pr_number === null) {
       $actual_head_rev = Str\trim(
-        $this->gitCommand('rev-parse', $expected_head_rev),
+        await $this->genGitCommand('rev-parse', $expected_head_rev),
       );
       invariant(
         $expected_head_rev === $actual_head_rev,
@@ -64,8 +64,14 @@ final class ImportItRepoGIT extends \Facebook\ShipIt\ShipItRepoGIT {
       $commit_title = 'ImportIt commit';
     } else {
       // First, fetch the special head ref that GitHub creates for the PR.
-      $this->gitCommand('fetch', 'origin', 'refs/pull/'.$pr_number.'/head');
-      $actual_head_rev = Str\trim($this->gitCommand('rev-parse', 'FETCH_HEAD'));
+      await $this->genGitCommand(
+        'fetch',
+        'origin',
+        'refs/pull/'.$pr_number.'/head',
+      );
+      $actual_head_rev = Str\trim(
+        await $this->genGitCommand('rev-parse', 'FETCH_HEAD'),
+      );
       invariant(
         $expected_head_rev === $actual_head_rev,
         'Expected %s to be the HEAD of the pull request, but got %s',
@@ -78,18 +84,22 @@ final class ImportItRepoGIT extends \Facebook\ShipIt\ShipItRepoGIT {
     // Now compute the merge base with the default branch (that we would land
     // the pull request to).
     $merge_base = Str\trim(
-      $this->gitCommand('merge-base', $actual_head_rev, $source_default_branch),
+      await $this->genGitCommand(
+        'merge-base',
+        $actual_head_rev,
+        $source_default_branch,
+      ),
     );
     // We now have enough information to generate a binary diff and commit it.
-    $diff = $this->gitCommand(
+    $diff = await $this->genGitCommand(
       'diff',
       '--binary',
       $merge_base,
       $actual_head_rev,
     );
-    $this->gitCommand('checkout', '-B', $branch_name, $merge_base);
+    await $this->genGitCommand('checkout', '-B', $branch_name, $merge_base);
     await $this->genSetBranch($branch_name);
-    $this->gitPipeCommand(
+    await $this->genGitPipeCommand(
       $diff,
       'apply',
       '--binary',
@@ -98,22 +108,22 @@ final class ImportItRepoGIT extends \Facebook\ShipIt\ShipItRepoGIT {
       // Read from stdin.
       '-',
     );
-    $this->gitCommand('add', '--all');
-    $full_status = Str\trim($this->gitCommand('status'));
+    await $this->genGitCommand('add', '--all');
+    $full_status = Str\trim(await $this->genGitCommand('status'));
     $abbreviated_status = Str\split($full_status, "\n")
       |> Vec\take($$, 100)
       |> Str\join($$, "\n");
     if ($full_status !== $abbreviated_status) {
       $abbreviated_status .= "\n...";
     }
-    $this->gitCommand(
+    await $this->genGitCommand(
       'commit',
       '--allow-empty',
       '-m',
       $commit_title."\n\n".$abbreviated_status,
     );
 
-    $rev = Str\trim($this->gitCommand('rev-parse', 'HEAD'));
+    $rev = Str\trim(await $this->genGitCommand('rev-parse', 'HEAD'));
     $changeset = await $this->genChangesetFromID($rev);
     if ($use_latest_base_revision) {
       $base_revision = null;
