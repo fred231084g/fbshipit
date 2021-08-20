@@ -29,7 +29,7 @@ class ShipItRepoHG
   public async function genSetBranch(string $branch): Awaitable<bool> {
     $this->branch = $branch;
     try {
-      $this->hgCommand('root');
+      await $this->genHgCommand('root');
     } catch (ShipItRepoException $_ex) {
       throw new ShipItRepoHGException($this, "{$this->path} is not a HG repo");
     }
@@ -42,8 +42,14 @@ class ShipItRepoHG
     if ($branch === null) {
       throw new ShipItRepoHGException($this, 'setBranch must be called first.');
     }
-    $this->hgCommand('bookmark', '--force', '--rev', $base_rev, $branch);
-    $this->hgCommand('update', $branch);
+    await $this->genHgCommand(
+      'bookmark',
+      '--force',
+      '--rev',
+      $base_rev,
+      $branch,
+    );
+    await $this->genHgCommand('update', $branch);
   }
 
   <<__Override>>
@@ -52,7 +58,7 @@ class ShipItRepoHG
     if ($branch === null) {
       throw new ShipItRepoHGException($this, "setBranch must be called first.");
     }
-    $log = $this->hgCommand(
+    $log = await $this->genHgCommand(
       'log',
       '--limit',
       '1',
@@ -82,7 +88,7 @@ class ShipItRepoHG
     if ($branch === null) {
       throw new ShipItRepoHGException($this, "setBranch must be called first.");
     }
-    $log = $this->hgCommand(
+    $log = await $this->genHgCommand(
       'log',
       '--limit',
       '1',
@@ -108,7 +114,7 @@ class ShipItRepoHG
   public async function genFindLastSourceCommit(
     keyset<string> $roots,
   ): Awaitable<?string> {
-    $log = $this->hgCommand(
+    $log = await $this->genHgCommand(
       'log',
       '--limit',
       '1',
@@ -128,7 +134,7 @@ class ShipItRepoHG
   ): Awaitable<string> {
     if (C\is_empty($patch->getDiffs())) {
       // This is an empty commit, which `hg patch` does not handle properly.
-      $this->hgCommand(
+      await $this->genHgCommand(
         '--config',
         'ui.allowemptycommit=True',
         'commit',
@@ -141,7 +147,7 @@ class ShipItRepoHG
       );
     } else {
       $diff = self::renderPatch($patch);
-      $this->hgPipeCommand($diff, 'patch', '-');
+      await $this->genHgPipeCommand($diff, 'patch', '-');
     }
     $id = (await $this->genChangesetFromID('.'))?->getID();
     invariant($id !== null, 'Unexpeceted null SHA!');
@@ -173,7 +179,7 @@ class ShipItRepoHG
     if ($branch === null) {
       throw new ShipItRepoHGException($this, 'setBranch must be called first.');
     }
-    $this->hgCommand('push', '--branch', $branch);
+    await $this->genHgCommand('push', '--branch', $branch);
   }
 
   /*
@@ -245,7 +251,7 @@ class ShipItRepoHG
   public async function genNativePatchFromID(
     string $revision,
   ): Awaitable<string> {
-    return $this->hgCommand(
+    return await $this->genHgCommand(
       'log',
       '--config',
       'diff.git=True',
@@ -261,7 +267,7 @@ class ShipItRepoHG
   public async function genNativeHeaderFromID(
     string $revision,
   ): Awaitable<string> {
-    return $this->hgCommand(
+    return await $this->genHgCommand(
       'log',
       '--config',
       'diff.git=True',
@@ -285,15 +291,19 @@ class ShipItRepoHG
   ): Awaitable<?ShipItChangeset> {
     $header = await $this->genNativeHeaderFromID($revision);
     $patch = await $this->genNativePatchFromID($revision);
-    $changeset = $this->getChangesetFromNativePatch($revision, $header, $patch);
+    $changeset = await $this->genChangesetFromNativePatch(
+      $revision,
+      $header,
+      $patch,
+    );
     return $changeset;
   }
 
-  private function getChangesetFromNativePatch(
+  private async function genChangesetFromNativePatch(
     string $revision,
     string $header,
     string $patch,
-  ): ShipItChangeset {
+  ): Awaitable<ShipItChangeset> {
     $changeset = self::getChangesetFromExportedPatch($header, $patch);
     // we need to have plain diffs for each file, and rename/copy from
     // breaks this, and we can't turn it off in hg.
@@ -326,7 +336,7 @@ class ShipItRepoHG
       );
       $diffs = Vec\concat(
         $diffs,
-        $this->makeDiffsUsingGit($revision, $needs_git),
+        await $this->genMakeDiffsUsingGit($revision, $needs_git),
       );
       $changeset = $changeset->withDiffs($diffs);
     }
@@ -354,7 +364,10 @@ class ShipItRepoHG
     return $changeset->withDiffs(self::getDiffsFromPatch($patch));
   }
 
-  protected function hgPipeCommand(?string $stdin, string ...$args): string {
+  protected async function genHgPipeCommand(
+    ?string $stdin,
+    string ...$args
+  ): Awaitable<string> {
     // Some server-side commands will inexplicitly fail, and then succeed the
     // next time they are ran.  There are a some, however, that we never want
     // to re-run because we'll lose error messages as a result.
@@ -372,16 +385,16 @@ class ShipItRepoHG
     if ($stdin !== null) {
       $command->setStdIn($stdin);
     }
-    return $command->runSynchronously()->getStdOut();
+    return (await $command->genRun())->getStdOut();
   }
 
-  protected function hgCommand(string ...$args): string {
-    return $this->hgPipeCommand(null, ...$args);
+  protected async function genHgCommand(string ...$args): Awaitable<string> {
+    return await $this->genHgPipeCommand(null, ...$args);
   }
 
   <<__Override>>
   public async function genClean(): Awaitable<void> {
-    $this->hgCommand('purge', '--all');
+    await $this->genHgCommand('purge', '--all');
   }
 
   <<__Override>>
@@ -397,25 +410,25 @@ class ShipItRepoHG
     if (ShipItRepo::$verbose & ShipItRepo::VERBOSE_FETCH) {
       ShipItLogger::err("** Updating checkout in %s\n", $this->path);
     }
-    $this->hgCommand('pull');
+    await $this->genHgCommand('pull');
   }
 
   <<__Override>>
   public async function genOrigin(): Awaitable<string> {
-    return Str\trim($this->hgCommand('config', 'paths.default'));
+    return Str\trim(await $this->genHgCommand('config', 'paths.default'));
   }
 
-  private function makeDiffsUsingGit(
+  private async function genMakeDiffsUsingGit(
     string $rev,
     keyset<string> $files,
-  ): vec<ShipItDiff> {
+  ): Awaitable<vec<ShipItDiff>> {
     $tempdir = new ShipItTempDir('git-wd');
     $path = $tempdir->getPath();
 
-    $this->checkoutFilesAtRevToPath($files, $rev.'^', $path.'/a');
-    $this->checkoutFilesAtRevToPath($files, $rev, $path.'/b');
+    await $this->genCheckoutFilesAtRevToPath($files, $rev.'^', $path.'/a');
+    await $this->genCheckoutFilesAtRevToPath($files, $rev, $path.'/b');
 
-    $result = (
+    $result = await (
       new ShipItShellCommand(
         $path,
         'git',
@@ -426,7 +439,7 @@ class ShipItRepoHG
         'a',
         'b',
       )
-    )->setNoExceptions()->runSynchronously();
+    )->setNoExceptions()->genRun();
 
     invariant(
       $result->getExitCode() === 1,
@@ -446,11 +459,11 @@ class ShipItRepoHG
     return $diffs;
   }
 
-  private function checkoutFilesAtRevToPath(
+  private async function genCheckoutFilesAtRevToPath(
     keyset<string> $files,
     string $rev,
     string $path,
-  ): void {
+  ): Awaitable<void> {
     /* Use a list of patterns from a file (/dev/stdin) instead
      * of specifying on the command line - otherwise, we can
      * generate a command that is larger than the maximum length
@@ -473,7 +486,7 @@ class ShipItRepoHG
     // log extension
     $lock = $this->getSharedLock()->getExclusive();
     try {
-      $this->hgPipeCommand(
+      await $this->genHgPipeCommand(
         $patterns,
         'prefetch',
         '-r',
@@ -486,7 +499,7 @@ class ShipItRepoHG
       $lock->release();
     }
 
-    $this->hgPipeCommand(
+    await $this->genHgPipeCommand(
       $patterns,
       'archive',
       '--config',
@@ -509,16 +522,23 @@ class ShipItRepoHG
       throw new ShipItRepoHGException($this, 'setBranch must be called first.');
     }
     if ($rev === null) {
-      $rev = $this->hgCommand('log', '-r', $branch, '-T', '{node}');
+      $rev = await $this->genHgCommand('log', '-r', $branch, '-T', '{node}');
     }
 
     $temp_dir = new ShipItTempDir('hg-export');
-    $this->checkoutFilesAtRevToPath($roots, $rev, $temp_dir->getPath());
+    await $this->genCheckoutFilesAtRevToPath(
+      $roots,
+      $rev,
+      $temp_dir->getPath(),
+    );
 
     return shape('tempDir' => $temp_dir, 'revision' => $rev);
   }
 
-  public function getFileContents(string $rev, string $path): string {
-    return $this->hgCommand('cat', '-r', $rev, $path);
+  public async function genFileContents(
+    string $rev,
+    string $path,
+  ): Awaitable<string> {
+    return await $this->genHgCommand('cat', '-r', $rev, $path);
   }
 }
