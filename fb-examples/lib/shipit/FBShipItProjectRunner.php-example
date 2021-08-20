@@ -46,7 +46,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
           $action,
           $configObject,
           $externalBranch,
-          $this->argumentParser,
+          $argumentParser,
         ),
         $argumentParser,
       );
