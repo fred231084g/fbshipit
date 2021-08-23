@@ -139,17 +139,15 @@ abstract class ShipItRepo {
    */
   public static function parseDiffHunk(string $hunk): ?ShipItDiff {
     list($header, $body) = Str\split($hunk, "\n", 2);
-    $matches = vec[];
-    PHP\preg_match(
-      '@^diff --git ("?)[ab]/(.*?)"? "?[ab]/(.*?)"?$@',
+    $matches = Regex\first_match(
       Str\trim($header),
-      inout $matches,
+      re'@^diff --git ("?)[ab]/(.*?)"? "?[ab]/(.*?)"?$@',
     );
-    if (C\is_empty($matches as KeyedContainer<_, _>)) {
+    if ($matches is null) {
       return null;
     }
     $path = $matches[2] as string;
-    $new_path = C\count($matches) > 3 ? $matches[3] as string : null;
+    $new_path = $matches[3] !== '' ? $matches[3] : null;
     if ($new_path !== null && $path !== $new_path) {
       $operation = ShipItDiffOperation::RENAME;
     } else {

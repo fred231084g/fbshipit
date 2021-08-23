@@ -12,7 +12,7 @@
  */
 namespace Facebook\ShipIt;
 
-use namespace HH\Lib\Str; // @oss-enable
+use namespace HH\Lib\{Regex, Str}; // @oss-enable
 
 final class ShipItDeleteCorruptedRepoPhase extends ShipItPhase {
   public function __construct(private ShipItRepoSide $side) {
@@ -133,8 +133,7 @@ final class ShipItDeleteCorruptedRepoPhase extends ShipItPhase {
       return true;
     }
     $revision = Str\trim($result->getStdOut());
-    $matches = vec[];
-    if (PHP\preg_match('/^0+$/', $revision, inout $matches)) {
+    if (Regex\matches($revision, re'/^0+$/')) {
       // 000000...0 is not a valid revision ID, but it's what we get
       // for an empty repository
       return true;
