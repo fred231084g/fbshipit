@@ -18,7 +18,7 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
     'land_branch' => ?string,
     'branches' => vec<string>,
     'internal_repo' => string,
-    'arcanist_project' => ?string,
+    'arcanist_project' => string,
   );
 
   public function __construct(
