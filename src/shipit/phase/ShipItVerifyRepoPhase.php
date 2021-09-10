@@ -89,7 +89,8 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
           "sets the verify source commit",
         );
       }
-      $repo = await ShipItRepo::genTypedOpen<ShipItDestinationRepo>(
+      $repo = await ShipItRepo::genTypedOpen(
+        ShipItDestinationRepo::class,
         $manifest->getDestinationSharedLock(),
         $manifest->getDestinationPath(),
         $manifest->getDestinationBranch(),
@@ -175,7 +176,8 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
 
     $source_sync_id = $this->verifySourceCommit;
     if ($source_sync_id === null) {
-      $repo = await ShipItRepo::genTypedOpen<ShipItSourceRepo>(
+      $repo = await ShipItRepo::genTypedOpen(
+        ShipItSourceRepo::class,
         $manifest->getSourceSharedLock(),
         $manifest->getSourcePath(),
         $manifest->getSourceBranch(),

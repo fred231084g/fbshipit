@@ -19,7 +19,8 @@ use namespace HH\Lib\Str; // @oss-enable
 final class EmptyCommitTest extends ShellTest {
   public async function testSourceGitDestGit(): Awaitable<void> {
     list($source_dir, $rev) = await $this->genSourceGitRepoAndRev();
-    $source_repo = await ShipItRepo::genTypedOpen<ShipItSourceRepo>(
+    $source_repo = await ShipItRepo::genTypedOpen(
+      ShipItSourceRepo::class,
       new ShipItDummyLock(),
       $source_dir->getPath(),
       'master',
@@ -39,7 +40,8 @@ final class EmptyCommitTest extends ShellTest {
 
     $dest_path = new ShipItTempDir('destination-git-repo');
     await $this->genInitGitRepo($dest_path);
-    $dest_repo = await ShipItRepo::genTypedOpen<ShipItDestinationRepo>(
+    $dest_repo = await ShipItRepo::genTypedOpen(
+      ShipItDestinationRepo::class,
       new ShipItDummyLock(),
       $dest_path->getPath(),
       'master',
@@ -54,7 +56,8 @@ final class EmptyCommitTest extends ShellTest {
 
   public async function testSourceGitDestHg(): Awaitable<void> {
     list($source_dir, $rev) = await $this->genSourceGitRepoAndRev();
-    $source_repo = await ShipItRepo::genTypedOpen<ShipItSourceRepo>(
+    $source_repo = await ShipItRepo::genTypedOpen(
+      ShipItSourceRepo::class,
       new ShipItDummyLock(),
       $source_dir->getPath(),
       'master',
@@ -74,7 +77,8 @@ final class EmptyCommitTest extends ShellTest {
 
     $dest_path = new ShipItTempDir('destination-hg-repo');
     await $this->genInitMercurialRepo($dest_path);
-    $dest_repo = await ShipItRepo::genTypedOpen<ShipItDestinationRepo>(
+    $dest_repo = await ShipItRepo::genTypedOpen(
+      ShipItDestinationRepo::class,
       new ShipItDummyLock(),
       $dest_path->getPath(),
       'master',
@@ -89,7 +93,8 @@ final class EmptyCommitTest extends ShellTest {
 
   public async function testSourceHgDestGit(): Awaitable<void> {
     list($source_dir, $rev) = await $this->genSourceHgRepoAndRev();
-    $source_repo = await ShipItRepo::genTypedOpen<ShipItSourceRepo>(
+    $source_repo = await ShipItRepo::genTypedOpen(
+      ShipItSourceRepo::class,
       new ShipItDummyLock(),
       $source_dir->getPath(),
       'master',
@@ -109,7 +114,8 @@ final class EmptyCommitTest extends ShellTest {
 
     $dest_path = new ShipItTempDir('destination-git-repo');
     await $this->genInitGitRepo($dest_path);
-    $dest_repo = await ShipItRepo::genTypedOpen<ShipItDestinationRepo>(
+    $dest_repo = await ShipItRepo::genTypedOpen(
+      ShipItDestinationRepo::class,
       new ShipItDummyLock(),
       $dest_path->getPath(),
       'master',
@@ -124,7 +130,8 @@ final class EmptyCommitTest extends ShellTest {
 
   public async function testSourceHgDestHg(): Awaitable<void> {
     list($source_dir, $rev) = await $this->genSourceHgRepoAndRev();
-    $source_repo = await ShipItRepo::genTypedOpen<ShipItSourceRepo>(
+    $source_repo = await ShipItRepo::genTypedOpen(
+      ShipItSourceRepo::class,
       new ShipItDummyLock(),
       $source_dir->getPath(),
       'master',
@@ -144,7 +151,8 @@ final class EmptyCommitTest extends ShellTest {
 
     $dest_path = new ShipItTempDir('destination-hg-repo');
     await $this->genInitMercurialRepo($dest_path);
-    $dest_repo = await ShipItRepo::genTypedOpen<ShipItDestinationRepo>(
+    $dest_repo = await ShipItRepo::genTypedOpen(
+      ShipItDestinationRepo::class,
       new ShipItDummyLock(),
       $dest_path->getPath(),
       'master',
