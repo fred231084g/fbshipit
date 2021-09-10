@@ -178,8 +178,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
   ): Awaitable<void> {
     $logger = new ShipItVerboseLogger($manifest->isVerboseEnabled());
 
-    $source = await ShipItRepo::genTypedOpen(
-      ShipItSourceRepo::class,
+    $source = await ShipItRepo::genTypedOpen<ShipItSourceRepo>(
       $manifest->getSourceSharedLock(),
       $manifest->getSourcePath(),
       $manifest->getSourceBranch(),
@@ -264,8 +263,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       ShipItScopedFlock::getLockFilePathForRepoPath($export_dir->getPath()),
     );
     try {
-      $exported_repo = await ShipItRepo::genTypedOpen(
-        ShipItSourceRepo::class,
+      $exported_repo = await ShipItRepo::genTypedOpen<ShipItSourceRepo>(
         $export_lock,
         $export_dir->getPath(),
         'master',
@@ -321,8 +319,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       ShipItScopedFlock::getLockFilePathForRepoPath($output_dir),
     );
     try {
-      $filtered_repo = await ShipItRepo::genTypedOpen(
-        ShipItDestinationRepo::class,
+      $filtered_repo = await ShipItRepo::genTypedOpen<ShipItDestinationRepo>(
         $output_lock,
         $output_dir,
         '--orphan='.$manifest->getDestinationBranch(),

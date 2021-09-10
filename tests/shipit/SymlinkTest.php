@@ -133,12 +133,26 @@ final class SymlinkTest extends ShellTest {
         ->genRun();
     }
 
-    $repo = await ShipItRepo::genTypedOpen(
-      $repo_type,
-      new ShipItDummyLock(),
-      $temp_dir->getPath(),
-      'master',
-    );
+    if ($repo_type === ShipItRepoGIT::class) {
+      $repo = await ShipItRepo::genTypedOpen<ShipItRepoGIT>(
+        new ShipItDummyLock(),
+        $temp_dir->getPath(),
+        'master',
+      );
+    } else if ($repo_type === ShipItRepoHG::class) {
+      $repo = await ShipItRepo::genTypedOpen<ShipItRepoHG>(
+        new ShipItDummyLock(),
+        $temp_dir->getPath(),
+        'master',
+      );
+    } else {
+      invariant_violation(
+        'Invalid repo: %s, must be %s or %s',
+        $repo_type,
+        ShipItRepoHG::class,
+        ShipItRepoGIT::class,
+      );
+    }
 
     $changeset = await $repo->genChangesetFromID($rev);
     $changeset = \expect($changeset)->toNotBeNull();
