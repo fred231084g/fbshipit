@@ -371,7 +371,7 @@ class ShipItRepoHG
     // Some server-side commands will inexplicitly fail, and then succeed the
     // next time they are ran.  There are a some, however, that we never want
     // to re-run because we'll lose error messages as a result.
-    switch (C\first(vec($args)) ?? '') {
+    switch (C\first($args) ?? '') {
       case 'patch':
         $retry_count = 0;
         break;
