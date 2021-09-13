@@ -221,8 +221,7 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
     );
     $changeset = await $repo->genHeadChangeset();
     invariant($changeset !== null, 'impossible');
-    $repo = await ShipItRepoGIT::genTypedOpen(
-      ShipItRepoGIT::class,
+    $repo = await ShipItRepoGIT::genTypedOpen<ShipItRepoGIT>(
       new ShipItDummyLock(),
       $dest_dir->getPath(),
       'master',

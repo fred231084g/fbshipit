@@ -152,8 +152,7 @@ final class SubmoduleTest extends ShellTest {
       )
     )
       ->genRun();
-    $repo = await ShipItRepoGIT::genTypedOpen(
-      ShipItRepoGIT::class,
+    $repo = await ShipItRepoGIT::genTypedOpen<ShipItRepoGIT>(
       new ShipItDummyLock(),
       $dest_dir->getPath(),
       'master',

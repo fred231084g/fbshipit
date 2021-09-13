@@ -92,22 +92,18 @@ abstract class ShipItRepo {
    */
   public abstract function genOrigin(): Awaitable<string>;
 
-  public static async function genTypedOpen<Trepo as ShipItRepo>(
-    classname<Trepo> $interface,
-    IShipItLock $lock,
-    string $path,
-    string $branch,
-  ): Awaitable<Trepo> {
+  public static async function genTypedOpen<
+    <<__Enforceable>> reify Trepo as ShipItRepo,
+  >(IShipItLock $lock, string $path, string $branch): Awaitable<Trepo> {
     $repo = await ShipItRepo::genOpen($lock, $path, $branch);
     invariant(
-      \is_a($repo, $interface),
+      $repo is Trepo,
       '%s is a %s, needed a %s',
       $path,
       \get_class($repo),
-      $interface,
+      Trepo::class,
     );
-    /* HH_FIXME[4110] */
-    return $repo;
+    return $repo as Trepo;
   }
 
   /**
