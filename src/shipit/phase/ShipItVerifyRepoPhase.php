@@ -133,8 +133,8 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
           'git',
           'diff',
           '--stat',
-          'HEAD',
           $dirty_ref,
+          'HEAD',
         )
       )->genRun()
     )->getStdOut();
