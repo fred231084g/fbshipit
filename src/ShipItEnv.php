@@ -25,6 +25,10 @@ final abstract class ShipItEnv {
     return self::$extraEnv;
   }
 
+  public static function getAllExtraEnv(): dict<string, string> {
+    return self::$extraEnv;
+  }
+
   public static function getEnv(string $name): ?string {
     return idx(self::getAll(), $name);
   }
