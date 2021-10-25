@@ -90,9 +90,8 @@ final abstract class FBCommonFilters {
 
     unset($sections['summary']);
 
-    return $changeset->withMessage(
-      ShipItMessageSections::buildMessage($sections),
-    );
+    return
+      $changeset->withMessage(ShipItMessageSections::buildMessage($sections));
   }
 
   ////////////////////////////////////////////
@@ -205,9 +204,8 @@ final abstract class FBCommonFilters {
       unset($sections['test plan']);
     }
 
-    return $changeset->withMessage(
-      ShipItMessageSections::buildMessage($sections),
-    );
+    return
+      $changeset->withMessage(ShipItMessageSections::buildMessage($sections));
   }
 
   public static function stripSubjectMergePrefix(
@@ -297,9 +295,8 @@ final abstract class FBCommonFilters {
       self::getSupportedMessageSectionNames(),
     );
     unset($sections['summary']);
-    return $changeset->withMessage(
-      ShipItMessageSections::buildMessage($sections),
-    );
+    return
+      $changeset->withMessage(ShipItMessageSections::buildMessage($sections));
   }
 
   public static function getSupportedMessageSectionNames(): keyset<string> {
@@ -346,9 +343,8 @@ final abstract class FBCommonFilters {
       self::getSupportedMessageSectionNames(),
     )
       |> Dict\filter_keys($$, ($k) ==> C\contains($keep, $k));
-    return $changeset->withMessage(
-      ShipItMessageSections::buildMessage($sections),
-    );
+    return
+      $changeset->withMessage(ShipItMessageSections::buildMessage($sections));
   }
 
   public static async function genRewriteMentions(
@@ -429,13 +425,11 @@ final abstract class FBCommonFilters {
       );
     }
 
-    $changeset = ShipItUserFilters::rewriteAuthorFromGitHubAuthorLine(
-      $changeset,
-    );
+    $changeset =
+      ShipItUserFilters::rewriteAuthorFromGitHubAuthorLine($changeset);
     if (!Regex\matches($changeset->getAuthor(), re"/.*<.*>/")) {
-      $changeset = $changeset->withAuthor(
-        Str\format('%s <>', $changeset->getAuthor()),
-      );
+      $changeset =
+        $changeset->withAuthor(Str\format('%s <>', $changeset->getAuthor()));
     }
     return $changeset;
   }
@@ -463,9 +457,8 @@ final abstract class FBCommonFilters {
     $names = Vec\filter($names, $x ==> Str\length($x ?? '') > 0);
     $names = Vec\filter_nulls($names);
     $sections['reviewed by'] = Str\join($names, ', ');
-    return $changeset->withMessage(
-      ShipItMessageSections::buildMessage($sections),
-    );
+    return
+      $changeset->withMessage(ShipItMessageSections::buildMessage($sections));
   }
 
   public static function stripCoAuthoredByLines(

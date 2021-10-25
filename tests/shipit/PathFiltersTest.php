@@ -77,11 +77,8 @@ final class PathFiltersTest extends BaseTest {
       ]),
     );
 
-    $changeset = ShipItPathFilters::stripPaths(
-      $changeset,
-      $patterns,
-      $exceptions,
-    );
+    $changeset =
+      ShipItPathFilters::stripPaths($changeset, $patterns, $exceptions);
 
     \expect(Keyset\map($changeset->getDiffs(), $diff ==> $diff['path']))
       ->toBePHPEqual($expected_files);
@@ -144,11 +141,8 @@ final class PathFiltersTest extends BaseTest {
       ->withDiffs(
         Vec\map($in, $path ==> shape('path' => $path, 'body' => 'junk')),
       );
-    $changeset = ShipItPathFilters::moveDirectories(
-      $changeset,
-      $map,
-      $skip_patterns,
-    );
+    $changeset =
+      ShipItPathFilters::moveDirectories($changeset, $map, $skip_patterns);
     \expect(Vec\map($changeset->getDiffs(), $diff ==> $diff['path']))
       ->toBePHPEqual($expected);
   }

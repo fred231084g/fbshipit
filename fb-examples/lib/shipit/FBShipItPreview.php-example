@@ -125,10 +125,8 @@ pull request in order to preview the full patch.';
           async $branch_config ==> {
             $source_roots =
               $config_object->getManifest($branch_config)->getSourceRoots();
-            $changeset_paths = Vec\map(
-              $changeset->getDiffs(),
-              ($diff) ==> $diff['path'],
-            );
+            $changeset_paths =
+              Vec\map($changeset->getDiffs(), ($diff) ==> $diff['path']);
             if (
               !self::hasModifiedPathsForSourceRoots(
                 $changeset_paths,
@@ -145,13 +143,11 @@ pull request in order to preview the full patch.';
             if (C\is_empty($transformed_changeset->getDiffs())) {
               return null;
             }
-            $commit_message = ShipItRepoGIT::getCommitMessage(
-              $transformed_changeset,
-            );
+            $commit_message =
+              ShipItRepoGIT::getCommitMessage($transformed_changeset);
             if ($patch !== null) {
-              $transformed_patch = ShipItRepoGIT::renderPatch(
-                $transformed_changeset,
-              );
+              $transformed_patch =
+                ShipItRepoGIT::renderPatch($transformed_changeset);
             } else {
               $transformed_patch = null;
             }

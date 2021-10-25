@@ -32,10 +32,8 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
   }
 
   public async function testGetPhasesNoBranch(): Awaitable<void> {
-    $phase = self::getPhases(
-      FBShipItCLIAction::SHIP_IT,
-      self::getConfigObject(),
-    )[0];
+    $phase =
+      self::getPhases(FBShipItCLIAction::SHIP_IT, self::getConfigObject())[0];
     invariant(
       $phase is FBShipItBranchResolutionPhase,
       'Unexpected phase type: %s',
@@ -81,10 +79,8 @@ final class FBShipItProjectRunnerTest extends FBBaseTest {
   }
 
   public async function testGetPhasesImportItRequiresBranch(): Awaitable<void> {
-    $phase = self::getPhases(
-      FBShipItCLIAction::IMPORT_IT,
-      self::getConfigObject(),
-    )[0];
+    $phase =
+      self::getPhases(FBShipItCLIAction::IMPORT_IT, self::getConfigObject())[0];
     invariant(
       $phase is FBImportItBranchResolutionPhase,
       'Unexpected phase type: %s',

@@ -124,10 +124,8 @@ abstract class ShipItRepo {
       await $repo->genSetBranch($branch);
       return $repo;
     }
-    throw new ShipItRepoException(
-      null,
-      "Can't determine type of repo at ".$path,
-    );
+    throw
+      new ShipItRepoException(null, "Can't determine type of repo at ".$path);
   }
 
   /**

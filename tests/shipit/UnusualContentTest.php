@@ -83,9 +83,8 @@ final class UnusualContentTest extends BaseTest {
   }
 
   public function testAddingNewlineAtEOF(): void {
-    $header = \file_get_contents(
-      __DIR__.'/git-diffs/add-newline-at-eof.header',
-    );
+    $header =
+      \file_get_contents(__DIR__.'/git-diffs/add-newline-at-eof.header');
     $patch = \file_get_contents(__DIR__.'/git-diffs/add-newline-at-eof.patch');
     $changeset = ShipItRepoGIT::getChangesetFromExportedPatch($header, $patch);
     $changeset = \expect($changeset)->toNotBeNull();
@@ -98,12 +97,10 @@ final class UnusualContentTest extends BaseTest {
   }
 
   public function testStripFileListFromShortCommit(): void {
-    $header = \file_get_contents(
-      __DIR__.'/git-diffs/no-summary-in-message.header',
-    );
-    $patch = \file_get_contents(
-      __DIR__.'/git-diffs/no-summary-in-message.patch',
-    );
+    $header =
+      \file_get_contents(__DIR__.'/git-diffs/no-summary-in-message.header');
+    $patch =
+      \file_get_contents(__DIR__.'/git-diffs/no-summary-in-message.patch');
     $changeset = ShipItRepoGIT::getChangesetFromExportedPatch($header, $patch);
     $changeset = \expect($changeset)->toNotBeNull();
 
@@ -112,12 +109,10 @@ final class UnusualContentTest extends BaseTest {
   }
 
   public function testStripFileListFromLongCommit(): void {
-    $header = \file_get_contents(
-      __DIR__.'/git-diffs/has-summary-in-message.header',
-    );
-    $patch = \file_get_contents(
-      __DIR__.'/git-diffs/has-summary-in-message.patch',
-    );
+    $header =
+      \file_get_contents(__DIR__.'/git-diffs/has-summary-in-message.header');
+    $patch =
+      \file_get_contents(__DIR__.'/git-diffs/has-summary-in-message.patch');
     $changeset = ShipItRepoGIT::getChangesetFromExportedPatch($header, $patch);
     $changeset = \expect($changeset)->toNotBeNull();
 
@@ -134,9 +129,8 @@ final class UnusualContentTest extends BaseTest {
   }
 
   public function testDiffInMessage(): void {
-    $header = \file_get_contents(
-      __DIR__.'/hg-diffs/has-diff-in-message.header',
-    );
+    $header =
+      \file_get_contents(__DIR__.'/hg-diffs/has-diff-in-message.header');
     $patch = \file_get_contents(__DIR__.'/hg-diffs/has-diff-in-message.patch');
     $changeset = ShipItRepoGIT::getChangesetFromExportedPatch($header, $patch);
     $changeset = \expect($changeset)->toNotBeNull();

@@ -42,7 +42,7 @@ abstract final class ShipItLogger {
       // No place to log to.
       return;
     }
-    PHP\fprintf(\STDOUT, (string) $f, ...$args);
+    PHP\fprintf(\STDOUT, (string)$f, ...$args);
   }
 
   public static function err(Str\SprintfFormatString $f, mixed ...$args): void {
@@ -56,6 +56,6 @@ abstract final class ShipItLogger {
       // No place to log to.
       return;
     }
-    PHP\fprintf(\STDERR, (string) $f, ...$args);
+    PHP\fprintf(\STDERR, (string)$f, ...$args);
   }
 }

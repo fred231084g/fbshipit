@@ -47,10 +47,8 @@ class ShipItRepoGIT
   <<__Override>>
   public async function genUpdateBranchTo(string $base_rev): Awaitable<void> {
     if (Str\is_empty($this->branch)) {
-      throw new ShipItRepoGITException(
-        $this,
-        'setBranch must be called first.',
-      );
+      throw
+        new ShipItRepoGITException($this, 'setBranch must be called first.');
     }
     await $this->genGitCommand('checkout', '-B', $this->branch, $base_rev);
   }
@@ -579,9 +577,8 @@ class ShipItRepoGIT
   }
 
   protected async function genHEADSha(): Awaitable<string> {
-    return Str\trim(
-      await $this->genGitCommand('log', '-1', "--pretty=format:%H"),
-    );
+    return
+      Str\trim(await $this->genGitCommand('log', '-1', "--pretty=format:%H"));
   }
 
   private async function genSubmodules(
@@ -596,12 +593,8 @@ class ShipItRepoGIT
     if (!PHP\file_exists($this->getPath().'/.gitmodules')) {
       return vec[];
     }
-    $configs = await $this->genGitCommand(
-      'config',
-      '-f',
-      '.gitmodules',
-      '--list',
-    );
+    $configs =
+      await $this->genGitCommand('config', '-f', '.gitmodules', '--list');
     $configs = dict(PHP\parse_ini_string($configs) as KeyedContainer<_, _>)
       |> Dict\filter_keys($$, ($key) ==> {
         return Str\slice($key as string, 0, 10) === 'submodule.' &&

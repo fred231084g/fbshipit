@@ -26,9 +26,8 @@ abstract final class ShipItUserFilters {
   ): Awaitable<ShipItChangeset> {
     $matches = Regex\first_match($changeset->getAuthor(), $pattern);
     if ($matches is nonnull) {
-      $author = await $user_info::genDestinationAuthorFromLocalUser(
-        $matches['user'],
-      );
+      $author =
+        await $user_info::genDestinationAuthorFromLocalUser($matches['user']);
       if ($author !== null) {
         return $changeset->withAuthor($author);
       }

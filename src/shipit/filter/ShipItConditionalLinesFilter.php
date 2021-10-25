@@ -89,7 +89,8 @@ final abstract class ShipItConditionalLinesFilter {
     foreach ($changeset->getDiffs() as $diff) {
       $_matches = vec[];
       if (
-        $path_regex is nonnull && !PHP\preg_match($path_regex, $diff['path'], inout $_matches)
+        $path_regex is nonnull &&
+        !PHP\preg_match($path_regex, $diff['path'], inout $_matches)
       ) {
         $diffs[] = $diff;
         continue;
@@ -97,7 +98,12 @@ final abstract class ShipItConditionalLinesFilter {
       $diff['body'] = Str\split($diff['body'], "\n")
         |> Vec\map(
           $$,
-          $line ==> PHP\preg_replace($pattern, $replacement, $line, /* limit */ 1) as string,
+          $line ==> PHP\preg_replace(
+            $pattern,
+            $replacement,
+            $line, /* limit */
+            1,
+          ) as string,
         )
         |> Str\join($$, "\n");
       $diffs[] = $diff;

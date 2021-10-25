@@ -46,10 +46,8 @@ final class ShipItShellCommand {
   }
 
   public function setEnvironmentVariables(dict<string, string> $vars): this {
-    $this->environmentVariables = Dict\merge(
-      $this->environmentVariables,
-      $vars,
-    );
+    $this->environmentVariables =
+      Dict\merge($this->environmentVariables, $vars);
     return $this;
   }
 

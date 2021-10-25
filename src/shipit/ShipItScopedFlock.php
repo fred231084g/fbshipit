@@ -129,10 +129,8 @@ final class ShipItScopedFlock implements IShipItLock {
   }
 
   public static function getLockFilePathForRepoPath(string $repo_path): string {
-    return PHP\dirname($repo_path).
-      '/'.
-      PHP\basename($repo_path).
-      '.fbshipit-lock';
+    return
+      PHP\dirname($repo_path).'/'.PHP\basename($repo_path).'.fbshipit-lock';
   }
 }
 

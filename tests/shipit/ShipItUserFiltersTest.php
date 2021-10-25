@@ -21,9 +21,8 @@ final class ShipItUserFiltersTest extends BaseTest {
       ->withMessage(
         "Summary: text\nGitHub Author: github author\nTest Plan: none",
       );
-    $changeset = ShipItUserFilters::rewriteAuthorFromGitHubAuthorLine(
-      $changeset,
-    );
+    $changeset =
+      ShipItUserFilters::rewriteAuthorFromGitHubAuthorLine($changeset);
     \expect($changeset->getAuthor())->toBePHPEqual('github author');
   }
 
@@ -33,9 +32,8 @@ final class ShipItUserFiltersTest extends BaseTest {
       ->withMessage(
         "Summary: text\nGitHup Author: github author\nTest Plan: none",
       );
-    $changeset = ShipItUserFilters::rewriteAuthorFromGitHubAuthorLine(
-      $changeset,
-    );
+    $changeset =
+      ShipItUserFilters::rewriteAuthorFromGitHubAuthorLine($changeset);
     \expect($changeset->getAuthor())->toBePHPEqual('original author');
   }
 
@@ -45,9 +43,8 @@ final class ShipItUserFiltersTest extends BaseTest {
       ->withMessage(
         "Summary:\ntext\nGitHub Author:\ngithub author\nTest Plan:\nnone",
       );
-    $changeset = ShipItUserFilters::rewriteAuthorFromGitHubAuthorLine(
-      $changeset,
-    );
+    $changeset =
+      ShipItUserFilters::rewriteAuthorFromGitHubAuthorLine($changeset);
     \expect($changeset->getAuthor())->toBePHPEqual('github author');
   }
 }

@@ -58,20 +58,14 @@ abstract class ShipItGitHubUtils {
           $credentials === null,
           'Credentials should not be specified for SSH transport',
         );
-        $origin = Str\format(
-          'git@github.com:%s/%s.git',
-          $organization,
-          $project,
-        );
+        $origin =
+          Str\format('git@github.com:%s/%s.git', $organization, $project);
 
         await self::genCloneAndVerifyRepo($origin, $local_path);
         break;
       case ShipItTransport::HTTPS:
-        $origin = Str\format(
-          'https://github.com/%s/%s.git',
-          $organization,
-          $project,
-        );
+        $origin =
+          Str\format('https://github.com/%s/%s.git', $organization, $project);
         if ($credentials === null) {
           await self::genCloneAndVerifyRepo($origin, $local_path);
           break;
@@ -104,11 +98,8 @@ abstract class ShipItGitHubUtils {
         $user is nonnull && $password is nonnull,
         'Either an access token or user/password is required.',
       );
-      $auth_user = Str\format(
-        '%s:%s',
-          PHP\urlencode($user),
-          PHP\urlencode($password),
-      );
+      $auth_user =
+        Str\format('%s:%s', PHP\urlencode($user), PHP\urlencode($password));
     }
     if (Str\search($remote_url, self::GIT_HTTPS_URL_PREFIX) === 0) {
       $prefix_len = Str\length(self::GIT_HTTPS_URL_PREFIX);
@@ -147,10 +138,8 @@ abstract class ShipItGitHubUtils {
     $use_oauth = $access_token !== null;
 
     if ($use_oauth) {
-      $request_headers[] = Str\format(
-        'Authorization: token %s',
-        $access_token ?? 'null',
-      );
+      $request_headers[] =
+        Str\format('Authorization: token %s', $access_token ?? 'null');
     }
 
     $url = Str\format('https://api.github.com%s', $path);

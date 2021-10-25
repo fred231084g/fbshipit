@@ -47,9 +47,8 @@ final class ImportItRepoGIT extends \Facebook\ShipIt\ShipItRepoGIT {
     bool $use_latest_base_revision,
   ): Awaitable<(ShipItChangeset, ?string)> {
     if ($pr_number === null) {
-      $actual_head_rev = Str\trim(
-        await $this->genGitCommand('rev-parse', $expected_head_rev),
-      );
+      $actual_head_rev =
+        Str\trim(await $this->genGitCommand('rev-parse', $expected_head_rev));
       invariant(
         $expected_head_rev === $actual_head_rev,
         'Expected %s to be the HEAD of the import, but got %s',
@@ -65,9 +64,8 @@ final class ImportItRepoGIT extends \Facebook\ShipIt\ShipItRepoGIT {
         'origin',
         'refs/pull/'.$pr_number.'/head',
       );
-      $actual_head_rev = Str\trim(
-        await $this->genGitCommand('rev-parse', 'FETCH_HEAD'),
-      );
+      $actual_head_rev =
+        Str\trim(await $this->genGitCommand('rev-parse', 'FETCH_HEAD'));
       invariant(
         $expected_head_rev === $actual_head_rev,
         'Expected %s to be the HEAD of the pull request, but got %s',

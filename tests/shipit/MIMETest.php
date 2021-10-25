@@ -33,10 +33,7 @@ final class MIMETest extends ShellTest {
       )
     )->genRun();
 
-    $repo = new ShipItRepoGIT(
-      new ShipItDummyLock(),
-      $tempdir->getPath(),
-    );
+    $repo = new ShipItRepoGIT(new ShipItDummyLock(), $tempdir->getPath());
     await $repo->genSetBranch('master');
     await $repo->genCommitPatch($changeset);
 

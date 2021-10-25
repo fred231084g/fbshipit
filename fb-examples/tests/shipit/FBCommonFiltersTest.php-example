@@ -18,9 +18,8 @@ use namespace HH\Lib\Str; // @oss-enable
 <<\Oncalls('open_source')>>
 final class FBCommonFiltersTest extends FBBaseTest {
   private static function getKeepSections(): keyset<string> {
-    return keyset(
-      Config\shipit_configs_CONSTANTS::DEFAULT_MESSAGE_SECTION_NAMES,
-    );
+    return
+      keyset(Config\shipit_configs_CONSTANTS::DEFAULT_MESSAGE_SECTION_NAMES);
   }
 
   public async function testFBAuthorWithoutGitHubAuthor(): Awaitable<void> {

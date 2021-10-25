@@ -33,12 +33,8 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     private ?string $externalBranch = null,
     ?IShipItArgumentParser $argumentParser = null,
   ) {
-    $manifest = new ShipItManifest(
-      '/var/tmp/fbshipit',
-      'shipit',
-      'shipit',
-      keyset[],
-    );
+    $manifest =
+      new ShipItManifest('/var/tmp/fbshipit', 'shipit', 'shipit', keyset[]);
     if ($configObject !== null) {
       parent::__construct(
         $manifest,
@@ -165,9 +161,8 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     }
     // reponame OR FacebookReponame
     // Search for a unique match in repo name or class name
-    $config_objects = FBShipItConfigRegistry::getAllConfigs(
-      $this->configeratorDir,
-    );
+    $config_objects =
+      FBShipItConfigRegistry::getAllConfigs($this->configeratorDir);
     $match = null;
     foreach ($config_objects as $config_object) {
       if ($config_object->getConfigeratorName() === $name) {
@@ -196,10 +191,8 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     $config = $this->getCLIArguments();
     $raw_opts = $this->argumentParser->parseArgs($config);
     $this->parseOptions($config, $raw_opts);
-    $non_project_config_names = Keyset\map(
-      $config,
-      $cli_arg ==> $cli_arg['long_name'],
-    );
+    $non_project_config_names =
+      Keyset\map($config, $cli_arg ==> $cli_arg['long_name']);
     $project_config = Vec\filter(
       $this->getCLIArguments(),
       $cli_arg ==>

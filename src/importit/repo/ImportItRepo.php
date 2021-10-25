@@ -44,9 +44,7 @@ abstract class ImportItRepo {
       await $repo->genSetBranch('master');
       return $repo;
     }
-    throw new ImportItRepoException(
-      null,
-      "Can't determine type of repo at ".$path,
-    );
+    throw
+      new ImportItRepoException(null, "Can't determine type of repo at ".$path);
   }
 }

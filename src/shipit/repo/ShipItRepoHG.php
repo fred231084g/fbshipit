@@ -291,11 +291,8 @@ class ShipItRepoHG
   ): Awaitable<?ShipItChangeset> {
     $header = await $this->genNativeHeaderFromID($revision);
     $patch = await $this->genNativePatchFromID($revision);
-    $changeset = await $this->genChangesetFromNativePatch(
-      $revision,
-      $header,
-      $patch,
-    );
+    $changeset =
+      await $this->genChangesetFromNativePatch($revision, $header, $patch);
     return $changeset;
   }
 

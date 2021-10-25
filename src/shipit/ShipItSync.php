@@ -91,9 +91,8 @@ final class ShipItSync {
 
         $changeset = await $gen_filter($manifest, $changeset);
         if (!$this->isValidChangeToSync($changeset)) {
-          return $changeset->withDebugMessage(
-            'SKIPPED COMMIT: no matching files',
-          );
+          return
+            $changeset->withDebugMessage('SKIPPED COMMIT: no matching files');
         } else {
           return self::addTrackingData($manifest, $changeset);
         }
@@ -134,10 +133,8 @@ final class ShipItSync {
           ShipItLogger::out("Overwriting patch file: %s\n", $file);
         }
         PHP\file_put_contents($file, $dest::renderPatch($changeset));
-        $changeset = $changeset->withDebugMessage(
-          'Saved patch file: %s',
-          $file,
-        );
+        $changeset =
+          $changeset->withDebugMessage('Saved patch file: %s', $file);
       }
 
       if ($verbose) {
@@ -207,11 +204,8 @@ final class ShipItSync {
     // Support logging stats for a project with multiple branches.
     if (PHP\is_dir($filename)) {
       // Slashes are allowed in branch names but not filenames.
-      $namesafe_branch = Regex\replace(
-        $destination_branch,
-        re"/[^a-zA-Z0-9_\-.]/",
-        '_',
-      );
+      $namesafe_branch =
+        Regex\replace($destination_branch, re"/[^a-zA-Z0-9_\-.]/", '_');
       $filename = $filename.'/'.$namesafe_branch.'.json';
     }
     $source_repo = await $this->genRepo<ShipItSourceRepo>();
