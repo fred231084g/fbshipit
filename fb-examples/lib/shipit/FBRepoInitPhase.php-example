@@ -19,16 +19,7 @@ final class FBRepoInitPhase extends ShipItPhase {
   public function __construct(
     private ShipItRepoSide $side,
     private FBShipItInternalRepo $repo,
-  ) {
-    $this->assertIsSourceSide();
-  }
-
-  private function assertIsSourceSide(): void {
-    invariant(
-      $this->side === ShipItRepoSide::SOURCE,
-      'writing to Facebook repositories is not supported',
-    );
-  }
+  ) {}
 
   <<__Override>>
   public function getReadableName(): string {
