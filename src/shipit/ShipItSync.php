@@ -311,6 +311,14 @@ final class ShipItSync {
     return $src_commit;
   }
 
+  public static function addTrackingDataToString(
+    string $message,
+    string $commit_marker,
+    string $rev,
+  ): string {
+    return Str\format("%s\n\n%s: %s", $message, $commit_marker, $rev);
+  }
+
   public static function addTrackingData(
     ShipItManifest $manifest,
     ShipItChangeset $changeset,
@@ -319,8 +327,7 @@ final class ShipItSync {
     if ($rev === null) {
       $rev = $changeset->getID();
     }
-    $new_message = Str\format(
-      "%s\n\n%s: %s",
+    $new_message = self::addTrackingDataToString(
       $changeset->getMessage(),
       $manifest->getCommitMarker(),
       $rev,

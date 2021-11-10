@@ -510,7 +510,13 @@ class ShipItRepoGIT
     }
 
     await $this->genGitCommand('fetch', 'origin');
-    await $this->genGitCommand('reset', '--hard', 'origin/'.$this->branch);
+    try {
+      await $this->genGitCommand('reset', '--hard', 'origin/'.$this->branch);
+    } catch (ShipItShellCommandException $_) {
+      // In the case we are using a raw SHA as a "branch", this will work
+      // instead:
+      await $this->genGitCommand('reset', '--hard', $this->branch);
+    }
   }
 
   <<__Override>>

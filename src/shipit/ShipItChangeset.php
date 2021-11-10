@@ -56,8 +56,13 @@ final class ShipItChangeset {
   public function isValid(): bool {
     return !$this->isEmptyChange();
   }
+
   public function isEmptyChange(): bool {
     return C\is_empty($this->diffs);
+  }
+
+  public function skip(string $debug_reason): this {
+    return $this->withDiffs(vec[])->withDebugMessage('%s', $debug_reason);
   }
 
   public function getID(): string {
