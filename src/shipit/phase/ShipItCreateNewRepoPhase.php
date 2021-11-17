@@ -20,6 +20,11 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
   private ?string $outputPath = null;
   private bool $shouldDoSubmodules = true;
 
+  // In an ideal world, we could chunk based on file size. But that's
+  // non-trivial so the next best thing is to hope that average file size
+  // is less than or equal to 20MB (aka 2GB / 100), fingers crossed:
+  const int FILE_CHUNK_SIZE = 100;
+
   public function __construct(
     private (function(ShipItChangeset): Awaitable<ShipItChangeset>) $genFilter,
     private shape('name' => string, 'email' => string) $committer,
@@ -230,10 +235,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
       // already escape arguments in ShipItShellCommand, we need to remove
       // the escaping from any files that have it:
       |> Vec\map($$, ($line) ==> Str\trim($line, '"'))
-      // In an ideal world, we could chunk based on file size. But that's
-      // non-trivial so the next best thing is to hope that average file size
-      // is less than or equal to 4MB (aka 2GB / 500), fingers crossed:
-      |> Vec\chunk($$, 500);
+      |> Vec\chunk($$, self::FILE_CHUNK_SIZE);
 
     $chunk_count = C\count($all_filenames_chunked);
 
