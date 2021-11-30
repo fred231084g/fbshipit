@@ -149,7 +149,7 @@ class ShipItPhaseRunner {
       $short = Str\trim_right(Shapes::idx($opt, 'short_name', ''), ':');
       $long = Str\trim_right($opt['long_name'], ':');
 
-      if ($short is nonnull && C\contains_key($raw_opts, $short)) {
+      if (!Str\is_empty($short) && C\contains_key($raw_opts, $short)) {
         $key = '-'.$short;
         $value = $is_bool ? true : $raw_opts[$short];
       } else if (C\contains_key($raw_opts, $long)) {
@@ -158,13 +158,8 @@ class ShipItPhaseRunner {
       } else {
         $key = null;
         $value = $is_bool ? false : '';
-        $have_value = false;
-        $isset_func = Shapes::idx($opt, 'isset');
-        if ($isset_func) {
-          $have_value = $isset_func();
-        }
 
-        if ($is_required && !$have_value) {
+        if ($is_required) {
           ShipItLogger::err("ERROR: Expected --%s\n\n", $long);
           self::printHelp($config);
           throw new ShipItExitException(1);

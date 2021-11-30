@@ -22,8 +22,4 @@ type ShipItCLIArgument = shape(
   ?'replacement' => string,
   // Handler function for when the option is set
   ?'write' => (function(string): mixed),
-  // Detect if a required option has been set; if this isn't provided, it will
-  // be required on the command line. Specifying this function allows it to be
-  // prefilled on the config object instead
-  ?'isset' => (function(): bool),
 );
