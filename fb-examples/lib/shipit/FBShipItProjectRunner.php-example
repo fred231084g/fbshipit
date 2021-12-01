@@ -212,7 +212,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
         foreach ($this->phases as $phase) {
           if ($phase is FBShipItBranchResolutionPhase) {
             $config_object = $phase->getConfigObject();
-            $project_runner = $phase::getRunner(
+            $project_runner = $phase->getRunner(
               $config_object,
               // @lint-ignore AWAIT_IN_LOOP We want to execute this serially
               (await $config_object->genBranchConfigs())[0],

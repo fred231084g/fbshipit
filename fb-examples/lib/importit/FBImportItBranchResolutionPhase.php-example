@@ -35,7 +35,7 @@ final class FBImportItBranchResolutionPhase
   }
 
   <<__Override>>
-  public static function getRunner(
+  public function getRunner(
     FBShipItConfig $config_object,
     FBSourceBranchConfig $branch_config,
     ?IShipItArgumentParser $argument_parser = null,
