@@ -17,7 +17,11 @@ use namespace HH\Lib\{C, Regex, Str, Vec}; // @oss-enable
 
 class ShipItException extends \Exception {}
 
-final class ShipItImportDisallowedException extends ShipItException {}
+<<__Sealed(ShipItMultipleImportPathsException::class)>>
+class ShipItImportDisallowedException extends ShipItException {}
+
+final class ShipItMultipleImportPathsException
+  extends ShipItImportDisallowedException {}
 
 final class ShipItSync {
   public function __construct(

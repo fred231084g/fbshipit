@@ -65,7 +65,7 @@ abstract final class ImportItPathFilters {
     $reverse_mapping = dict[];
     foreach ($shipit_mapping as $dest_path => $src_path) {
       if (C\contains_key($reverse_mapping, $src_path)) {
-        throw new \Facebook\ShipIt\ShipItImportDisallowedException(
+        throw new \Facebook\ShipIt\ShipItMultipleImportPathsException(
           Str\format(
             'Multiple paths map from "%s" ("%s" and "%s")!',
             $src_path,
