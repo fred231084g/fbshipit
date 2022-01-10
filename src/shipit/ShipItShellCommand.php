@@ -30,7 +30,7 @@ final class ShipItShellCommand {
   private bool $showShellExecs = false;
 
   public function __construct(private ?string $path, string ...$command) {
-    $this->command = vec($command);
+    $this->command = $command;
     if (ShipItEnv::getEnv("SHIPIT_OUTPUT_EXECS") !== null) {
       $this->showShellExecs = true;
     }
@@ -133,7 +133,7 @@ final class ShipItShellCommand {
     $pipes = vec[];
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
-    $fp = \proc_open($command, $fds, inout $pipes, $this->path, dict($env_vars));
+    $fp = \proc_open($command, $fds, inout $pipes, $this->path, $env_vars);
     if (!$fp || !\HH\is_any_array($pipes)) {
       throw new \Exception("Failed executing $command");
     }
