@@ -25,7 +25,6 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
   public function __construct(
     private FBShipItConfig $configObject,
     protected ?string $externalBranch = null,
-    private ?string $repoMetadataFile = null,
     private ?IShipItArgumentParser $argumentParser = null,
     private bool $allowCustomExportBranch = false,
   ) {}
@@ -53,14 +52,6 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
         'write' => $_ ==> {
           $this->allowCustomExportBranch = true;
           return $this->allowCustomExportBranch;
-        },
-      ),
-      shape(
-        'long_name' => 'save-repo-metadata-to::',
-        'description' => "List metadata for the repository, and exit.",
-        'write' => $x ==> {
-          $this->repoMetadataFile = $x;
-          return $this->repoMetadataFile;
         },
       ),
     ];
@@ -141,13 +132,6 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
   ): Awaitable<void> {
     $config_object = $this->configObject;
     $branch_configs = await $this->genBranchConfigs();
-    if ($this->repoMetadataFile !== null) {
-      \Filesystem::writeFile(
-        $this->repoMetadataFile,
-        \json_encode(await $this->genRepoMetadata()),
-      );
-      throw new ShipItExitException(0);
-    }
     foreach ($branch_configs as $branch_config) {
       ShipItLogger::out(
         "--- Running for branch: (%s, %s)\n",

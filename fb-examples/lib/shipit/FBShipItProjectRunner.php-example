@@ -28,10 +28,11 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
   // folder on disk, this is primarily used for sandcastle jobs
   private ?string $configeratorDir = null;
 
+  private ?string $externalBranch = null;
+
   public function __construct(
     private FBShipItCLIAction $action,
     private ?FBShipItConfig $configObject = null,
-    private ?string $externalBranch = null,
     ?IShipItArgumentParser $argumentParser = null,
   ) {
     $manifest =
@@ -39,12 +40,7 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
     if ($configObject !== null) {
       parent::__construct(
         $manifest,
-        self::getPhases(
-          $action,
-          $configObject,
-          $externalBranch,
-          $argumentParser,
-        ),
+        self::getPhases($action, $configObject, null, $argumentParser),
         $argumentParser,
       );
     } else {
@@ -120,7 +116,6 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
           new FBShipItBranchResolutionPhase(
             $config_object,
             $external_branch,
-            null,
             $argument_parser,
           ),
         ];
@@ -129,7 +124,6 @@ final class FBShipItProjectRunner extends ShipItPhaseRunner {
           new FBImportItBranchResolutionPhase(
             $config_object,
             $external_branch,
-            null,
             $argument_parser,
           ),
         ];
