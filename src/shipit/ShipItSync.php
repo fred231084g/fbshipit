@@ -86,12 +86,11 @@ final class ShipItSync {
         }
         if ($skip_match !== null) {
           return $changeset
-            ->withDiffs(vec[])
-            ->withDebugMessage(
+            ->skip(Str\format(
               'USER SKIPPED COMMIT: id "%s" matches "%s"',
               $changeset->getID(),
               $skip_match,
-            );
+            ));
         }
 
         $changeset = await $gen_filter($manifest, $changeset);

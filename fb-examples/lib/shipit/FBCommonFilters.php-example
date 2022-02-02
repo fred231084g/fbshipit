@@ -117,9 +117,7 @@ final abstract class FBCommonFilters {
       // This is a typo that is fairly common for non-native English speakers
       ShipItMentions::containsMention($changeset, '@already-in-github')
     ) {
-      $changeset = $changeset
-        ->withDiffs(vec[])
-        ->withDebugMessage('SKIP COMMIT: @already-on-github');
+      $changeset = $changeset->skip('SKIP COMMIT: @already-on-github');
       invariant(!$changeset->isValid(), '@already-on-github diff still valid');
     }
     return $changeset;
