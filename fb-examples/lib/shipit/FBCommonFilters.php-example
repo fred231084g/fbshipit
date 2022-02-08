@@ -85,11 +85,11 @@ final abstract class FBCommonFilters {
       self::getSupportedMessageSectionNames(),
     );
 
-    if (C\contains_key($sections, 'github author')) {
+    if (C\contains_key($sections, ShipItMessageSectionHeaders::GITHUB_AUTHOR)) {
       return $changeset;
     }
 
-    unset($sections['summary']);
+    unset($sections[ShipItMessageSectionHeaders::SUMMARY]);
 
     return
       $changeset->withMessage(ShipItMessageSections::buildMessage($sections));
@@ -199,8 +199,11 @@ final abstract class FBCommonFilters {
     );
 
     // If No test plan, remove "test plan" from Summary
-    if (($sections['test plan'] ?? null) === self::NOT_A_TEST_PLAN) {
-      unset($sections['test plan']);
+    if (
+      ($sections[ShipItMessageSectionHeaders::TEST_PLAN] ?? null) ===
+        self::NOT_A_TEST_PLAN
+    ) {
+      unset($sections[ShipItMessageSectionHeaders::TEST_PLAN]);
     }
 
     return
@@ -293,29 +296,30 @@ final abstract class FBCommonFilters {
       $changeset,
       self::getSupportedMessageSectionNames(),
     );
-    unset($sections['summary']);
+    unset($sections[ShipItMessageSectionHeaders::SUMMARY]);
     return
       $changeset->withMessage(ShipItMessageSections::buildMessage($sections));
   }
 
-  public static function getSupportedMessageSectionNames(): keyset<string> {
+  public static function getSupportedMessageSectionNames(
+  ): keyset<ShipItMessageSectionHeaders> {
     return keyset[
-      'summary',
-      'facebook',
-      'github author',
-      'github pr sync',
-      'test plan',
-      'reviewers',
-      'reviewed by',
-      'differential revision',
-      'blame revision',
-      'tags',
-      'task id',
-      'tasks',
-      'subscribers',
-      'signature',
-      'committer',
-      'pulled by',
+      ShipItMessageSectionHeaders::SUMMARY,
+      ShipItMessageSectionHeaders::FACEBOOK,
+      ShipItMessageSectionHeaders::GITHUB_AUTHOR,
+      ShipItMessageSectionHeaders::GITHUB_PR_SYNC,
+      ShipItMessageSectionHeaders::TEST_PLAN,
+      ShipItMessageSectionHeaders::REVIEWERS,
+      ShipItMessageSectionHeaders::REVIEWED_BY,
+      ShipItMessageSectionHeaders::DIFFERENTIAL_REVISION,
+      ShipItMessageSectionHeaders::BLAME_REVISION,
+      ShipItMessageSectionHeaders::TAGS,
+      ShipItMessageSectionHeaders::TASK_ID,
+      ShipItMessageSectionHeaders::TASKS,
+      ShipItMessageSectionHeaders::SUBSCRIBERS,
+      ShipItMessageSectionHeaders::SIGNATURE,
+      ShipItMessageSectionHeaders::COMMITTER,
+      ShipItMessageSectionHeaders::PULLED_BY,
     ];
   }
 
@@ -406,8 +410,9 @@ final abstract class FBCommonFilters {
         $changeset,
         self::getSupportedMessageSectionNames(),
       );
-      if (C\contains_key($sections, 'reviewed by')) {
-        $names = Str\split($sections['reviewed by'], ', ');
+      if (C\contains_key($sections, ShipItMessageSectionHeaders::REVIEWED_BY)) {
+        $names =
+          Str\split($sections[ShipItMessageSectionHeaders::REVIEWED_BY], ', ');
         if (C\count($names) === 1) {
           $pulled_by_unixname = $names[0];
         }
@@ -440,11 +445,11 @@ final abstract class FBCommonFilters {
       $changeset,
       self::getSupportedMessageSectionNames(),
     );
-    if (!C\contains_key($sections, 'reviewed by')) {
+    if (!C\contains_key($sections, ShipItMessageSectionHeaders::REVIEWED_BY)) {
       return $changeset;
     }
     $names = await (
-      Str\split($sections['reviewed by'], ', ')
+      Str\split($sections[ShipItMessageSectionHeaders::REVIEWED_BY], ', ')
       // No project reviewers e.g., #WDT in D2407623
       |> Vec\filter($$, $name ==> Str\slice(Str\trim($name), 0, 1) !== '#')
       |> Vec\map_async(
@@ -455,7 +460,8 @@ final abstract class FBCommonFilters {
     );
     $names = Vec\filter($names, $x ==> Str\length($x ?? '') > 0);
     $names = Vec\filter_nulls($names);
-    $sections['reviewed by'] = Str\join($names, ', ');
+    $sections[ShipItMessageSectionHeaders::REVIEWED_BY] =
+      Str\join($names, ', ');
     return
       $changeset->withMessage(ShipItMessageSections::buildMessage($sections));
   }

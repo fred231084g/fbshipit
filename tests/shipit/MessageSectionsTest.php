@@ -46,7 +46,7 @@ final class MessageSectionsTest extends BaseTest {
   <<DataProvider('examplesForGetSections')>>
   public function testGetSections(
     string $message,
-    ?keyset<string> $valid,
+    ?keyset<ShipItMessageSectionHeaders> $valid,
     dict<string, string> $expected,
   ): void {
     $in = (new ShipItChangeset())->withMessage($message);
@@ -88,7 +88,10 @@ final class MessageSectionsTest extends BaseTest {
   public function testWhitespaceEndToEnd(string $in, string $expected): void {
     $message = (new ShipItChangeset())
       ->withMessage($in)
-      |> ShipItMessageSections::getSections($$, keyset['summary'])
+      |> ShipItMessageSections::getSections(
+        $$,
+        keyset[ShipItMessageSectionHeaders::SUMMARY],
+      )
       |> ShipItMessageSections::buildMessage($$);
     \expect($message)->toEqual($expected);
   }

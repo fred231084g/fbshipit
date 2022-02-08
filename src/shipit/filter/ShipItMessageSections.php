@@ -13,6 +13,25 @@
  */
 namespace Facebook\ShipIt;
 
+enum ShipItMessageSectionHeaders: string as string {
+  SUMMARY = 'summary';
+  FACEBOOK = 'facebook';
+  GITHUB_AUTHOR = 'github author';
+  GITHUB_PR_SYNC = 'github pr sync';
+  TEST_PLAN = 'test plan';
+  REVIEWERS = 'reviewers';
+  REVIEWED_BY = 'reviewed by';
+  DIFFERENTIAL_REVISION = 'differential revision';
+  BLAME_REVISION = 'blame revision';
+  TAGS = 'tags';
+  TASK_ID = 'task id';
+  TASKS = 'tasks';
+  SUBSCRIBERS = 'subscribers';
+  SIGNATURE = 'signature';
+  COMMITTER = 'committer';
+  PULLED_BY = 'pulled by';
+}
+
 use namespace HH\Lib\{C, Dict, Str, Regex}; // @oss-enable
 
 /** Utility class for commit messages with sections preceded by "Header: ".
@@ -34,7 +53,7 @@ final class ShipItMessageSections {
    */
   public static function getSections(
     ShipItChangeset $changeset,
-    ?keyset<string> $valid_sections = null,
+    ?keyset<ShipItMessageSectionHeaders> $valid_sections = null,
   ): dict<string, string> {
     $sections = dict['' => ''];
     $section = '';
