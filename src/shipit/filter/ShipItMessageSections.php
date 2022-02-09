@@ -14,6 +14,8 @@
 namespace Facebook\ShipIt;
 
 enum ShipItMessageSectionHeaders: string as string {
+  // @lint-ignore[HackLint5520] Intentionally breaking naming conventions
+  _NO_HEADER = '';
   SUMMARY = 'summary';
   FACEBOOK = 'facebook';
   GITHUB_AUTHOR = 'github author';
@@ -55,7 +57,7 @@ final class ShipItMessageSections {
     ShipItChangeset $changeset,
     ?keyset<ShipItMessageSectionHeaders> $valid_sections = null,
   ): dict<string, string> {
-    $sections = dict['' => ''];
+    $sections = dict[ShipItMessageSectionHeaders::_NO_HEADER => ''];
     $section = '';
     foreach (Str\split($changeset->getMessage(), "\n") as $line) {
       $line = Str\trim_right($line);
