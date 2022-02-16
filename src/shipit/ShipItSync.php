@@ -200,6 +200,10 @@ final class ShipItSync {
     vec<ShipItChangeset> $changesets_applied,
     vec<ShipItChangeset> $changesets_skipped,
   ): Awaitable<void> {
+    $stats_function = $this->syncConfig->getStatsFunction();
+    if ($stats_function is nonnull) {
+      $stats_function($changesets_applied, $changesets_skipped);
+    }
     $filename = $this->syncConfig->getStatsFilename();
     if ($filename === null) {
       return;

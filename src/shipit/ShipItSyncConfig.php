@@ -22,12 +22,17 @@ final class ShipItSyncConfig {
     vec<ShipItChangeset>,
     ShipItRepo,
   ): Awaitable<vec<ShipItChangeset>>);
+  const type TStatsFn = (function(
+    vec<ShipItChangeset>,
+    vec<ShipItChangeset>,
+  ): void);
 
   private ?string $firstCommit = null;
   private keyset<string> $skippedSourceCommits = keyset[];
   private ?string $patchesDirectory = null;
   private keyset<string> $destinationRoots = keyset[];
   private ?string $statsFilename = null;
+  private ?self::TStatsFn $statsFunction = null;
   private ?bool $allowEmptyCommit = false;
   private bool $doSubmodules = true;
 
@@ -124,6 +129,19 @@ final class ShipItSyncConfig {
       $ret ==> {
         $ret->statsFilename = $filename;
         return $ret->statsFilename;
+      },
+    );
+  }
+
+  public function getStatsFunction(): ?self::TStatsFn {
+    return $this->statsFunction;
+  }
+
+  public function withStatsFunction(?self::TStatsFn $function): this {
+    return $this->modified(
+      $ret ==> {
+        $ret->statsFunction = $function;
+        return $ret->statsFunction;
       },
     );
   }
