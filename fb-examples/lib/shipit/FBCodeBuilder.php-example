@@ -13,8 +13,6 @@
  */
 namespace Facebook\ShipIt;
 
-use namespace HH\Lib\Str; // @oss-enable
-
 final class FBCodeBuilder {
   const string SRC_FBCODE_BUILDER = 'fbcode/opensource/fbcode_builder/';
   const string DEST_FBCODE_BUILDER = 'build/fbcode_builder/';
@@ -26,11 +24,8 @@ final class FBCodeBuilder {
   const string DEST_GITHUB_HASHES = 'build/deps/github_hashes/';
 
   public static function getPathMappings(
-    ?string $travis_config = null,
+    string $travis_config,
   ): dict<string, string> {
-    if ($travis_config === null) {
-      $travis_config = FBCodeBuilder::SRC_FBCODE_BUILDER.'travis.yml';
-    }
     return dict[
       $travis_config => '.travis.yml',
       FBCodeBuilder::SRC_FBCODE_BUILDER => FBCodeBuilder::DEST_FBCODE_BUILDER,
@@ -62,5 +57,3 @@ final class FBCodeBuilder {
     ];
   }
 }
-
-interface ISupportsFBCodeBuilder {}
