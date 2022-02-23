@@ -296,6 +296,7 @@ class ShipItRepoGIT
         'am',
         '--keep-non-patch',
         '--keep-cr',
+        '--committer-date-is-author-date',
       );
     } catch (ShipItRepoGITException $e) {
       // If we are trying to git am on a non-git repo, for example
