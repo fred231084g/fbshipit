@@ -26,7 +26,7 @@ final abstract class FBCommonFilters {
       'filterMessageSections/keepFields' => keyset<string>,
       ?'keepTags' => bool,
       ?'referencePullRequestNumber' => bool,
-      ?'linkCommitsForProjectFullName' => string,
+      'projectFullName' => string,
     ) $config,
   ): Awaitable<ShipItChangeset> {
     $changeset = await (
@@ -44,13 +44,17 @@ final abstract class FBCommonFilters {
       |> self::stripAccept2Ship($$);
     $changeset = await FBDiffFilters::genAddCommitLinksToDiffNumbers(
       $changeset,
-      Shapes::idx($config, 'linkCommitsForProjectFullName'),
+      $config['projectFullName'],
     );
     if ($config['referencePullRequestNumber'] ?? true) {
       $changeset = self::referencePullRequestNumber($changeset);
     }
     $changeset = await (
-      self::stripSevRevertSummary($changeset)
+      self::stripPullRequestReferencesForOtherProjects(
+        $changeset,
+        $config['projectFullName'],
+      )
+      |> self::stripSevRevertSummary($$)
       |> self::delinkifyDifferentialURLs($$)
       |> ShipItUserFilters::genRewriteSVNAuthor($$, FBToGitHubUserInfo::class)
     );
@@ -159,18 +163,40 @@ final abstract class FBCommonFilters {
     );
   }
 
+  private static function stripPullRequestReferencesForOtherProjects(
+    ShipItChangeset $changeset,
+    string $repo_full_name,
+  ): ShipItChangeset {
+    return Regex\replace_with(
+      $changeset->getMessage(),
+      re"@^((?:Closes|Pull Request resolved:)) https://github.com/(.+/.+)/pull/[0-9]+@im",
+      ($match) ==> {
+        $full_match = $match[0];
+        $close_marker = $match[1];
+        $match_full_name = $match[2];
+
+        if (Str\compare_ci($repo_full_name, $match_full_name) !== 0) {
+          return Str\replace($full_match, $close_marker, 'X-link:');
+        }
+
+        return $full_match;
+      },
+    )
+      |> $changeset->withMessage($$);
+  }
+
   public static function referencePullRequestNumber(
     ShipItChangeset $changeset,
   ): ShipItChangeset {
     $matches = Regex\first_match(
       $changeset->getMessage(),
-      re"@^(?:Summary: )?(?:Closes|Pull Request resolved:) https://github.com/.+/.+/pull/([0-9]+)@im",
+      re"@^(?:Summary: )?(?:Closes|Pull Request resolved:) (https://github.com/.+/.+/pull/|#)([0-9]+)@im",
     );
     if ($matches === null) {
       return $changeset;
     }
     return $changeset->withSubject(
-      $changeset->getSubject().Str\format(' (#%s)', $matches[1]),
+      $changeset->getSubject().Str\format(' (#%s)', $matches[2]),
     );
   }
 
