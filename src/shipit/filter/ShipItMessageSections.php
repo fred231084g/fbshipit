@@ -21,6 +21,7 @@ enum ShipItMessageSectionHeaders: string as string {
   GITHUB_AUTHOR = 'github author';
   GITHUB_PR_SYNC = 'github pr sync';
   TEST_PLAN = 'test plan';
+  TESTS = 'tests'; // Phabricator also parses this as an alias for Test Plan
   REVIEWERS = 'reviewers';
   REVIEWED_BY = 'reviewed by';
   DIFFERENTIAL_REVISION = 'differential revision';
