@@ -109,7 +109,9 @@ final abstract class FBCommonFilters {
     return await ShipItUserFilters::genRewriteAuthorWithUserPattern(
       $changeset,
       FBToGitHubUserInfo::class,
-      re'/<(?<user>[^<]+)@fb.com>$/',
+      // Email domains should match
+      // OpensourceConstants::FACEBOOK_EMAIL_DOMAINS_REGEX
+      re'/<(?<user>[^<]+)(@fb.com|@oculus.com|@wa.com|@instagram.com)>$/',
     );
   }
 
