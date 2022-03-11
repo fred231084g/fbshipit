@@ -16,7 +16,6 @@ namespace Facebook\ShipIt;
 class FBShipItBranchResolutionPhase extends ShipItPhase {
 
   const type TRepoMetadata = shape(
-    'land_branch' => ?string,
     'branches' => vec<string>,
     'internal_repo' => string,
     'arcanist_project' => string,
@@ -116,7 +115,6 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
     $internal_repo = $config_object->getStaticConfig()['internalRepo'];
     $arcanist_project = $internal_repo['arcanistProject'];
     return shape(
-      'land_branch' => await $config_object->genLandBranch(),
       'branches' => Vec\map(
         $branch_configs,
         $branch_config ==> $branch_config->getExternalBranch(),
