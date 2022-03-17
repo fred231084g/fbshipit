@@ -23,7 +23,7 @@ final class ShipItGitHubInitPhase extends ShipItPhase {
     private ShipItRepoSide $side,
     private ShipItTransport $transport,
     private classname<ShipItGitHubUtils> $githubUtils,
-  ): void {
+  ) {
   }
 
   <<__Override>>
