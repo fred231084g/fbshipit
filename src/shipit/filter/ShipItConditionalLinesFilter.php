@@ -104,7 +104,8 @@ final abstract class ShipItConditionalLinesFilter {
             $replacement,
             $line, /* limit */
             1,
-          ) as string,
+          ) as ?string ??
+            $line, // if input length === 0, then `null` is returned
         )
         |> Str\join($$, "\n");
       $diffs[] = $diff;
