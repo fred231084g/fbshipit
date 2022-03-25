@@ -14,19 +14,13 @@
 namespace Facebook\ImportIt;
 
 final class ImportItRepoException extends \Exception {
-  public function __construct(?ImportItRepo $repo, string $message) {
-    if ($repo !== null) {
-      $message = \get_class($repo).": ".$message;
-    }
-    parent::__construct($message);
-  }
 }
 
 /**
  * Repo handler interface
  * For agnostic communication with git, hg, etc...
  */
-abstract class ImportItRepo {
+abstract final class ImportItRepo {
   /**
    * Factory
    */
@@ -45,7 +39,6 @@ abstract class ImportItRepo {
       await $repo->genSetBranch('master');
       return $repo;
     }
-    throw
-      new ImportItRepoException(null, "Can't determine type of repo at ".$path);
+    throw new ImportItRepoException("Can't determine type of repo at ".$path);
   }
 }
