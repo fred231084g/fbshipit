@@ -133,6 +133,8 @@ index %s..0000000
       '[^\n]+\n[^\n]+\n[^\n]+\n'.
       // One or two submodule lines
       Str\format('%s( *\n%s)?', $subproject_line, $subproject_line).
+      // Maybe the "no newline" line
+      '(\n\\\ No newline at end of file)?'.
       // Nothing else
       '\s*$@',
       $diff['body'],

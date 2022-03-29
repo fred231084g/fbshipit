@@ -20,6 +20,11 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
   private ?string $verifySourceCommit = null;
   private bool $shouldDoSubmodules = true;
 
+  const shape('name' => string, 'email' => string) COMMITTER_INFO = shape(
+    'name' => 'FBShipIt Internal User',
+    'email' => 'fbshipit@example.com',
+  );
+
   public function __construct(
     private (function(ShipItChangeset): Awaitable<ShipItChangeset>) $genFilter,
   ) {
@@ -78,12 +83,28 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
     ];
   }
 
-  <<__Override>>
-  protected async function genRunImpl(
-    ShipItManifest $manifest,
-  ): Awaitable<void> {
-    if ($this->useLatestSourceCommit) {
-      if ($this->verifySourceCommit !== null) {
+  /**
+   * Verifys the destination repo by creating a fresh source repo and then
+   * comparing them.
+   *
+   * NOTE: the destination repo MUST be a git repo.
+   *
+   * The shape is only returned if 'createPatch' is passed AND the repo is out
+   * of sync. In all other cases ShipItExitException is thrown with an
+   * appropriate error code, after printing an error/success message.
+   */
+  public static async function genVerifyRepo(
+    shape(
+      'manifest' => ShipItManifest,
+      'genFilter' => (function(ShipItChangeset): Awaitable<ShipItChangeset>),
+      'useLatestSourceCommit' => bool,
+      'verifySourceCommit' => ?string,
+      'shouldDoSubmodules' => bool,
+      'createPatch' => bool,
+    ) $args,
+  ): Awaitable<shape('diffstat' => string, 'patch' => string)> {
+    if ($args['useLatestSourceCommit']) {
+      if ($args['verifySourceCommit'] is nonnull) {
         throw new ShipItException(
           "the 'verify-source-commit' flag cannot be used with the ".
           "'use-latest-source-commit' flag since the latter automatically ".
@@ -91,28 +112,29 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
         );
       }
       $repo = await ShipItRepo::genTypedOpen<ShipItDestinationRepo>(
-        $manifest->getDestinationSharedLock(),
-        $manifest->getDestinationPath(),
-        $manifest->getDestinationBranch(),
+        $args['manifest']->getDestinationSharedLock(),
+        $args['manifest']->getDestinationPath(),
+        $args['manifest']->getDestinationBranch(),
       );
-      $this->verifySourceCommit = await $repo->genFindLastSourceCommit(
+      invariant(
+        $repo is ShipItRepoGIT,
+        "This phase only works if the destination is a git repo",
+      );
+      $args['verifySourceCommit'] = await $repo->genFindLastSourceCommit(
         keyset[],
-        $manifest->getCommitMarker(),
+        $args['manifest']->getCommitMarker(),
       );
     }
     $clean_dir = await ShipItCreateNewRepoPhase::genCreateNewGitRepo(
-      $manifest,
-      $this->genFilter,
-      shape(
-        'name' => 'FBShipIt Internal User',
-        'email' => 'fbshipit@example.com',
-      ),
-      $this->shouldDoSubmodules,
-      $this->verifySourceCommit,
+      $args['manifest'],
+      $args['genFilter'],
+      static::COMMITTER_INFO,
+      $args['shouldDoSubmodules'],
+      $args['verifySourceCommit'],
     );
     $clean_path = $clean_dir->getPath();
     $dirty_remote = 'shipit_dest';
-    $dirty_ref = $dirty_remote.'/'.$manifest->getDestinationBranch();
+    $dirty_ref = $dirty_remote.'/'.$args['manifest']->getDestinationBranch();
 
     await (
       new ShipItShellCommand(
@@ -121,7 +143,7 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
         'remote',
         'add',
         $dirty_remote,
-        $manifest->getDestinationPath(),
+        $args['manifest']->getDestinationPath(),
       )
     )->genRun();
     await (
@@ -142,6 +164,58 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
     )->getStdOut();
 
     if ($diffstat === '') {
+      if ($args['createPatch']) {
+        ShipItLogger::err(
+          "  CREATE PATCH FAILED: destination is already in sync.\n",
+        );
+        throw new ShipItExitException(1);
+      }
+      ShipItLogger::out("  Verification OK: destination is in sync.\n");
+      throw new ShipItExitException(0);
+    }
+
+    if (!$args['createPatch']) {
+      ShipItLogger::err(
+        "  VERIFICATION FAILED: destination repo does not match:\n\n%s\n",
+        $diffstat,
+      );
+      throw new ShipItExitException(1);
+    }
+
+    $patch = (
+      await (
+        new ShipItShellCommand(
+          $clean_path,
+          'git',
+          'diff',
+          '--full-index',
+          '--binary',
+          '--no-color',
+          $dirty_ref,
+          'HEAD',
+        )
+      )->genRun()
+    )->getStdOut();
+
+    return shape('diffstat' => $diffstat, 'patch' => $patch);
+  }
+
+  <<__Override>>
+  protected async function genRunImpl(
+    ShipItManifest $manifest,
+  ): Awaitable<void> {
+    $results = await static::genVerifyRepo(shape(
+      'manifest' => $manifest,
+      'genFilter' => $this->genFilter,
+      'useLatestSourceCommit' => $this->useLatestSourceCommit,
+      'verifySourceCommit' => $this->verifySourceCommit,
+      'shouldDoSubmodules' => $this->shouldDoSubmodules,
+      'createPatch' => $this->createPatch,
+    ));
+    $diffstat = $results['diffstat'];
+    $diff = $results['patch'];
+
+    if ($diffstat === '') {
       if ($this->createPatch) {
         ShipItLogger::err(
           "  CREATE PATCH FAILED: destination is already in sync.\n",
@@ -159,21 +233,6 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
       );
       throw new ShipItExitException(1);
     }
-
-    $diff = (
-      await (
-        new ShipItShellCommand(
-          $clean_path,
-          'git',
-          'diff',
-          '--full-index',
-          '--binary',
-          '--no-color',
-          $dirty_ref,
-          'HEAD',
-        )
-      )->genRun()
-    )->getStdOut();
 
     $source_sync_id = $this->verifySourceCommit;
     if ($source_sync_id === null) {
