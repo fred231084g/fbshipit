@@ -34,6 +34,7 @@ enum ShipItMessageSectionHeaders: string as string {
   SIGNATURE = 'signature';
   COMMITTER = 'committer';
   PULLED_BY = 'pulled by';
+  PULL_REQUEST_RESOLVED = 'pull request resolved';
 }
 
 use namespace HH\Lib\{C, Dict, Str, Regex}; // @oss-enable
