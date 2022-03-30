@@ -137,6 +137,7 @@ pull request in order to preview the full patch.';
               return null;
             }
             $transformed_changeset = await $config_object->genFilterChangeset(
+              FBShipItConfigFilterPurpose::DISPLAY,
               $changeset,
               $branch_config,
             );
