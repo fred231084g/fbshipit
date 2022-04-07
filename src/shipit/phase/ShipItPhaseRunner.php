@@ -104,6 +104,14 @@ class ShipItPhaseRunner {
           return $this->manifest;
         },
       ),
+      shape(
+        'long_name' => 'skip-push',
+        'description' => 'Do not push the destination repository',
+        'write' => $_ ==> {
+          $this->manifest = $this->manifest->withPushSkippped();
+          return $this->manifest;
+        },
+      ),
     ];
   }
 

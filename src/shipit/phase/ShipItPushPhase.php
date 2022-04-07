@@ -34,6 +34,15 @@ final class ShipItPushPhase extends ShipItPhase {
   protected async function genRunImpl(
     ShipItManifest $manifest,
   ): Awaitable<void> {
+    if ($manifest->isPushSkipped()) {
+      $logger = new ShipItVerboseLogger($manifest->isVerboseEnabled());
+      $logger->out(
+        "Skipping phase from manifest: %s",
+        $this->getReadableName(),
+      );
+      return;
+    }
+
     $repo = await ShipItRepo::genOpen(
       $manifest->getDestinationSharedLock(),
       $manifest->getDestinationPath(),

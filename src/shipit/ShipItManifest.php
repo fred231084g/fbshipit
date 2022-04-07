@@ -187,6 +187,20 @@ final class ShipItManifest {
     return false;
   }
 
+  private bool $pushSkipped = false;
+  public function withPushSkippped(): this {
+    return $this->modified(
+      $ret ==> {
+        $ret->pushSkipped = true;
+        return $ret->pushSkipped;
+      },
+    );
+  }
+
+  public function isPushSkipped(): bool {
+    return $this->pushSkipped;
+  }
+
   private function modified<Tignored>(
     (function(ShipItManifest): Tignored) $mutator,
   ): ShipItManifest {
