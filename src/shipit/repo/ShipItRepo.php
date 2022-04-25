@@ -131,6 +131,22 @@ abstract class ShipItRepo implements ShipItSourceRepo, ShipItDestinationRepo {
     return $changeset->getSubject()."\n\n".$changeset->getMessage();
   }
 
+  final public static function fixInlinePatchesInCommitMessage(
+    string $message,
+  ): string {
+    /* Insert a space before patterns that will make `git am` think that a
+     * line in the commit message is the start of a patch, which is an artifact
+     * of the way `git am` tries to tell where the message ends and the diffs
+     * begin. This fix is a hack; a better fix might be to use `git apply` and
+     * `git commit` directly instead of `git am`, but this is an edge-case so
+     * it's not worth it right now.
+     *
+     * https://github.com/git/git/blob/77bd3ea9f54f1584147b594abc04c26ca516d987/builtin/mailinfo.c#L701
+     */
+    return
+      Regex\replace($message, re"/^(diff -|Index: |---(?:\s\S|\s*$))/m", ' $1');
+  }
+
   /*
    * Generator yielding patch sections of the diff blocks (individually)
    * and finally the footer.

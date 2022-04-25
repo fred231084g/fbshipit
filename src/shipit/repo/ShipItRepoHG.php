@@ -157,7 +157,8 @@ class ShipItRepoHG extends ShipItRepo {
   public static function renderPatch(ShipItChangeset $patch): string {
     // Mon Sep 17 is a magic date used by format-patch to distinguish from real
     // mailboxes. cf. https://git-scm.com/docs/git-format-patch
-    $commit_message = self::getCommitMessage($patch);
+    $commit_message = self::getCommitMessage($patch)
+      |> self::fixInlinePatchesInCommitMessage($$);
     $ret = "From {$patch->getID()} Mon Sep 17 00:00:00 2001\n".
       "From: {$patch->getAuthor()}\n".
       "Date: ".
