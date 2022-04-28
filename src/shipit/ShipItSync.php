@@ -74,34 +74,34 @@ final class ShipItSync {
     $gen_filter = $this->syncConfig->getFilter();
 
     $source_changesets = await $this->genSourceChangesets();
-    return await Vec\map_async(
-      $source_changesets,
-      async $changeset ==> {
-        $skip_match = null;
-        foreach ($skipped_ids as $skip_id) {
-          if (Str\search($changeset->getID(), $skip_id) === 0) {
-            $skip_match = $skip_id;
-            break;
-          }
+    $changesets = vec[];
+    foreach ($source_changesets as $changeset) {
+      $skip_match = null;
+      foreach ($skipped_ids as $skip_id) {
+        if (Str\search($changeset->getID(), $skip_id) === 0) {
+          $skip_match = $skip_id;
+          break;
         }
-        if ($skip_match !== null) {
-          return $changeset
-            ->skip(Str\format(
-              'USER SKIPPED COMMIT: id "%s" matches "%s"',
-              $changeset->getID(),
-              $skip_match,
-            ));
-        }
+      }
+      if ($skip_match !== null) {
+        $changesets[] = $changeset
+          ->skip(Str\format(
+            'USER SKIPPED COMMIT: id "%s" matches "%s"',
+            $changeset->getID(),
+            $skip_match,
+          ));
+      }
 
-        $changeset = await $gen_filter($manifest, $changeset);
-        if (!$this->isValidChangeToSync($changeset)) {
-          return
-            $changeset->withDebugMessage('SKIPPED COMMIT: no matching files');
-        } else {
-          return self::addTrackingData($manifest, $changeset);
-        }
-      },
-    );
+      // @lint-ignore AWAIT_IN_LOOP We need to run this serially
+      $changeset = await $gen_filter($manifest, $changeset);
+      if (!$this->isValidChangeToSync($changeset)) {
+        $changesets[] =
+          $changeset->withDebugMessage('SKIPPED COMMIT: no matching files');
+      } else {
+        $changesets[] = self::addTrackingData($manifest, $changeset);
+      }
+    }
+    return $changesets;
   }
 
   public async function genRun(): Awaitable<void> {
