@@ -90,6 +90,7 @@ final class ShipItSync {
             $changeset->getID(),
             $skip_match,
           ));
+        continue;
       }
 
       // @lint-ignore AWAIT_IN_LOOP We need to run this serially
