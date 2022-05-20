@@ -14,7 +14,7 @@
 namespace Facebook\ShipIt;
 
 enum ShipItMessageSectionHeaders: string as string {
-  // @lint-ignore[HackLint5520] Intentionally breaking naming conventions
+  // @lint-ignore HackLint5520 Intentionally breaking naming conventions
   _NO_HEADER = '';
   SUMMARY = 'summary';
   FACEBOOK = 'facebook';
