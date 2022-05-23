@@ -15,14 +15,6 @@ namespace Facebook\ShipIt;
 
 use namespace HH\Lib\{Str, C}; // @oss-enable
 
-type ShipItPreviewInput = shape(
-  'arcanistProject' => string,
-  'changeset' => ShipItChangesetData,
-  'internalBranch' => string,
-  // TODO(yrahbar) make this field non-optional after upgrading the client
-  ?'patch' => ?string,
-);
-
 type ShipItPreviewOutput = shape(
   'changeset' => ShipItChangesetData,
   'githubOrg' => string,
