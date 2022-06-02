@@ -44,19 +44,20 @@ final class FBShipItPreviewTest extends FBBaseTest {
       ->genHandleChangeset('phabtest1_git', 'side_branch', $changeset, null);
     \expect(1)->toBePHPEqual(C\count($result));
     \expect(
-      shape(
-        'id' => 'deadbeef',
-        'timestamp' => 12345,
-        'author' => 'yrahbar',
-        'subject' => 'Test Commit',
-        'message' => 'Summary: Stuff',
-        'diffs' => vec[
+      (new ShipItChangeset())->withID('deadbeef')
+        ->withTimestamp(12345)
+        ->withAuthor('yrahbar')
+        ->withSubject('Test Commit')
+        ->withMessage('Summary: Stuff')
+        ->withDiffs(vec[
           shape(
             'path' => 'public/example.php',
             'body' => 'Testing events from GitHub author date\\n',
           ),
-        ],
-      ),
+        ])
+        ->withDebugMessage(
+          'STRIP FILE: "facebook/filtered.txt" matches pattern "@^facebook[/|$]@"',
+        ),
     )->toBePHPEqual($result[0]['changeset']);
     \expect('facebook')->toBePHPEqual($result[0]['githubOrg']);
     \expect('phabtest1_git')->toBePHPEqual($result[0]['githubProject']);
@@ -75,7 +76,7 @@ final class FBShipItPreviewTest extends FBBaseTest {
       ->toBePHPEqual(
         \file_get_contents(__DIR__.'/example_fbshipit_git_diff.patch'),
       );
-    $diffs = $result[0]['changeset']['diffs'];
+    $diffs = $result[0]['changeset']->getDiffs();
     \expect(C\count($diffs))->toBePHPEqual(2);
     \expect($diffs[0]['path'])
       ->toBePHPEqual(
@@ -104,7 +105,7 @@ final class FBShipItPreviewTest extends FBBaseTest {
     $error = $result[0]['error'];
     invariant($error !== null, 'Expected error');
     \expect($error)->toContainSubstring('This patch contains renamed');
-    $diffs = $result[0]['changeset']['diffs'];
+    $diffs = $result[0]['changeset']->getDiffs();
     \expect(C\count($diffs))->toBePHPEqual(1);
     \expect('src/shipit/file.php')->toBePHPEqual($diffs[0]['path']);
   }

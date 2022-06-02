@@ -16,7 +16,7 @@ namespace Facebook\ShipIt;
 use namespace HH\Lib\{Str, C}; // @oss-enable
 
 type ShipItPreviewOutput = shape(
-  'changeset' => ShipItChangesetData,
+  'changeset' => ShipItChangeset,
   'githubOrg' => string,
   'githubProject' => string,
   'commitMessage' => string,
@@ -25,17 +25,7 @@ type ShipItPreviewOutput = shape(
   'error' => ?string,
 );
 
-
 final class FBShipItPreview {
-
-  // TODO consider using a streaming json parser
-  const string OBJECT_TERMINATOR = '===END===';
-
-  private vec<FBShipItConfig> $allConfigClasses;
-
-  public function __construct() {
-    $this->allConfigClasses = FBShipItConfigRegistry::getAllConfigs();
-  }
 
   public static function hasModifiedPathsForSourceRoots(
     Traversable<string> $modified_paths,
@@ -101,7 +91,7 @@ pull request in order to preview the full patch.';
     }
 
     return await Vec\map_async(
-      $this->allConfigClasses,
+      FBShipItConfigRegistry::getAllConfigs(),
       async $config_object ==> {
         $repo_config = $config_object->getStaticConfig();
         // Does the repo match this open source project?
@@ -149,7 +139,7 @@ pull request in order to preview the full patch.';
               $transformed_patch = $hack_patch_override;
             }
             return shape(
-              'changeset' => $transformed_changeset->toData(),
+              'changeset' => $transformed_changeset,
               'githubOrg' => $repo_config['githubOrg'],
               'githubProject' => $repo_config['githubProject'],
               'commitMessage' => $commit_message,

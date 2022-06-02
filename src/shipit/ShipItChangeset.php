@@ -28,15 +28,6 @@ type ShipItDiff = shape(
   ?'new_path' => ?string,
 );
 
-type ShipItChangesetData = shape(
-  'id' => string,
-  'timestamp' => int,
-  'author' => string,
-  'subject' => string,
-  'message' => string,
-  'diffs' => vec<ShipItDiff>,
-);
-
 /*
  * Repo agnostic representation of a patch/changeset
  */
@@ -188,26 +179,5 @@ final class ShipItChangeset {
     foreach ($this->getDebugMessages() as $message) {
       ShipItLogger::out("    %s\n", $message);
     }
-  }
-
-  public function toData(): ShipItChangesetData {
-    return shape(
-      'id' => $this->getID(),
-      'timestamp' => $this->getTimestamp(),
-      'author' => $this->getAuthor(),
-      'subject' => $this->getSubject(),
-      'message' => $this->getMessage(),
-      'diffs' => vec($this->getDiffs()),
-    );
-  }
-
-  public static function fromData(ShipItChangesetData $shape): ShipItChangeset {
-    return (new ShipItChangeset())
-      ->withID($shape['id'])
-      ->withTimestamp($shape['timestamp'])
-      ->withAuthor($shape['author'])
-      ->withSubject($shape['subject'])
-      ->withMessage($shape['message'])
-      ->withDiffs($shape['diffs']);
   }
 }
