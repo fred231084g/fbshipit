@@ -41,19 +41,6 @@ abstract class ShipItRepo implements ShipItSourceRepo, ShipItDestinationRepo {
     return $this->lock;
   }
 
-  const VERBOSE_FETCH = 1;
-  const VERBOSE_SHELL = 2;
-  const VERBOSE_SHELL_OUTPUT = 4;
-  const VERBOSE_SHELL_INPUT = 8;
-
-  // Level of verbosity for -v option
-  const VERBOSE_STANDARD = 3;
-
-  static public int $verbose = 0;
-
-  const TYPE_GIT = 'git';
-  const TYPE_HG = 'hg';
-
   public function getPath(): string {
     return $this->path;
   }

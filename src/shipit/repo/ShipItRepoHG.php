@@ -405,9 +405,6 @@ class ShipItRepoHG extends ShipItRepo {
 
   <<__Override>>
   public async function genPull(): Awaitable<void> {
-    if (ShipItRepo::$verbose & ShipItRepo::VERBOSE_FETCH) {
-      ShipItLogger::err("** Updating checkout in %s\n", $this->path);
-    }
     await $this->genHgCommand('pull');
   }
 

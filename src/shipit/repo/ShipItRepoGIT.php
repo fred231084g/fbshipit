@@ -434,10 +434,6 @@ class ShipItRepoGIT extends ShipItRepo {
       PHP\mkdir($parent_path, 0755, /* recursive = */ true);
     }
 
-    if (ShipItRepo::$verbose & ShipItRepo::VERBOSE_FETCH) {
-      ShipItLogger::err("** Cloning %s to %s\n", $origin, $path);
-    }
-
     await (
       new ShipItShellCommand($parent_path, 'git', 'clone', $origin, $path)
     )->genRun();
@@ -483,10 +479,6 @@ class ShipItRepoGIT extends ShipItRepo {
 
   <<__Override>>
   public async function genPull(): Awaitable<void> {
-    if (ShipItRepo::$verbose & ShipItRepo::VERBOSE_FETCH) {
-      ShipItLogger::err("** Updating checkout in %s\n", $this->path);
-    }
-
     try {
       await $this->genGitCommand('am', '--abort');
     } catch (ShipItShellCommandException $_e) {
