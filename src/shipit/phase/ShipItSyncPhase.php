@@ -27,7 +27,7 @@ final class ShipItSyncPhase extends ShipItPhase {
     private keyset<string> $destinationRoots = keyset[],
     private ?ShipItSyncConfig::TPostFilterChangesetsFn $postFilterChangesets =
       null,
-    private ?bool $allowEmptyCommit = false,
+    private bool $allowEmptyCommit = false,
     private ?ShipItSyncConfig::TStatsFn $statsFunction = null,
   ) {}
 

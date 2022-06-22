@@ -33,7 +33,7 @@ final class ShipItSyncConfig {
   private keyset<string> $destinationRoots = keyset[];
   private ?string $statsFilename = null;
   private ?self::TStatsFn $statsFunction = null;
-  private ?bool $allowEmptyCommit = false;
+  private bool $allowEmptyCommit = false;
   private bool $doSubmodules = true;
 
   public function __construct(
@@ -146,7 +146,7 @@ final class ShipItSyncConfig {
     );
   }
 
-  public function withAllowEmptyCommits(?bool $allow_empty_commit): this {
+  public function withAllowEmptyCommits(bool $allow_empty_commit): this {
     return $this->modified(
       $ret ==> {
         $ret->allowEmptyCommit = $allow_empty_commit;
@@ -155,7 +155,7 @@ final class ShipItSyncConfig {
     );
   }
   public function getAllowEmptyCommits(): bool {
-    return $this->allowEmptyCommit !== null && $this->allowEmptyCommit;
+    return $this->allowEmptyCommit;
   }
 
   public function withShouldDoSubmodules(bool $do_submodules): this {
