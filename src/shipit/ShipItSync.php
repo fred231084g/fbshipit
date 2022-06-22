@@ -256,27 +256,6 @@ final class ShipItSync {
     );
   }
 
-  private static function checkLastRev(?string $diff): string {
-    if ($diff === null) {
-      throw new ShipItException(
-        "Unable to determine last differential revision pushed to dest repo",
-      );
-    }
-    if (!Regex\matches($diff, re"/^D[0-9]{6,}$/")) {
-      throw new ShipItException(
-        "Last differential revision number ('{$diff}') is invalid",
-      );
-    }
-    return $diff;
-  }
-
-  private static function checkFindDiff(?string $id, string $diff): string {
-    if ($id === null) {
-      throw new ShipItException("Unable to find $diff in source repo");
-    }
-    return $id;
-  }
-
   <<__Memoize>>
   private async function genRepo<<<__Enforceable>> reify Trepo as IShipItRepo>(
   ): Awaitable<Trepo> {
