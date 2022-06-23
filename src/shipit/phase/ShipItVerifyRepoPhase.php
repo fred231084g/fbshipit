@@ -150,6 +150,10 @@ final class ShipItVerifyRepoPhase extends ShipItPhase {
       new ShipItShellCommand($clean_path, 'git', 'fetch', $dirty_remote)
     )->genRun();
 
+    await (
+      new ShipItShellCommand($clean_path, 'git', 'checkout', 'HEAD')
+    )->genRun();
+
     $diffstat = (
       await (
         new ShipItShellCommand(
