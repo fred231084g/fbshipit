@@ -18,6 +18,7 @@ enum ShipItMessageSectionHeaders: string as string {
   _NO_HEADER = '';
   SUMMARY = 'summary';
   FACEBOOK = 'facebook';
+  INTERNAL = 'internal';
   GITHUB_AUTHOR = 'github author';
   GITHUB_PR_SYNC = 'github pr sync';
   TEST_PLAN = 'test plan';

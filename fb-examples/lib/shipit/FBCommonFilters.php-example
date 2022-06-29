@@ -334,6 +334,7 @@ final abstract class FBCommonFilters {
     return keyset[
       ShipItMessageSectionHeaders::SUMMARY,
       ShipItMessageSectionHeaders::FACEBOOK,
+      ShipItMessageSectionHeaders::INTERNAL,
       ShipItMessageSectionHeaders::GITHUB_AUTHOR,
       ShipItMessageSectionHeaders::GITHUB_PR_SYNC,
       ShipItMessageSectionHeaders::TEST_PLAN,
