@@ -28,7 +28,7 @@ final class FBShipItFilterSubmoduleChangesetsTest extends ShellTest {
     }
     return (new ShipItChangeset())
       ->withAuthor(
-        \SandcastleOpensourceUpdateProjectSHAsCommand::getUpdateSubmoduleAuthor(),
+        \SandcastleOpensourceUpdateProjectSHAsCommand::UPDATE_SUBMODULE_AUTHOR,
       )
       ->withSubject(FBShipItConfig::UPDATE_SUBMODULE_SUBJECT)
       ->withMessage(
@@ -92,7 +92,7 @@ Reviewed By: nobody',
     $merged_changesets = $config_object->mergeSubmoduleChangesets($changesets);
     \expect(C\count($merged_changesets))->toBePHPEqual(4);
     \expect($merged_changesets[0]->getAuthor())->toBePHPEqual(
-      \SandcastleOpensourceUpdateProjectSHAsCommand::getUpdateSubmoduleAuthor(),
+      \SandcastleOpensourceUpdateProjectSHAsCommand::UPDATE_SUBMODULE_AUTHOR,
     );
     \expect($merged_changesets[0]->getSubject())->toBePHPEqual(
       FBShipItConfig::UPDATE_SUBMODULE_SUBJECT,
@@ -116,7 +116,7 @@ Test Plan:',
     \expect($merged_changesets[1])->toBePHPEqual($changesets[2]);
     \expect($merged_changesets[2])->toBePHPEqual($changesets[3]);
     \expect($merged_changesets[3]->getAuthor())->toBePHPEqual(
-      \SandcastleOpensourceUpdateProjectSHAsCommand::getUpdateSubmoduleAuthor(),
+      \SandcastleOpensourceUpdateProjectSHAsCommand::UPDATE_SUBMODULE_AUTHOR,
     );
     \expect($merged_changesets[3]->getSubject())->toBePHPEqual(
       FBShipItConfig::UPDATE_SUBMODULE_SUBJECT,
@@ -133,7 +133,7 @@ Test Plan:',
     $changesets = vec[
       (new ShipItChangeset())
         ->withAuthor(
-          \SandcastleOpensourceUpdateProjectSHAsCommand::getUpdateSubmoduleAuthor(),
+          \SandcastleOpensourceUpdateProjectSHAsCommand::UPDATE_SUBMODULE_AUTHOR,
         )
         ->withDiffs(vec[
           shape('path' => 'dep_a.txt', 'body' => '9'),
