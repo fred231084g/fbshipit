@@ -199,9 +199,10 @@ class ShipItRepoHG extends ShipItRepo {
     $return = "";
     foreach ($patch->getDiffs() as $diff) {
       $path = $diff['path'];
+      $new_path = Shapes::idx($diff, 'new_path', $path) ?? $path;
       $body = $diff['body'];
 
-      $return .= "diff --git a/{$path} b/{$path}\n{$body}\n";
+      $return .= "diff --git a/{$path} b/{$new_path}\n{$body}\n";
     }
     $return .= "--\n1.7.9.5\n";
 

@@ -262,19 +262,23 @@ final class ShipItSync {
     $manifest = $this->manifest;
 
     if (Trepo::class === ShipItSourceRepo::class) {
-      return await ShipItRepo::genTypedOpen<Trepo>(
+      $repo = await ShipItRepo::genTypedOpen<Trepo>(
         $manifest->getSourceSharedLock(),
         $manifest->getSourcePath(),
         $manifest->getSourceBranch(),
       );
+      $repo->setUseNativeRenames($this->syncConfig->getNativeRenames());
+      return $repo;
     }
 
     if (Trepo::class === ShipItDestinationRepo::class) {
-      return await ShipItRepo::genTypedOpen<Trepo>(
+      $repo = await ShipItRepo::genTypedOpen<Trepo>(
         $manifest->getDestinationSharedLock(),
         $manifest->getDestinationPath(),
         $manifest->getDestinationBranch(),
       );
+      $repo->setUseNativeRenames($this->syncConfig->getNativeRenames());
+      return $repo;
     }
 
     invariant_violation(

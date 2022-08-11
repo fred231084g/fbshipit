@@ -70,4 +70,9 @@ interface IShipItRepo {
 
   public static function getDiffsFromPatch(string $patch): vec<ShipItDiff>;
 
+  /**
+   * Toggle supporting renames natively in ShipIt
+   */
+  public function setUseNativeRenames(bool $native_renames): void;
+
 }

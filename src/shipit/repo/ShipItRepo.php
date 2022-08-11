@@ -134,6 +134,12 @@ abstract class ShipItRepo implements ShipItSourceRepo, ShipItDestinationRepo {
       Regex\replace($message, re"/^(diff -|Index: |---(?:\s\S|\s*$))/m", ' $1');
   }
 
+  protected bool $useNativeRenames = false;
+
+  final public function setUseNativeRenames(bool $use_native_renames): void {
+    $this->useNativeRenames = $use_native_renames;
+  }
+
   /*
    * Generator yielding patch sections of the diff blocks (individually)
    * and finally the footer.

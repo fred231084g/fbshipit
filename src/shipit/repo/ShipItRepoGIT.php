@@ -242,9 +242,10 @@ class ShipItRepoGIT extends ShipItRepo {
       "{$message}\n---\n\n";
     foreach ($patch->getDiffs() as $diff) {
       $path = $diff['path'];
+      $new_path = Shapes::idx($diff, 'new_path', $path) ?? $path;
       $body = $diff['body'];
 
-      $ret .= "diff --git a/{$path} b/{$path}\n{$body}";
+      $ret .= "diff --git a/{$path} b/{$new_path}\n{$body}";
     }
     $ret .= "--\n1.7.9.5\n";
     return $ret;

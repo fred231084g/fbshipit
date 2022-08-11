@@ -21,6 +21,7 @@ final class ShipItSyncPhase extends ShipItPhase {
   private ?string $patchesDirectory = null;
   private ?string $statsFilename = null;
   private bool $shouldDoSubmodules = true;
+  private bool $nativeRenames = false;
 
   public function __construct(
     private ShipItSyncConfig::TFilterFn $filter,
@@ -107,6 +108,15 @@ final class ShipItSyncPhase extends ShipItPhase {
           return $this->shouldDoSubmodules;
         },
       ),
+      shape(
+        'long_name' => 'native-renames',
+        'description' =>
+          'Use native renames instead of deleting and adding files',
+        'write' => $_ ==> {
+          $this->nativeRenames = true;
+          return $this->nativeRenames;
+        },
+      ),
     ];
   }
 
@@ -128,7 +138,8 @@ final class ShipItSyncPhase extends ShipItPhase {
       ->withStatsFilename($this->statsFilename)
       ->withStatsFunction($this->statsFunction)
       ->withAllowEmptyCommits($this->allowEmptyCommit)
-      ->withShouldDoSubmodules($this->shouldDoSubmodules);
+      ->withShouldDoSubmodules($this->shouldDoSubmodules)
+      ->withNativeRenames($this->nativeRenames);
 
     await (new ShipItSync($manifest, $sync))->genRun();
   }

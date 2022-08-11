@@ -35,6 +35,7 @@ final class ShipItSyncConfig {
   private ?self::TStatsFn $statsFunction = null;
   private bool $allowEmptyCommit = false;
   private bool $doSubmodules = true;
+  private bool $nativeRenames = false;
 
   public function __construct(
     private keyset<string> $sourceRoots,
@@ -169,6 +170,19 @@ final class ShipItSyncConfig {
 
   public function getShouldDoSubmodules(): bool {
     return $this->doSubmodules;
+  }
+
+  public function withNativeRenames(bool $native_renames): this {
+    return $this->modified(
+      $ret ==> {
+        $ret->nativeRenames = $native_renames;
+        return $this->nativeRenames;
+      },
+    );
+  }
+
+  public function getNativeRenames(): bool {
+    return $this->nativeRenames;
   }
 
   private function modified<Tignored>(

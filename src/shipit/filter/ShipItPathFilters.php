@@ -101,30 +101,50 @@ abstract final class ShipItPathFilters {
   ): ShipItChangeset {
     $diffs = vec[];
     foreach ($changeset->getDiffs() as $diff) {
-      $old_path = $diff['path'];
-      $new_path = $path_rewrite_callback($old_path);
-      if ($old_path === $new_path) {
+      $old_a_path = $diff['path'];
+      $old_b_path = Shapes::idx($diff, 'new_path');
+      $new_a_path = $path_rewrite_callback($old_a_path);
+      if ($old_b_path is nonnull) {
+        $new_b_path = $path_rewrite_callback($old_b_path);
+      } else {
+        $new_b_path = null;
+      }
+      if ($old_a_path === $new_a_path && $old_b_path === $new_b_path) {
         $diffs[] = $diff;
         continue;
       }
 
-      $old_path = PHP\preg_quote($old_path, '@');
+      $old_a_path = PHP\preg_quote($old_a_path, '@');
 
       $body = $diff['body'];
       $body = PHP\preg_replace(
-        '@^--- (a/'.$old_path.'|"a/.*?"$)@m',
-        '--- a/'.$new_path,
+        '@^--- (a/'.$old_a_path.'|"a/.*?"$)@m',
+        '--- a/'.$new_a_path,
         $body,
       ) as string;
+
+      if ($old_b_path is nonnull) {
+        $old_b_path = PHP\preg_quote($old_b_path, '@');
+      }
+
       $body = PHP\preg_replace(
-        '@^\+\+\+ (b/'.$old_path.'|"b/.*?"$)@m',
-        '+++ b/'.$new_path,
+        '@^\+\+\+ (b/'.($old_b_path ?? $old_a_path).'|"b/.*?"$)@m',
+        '+++ b/'.($new_b_path ?? $new_a_path),
         $body,
       ) as string;
-      $diffs[] = shape(
-        'path' => $new_path,
-        'body' => $body,
-      );
+
+      if ($new_b_path is null) {
+        $diffs[] = shape(
+          'path' => $new_a_path,
+          'body' => $body,
+        );
+      } else {
+        $diffs[] = shape(
+          'path' => $new_a_path,
+          'body' => $body,
+          'new_path' => $new_b_path,
+        );
+      }
     }
     return $changeset->withDiffs($diffs);
   }
