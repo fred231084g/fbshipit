@@ -117,21 +117,45 @@ abstract final class ShipItPathFilters {
       $old_a_path = PHP\preg_quote($old_a_path, '@');
 
       $body = $diff['body'];
-      $body = PHP\preg_replace(
+      $body = \Regex::replace(
         '@^--- (a/'.$old_a_path.'|"a/.*?"$)@m',
         '--- a/'.$new_a_path,
         $body,
-      ) as string;
+      );
 
       if ($old_b_path is nonnull) {
+        $body = \Regex::replace(
+          '@^rename from '.$old_a_path.'$@m',
+          'rename from '.$new_a_path,
+          $body,
+        );
+        $body = \Regex::replace(
+          '@^copy from '.$old_a_path.'$@m',
+          'copy from '.$new_a_path,
+          $body,
+        );
+
         $old_b_path = PHP\preg_quote($old_b_path, '@');
+
+        if ($new_b_path is nonnull) {
+          $body = \Regex::replace(
+            '@^rename to '.$old_b_path.'$@m',
+            'rename to '.$new_b_path,
+            $body,
+          );
+          $body = \Regex::replace(
+            '@^copy to '.$old_b_path.'$@m',
+            'copy to '.$new_b_path,
+            $body,
+          );
+        }
       }
 
-      $body = PHP\preg_replace(
+      $body = \Regex::replace(
         '@^\+\+\+ (b/'.($old_b_path ?? $old_a_path).'|"b/.*?"$)@m',
         '+++ b/'.($new_b_path ?? $new_a_path),
         $body,
-      ) as string;
+      );
 
       if ($new_b_path is null) {
         $diffs[] = shape(

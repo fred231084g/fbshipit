@@ -88,28 +88,35 @@ abstract class ShipItRepo implements ShipItSourceRepo, ShipItDestinationRepo {
     list($header, $body) = Str\split($hunk, "\n", 2);
     $matches = Regex\first_match(
       Str\trim($header),
-      re'@^diff --git ("?)[ab]/(.*?)"? "?[ab]/(.*?)"?$@',
+      re'@^diff --git ("?)[ab]/(.*?)"? ("?)[ab]/(.*?)"?$@',
     );
     if ($matches is null) {
       return null;
     }
     $path = $matches[2] as string;
-    $new_path = $matches[3] !== '' ? $matches[3] : null;
-    if ($new_path !== null && $path !== $new_path) {
-      $operation = ShipItDiffOperation::RENAME;
-    } else {
-      $operation = ShipItDiffOperation::CHANGE;
-    }
+    $new_path = $matches[4] !== '' ? $matches[4] : null;
     if ($matches[1] === '"') {
       // Quoted paths may contain escaped characters.
       $path = PHP\stripslashes($path);
     }
-    return shape(
-      'path' => $path,
-      'body' => $body,
-      'operation' => $operation,
-      'new_path' => $new_path,
-    );
+
+    if ($new_path is nonnull && $path !== $new_path) {
+      if ($matches[3] === '"') {
+        $new_path = PHP\stripslashes($new_path);
+      }
+      return shape(
+        'path' => $path,
+        'body' => $body,
+        'operation' => ShipItDiffOperation::RENAME,
+        'new_path' => $new_path,
+      );
+    } else {
+      return shape(
+        'path' => $path,
+        'body' => $body,
+        'operation' => ShipItDiffOperation::CHANGE,
+      );
+    }
   }
 
   final public static function getCommitMessage(

@@ -30,6 +30,7 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
   private bool $applyToLatest = false;
   private ?string $applyToTarget = null;
   private bool $shouldDoSubmodules = true;
+  private bool $nativeRenames = false;
 
   public function __construct(
     private (function(ShipItChangeset): ShipItChangeset) $filter,
@@ -116,6 +117,15 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
           return $this->shouldDoSubmodules;
         },
       ),
+      shape(
+        'long_name' => 'native-renames',
+        'description' =>
+          'Use native renames instead of deleting and adding files',
+        'write' => $_ ==> {
+          $this->nativeRenames = true;
+          return $this->nativeRenames;
+        },
+      ),
     ];
   }
 
@@ -158,6 +168,9 @@ final class ImportItSyncPhase extends \Facebook\ShipIt\ShipItPhase {
       $manifest->getSourcePath(),
     );
     await $source_repo->genSetBranch($manifest->getSourceBranch());
+    if ($this->nativeRenames) {
+      $source_repo->setUseNativeRenames(true);
+    }
     return await $source_repo->genChangesetAndBaseRevisionForPullRequest(
       $pr_number,
       $expected_head_rev,

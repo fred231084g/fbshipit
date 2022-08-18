@@ -146,17 +146,29 @@ class ShipItRepoGIT extends ShipItRepo {
   public async function genNativePatchFromID(
     string $revision,
   ): Awaitable<string> {
-    return await $this->genGitCommand(
-      'format-patch',
-      '--no-renames',
-      '--no-stat',
-      '--stdout',
-      // use full SHAs to avoid inconsistent SHAs between calls
-      '--full-index',
-      '--format=', // Contain nothing but the code changes
-      '-1',
-      $revision,
-    );
+    if ($this->useNativeRenames) {
+      return await $this->genGitCommand(
+        'format-patch',
+        '--no-stat',
+        '--stdout',
+        '--full-index',
+        '--format=',
+        '-1',
+        $revision,
+      );
+    } else {
+      return await $this->genGitCommand(
+        'format-patch',
+        '--no-renames',
+        '--no-stat',
+        '--stdout',
+        // use full SHAs to avoid inconsistent SHAs between calls
+        '--full-index',
+        '--format=', // Contain nothing but the code changes
+        '-1',
+        $revision,
+      );
+    }
   }
 
   public async function genNativeHeaderFromID(
@@ -170,17 +182,29 @@ class ShipItRepoGIT extends ShipItRepo {
     string $revision,
     string $patch,
   ): Awaitable<string> {
-    $full_patch = await $this->genGitCommand(
-      'format-patch',
-      '--always',
-      '--no-renames',
-      '--no-stat',
-      '--stdout',
-      // use full SHAs to avoid inconsistent SHAs between calls
-      '--full-index',
-      '-1',
-      $revision,
-    );
+    if ($this->useNativeRenames) {
+      $full_patch = await $this->genGitCommand(
+        'format-patch',
+        '--always',
+        '--no-stat',
+        '--stdout',
+        '--full-index',
+        '-1',
+        $revision,
+      );
+    } else {
+      $full_patch = await $this->genGitCommand(
+        'format-patch',
+        '--always',
+        '--no-renames',
+        '--no-stat',
+        '--stdout',
+        // use full SHAs to avoid inconsistent SHAs between calls
+        '--full-index',
+        '-1',
+        $revision,
+      );
+    }
     if (Str\length($patch) === 0) {
       // This is an empty commit, so everything is the header.
       return $full_patch;

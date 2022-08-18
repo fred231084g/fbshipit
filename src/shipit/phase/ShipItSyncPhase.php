@@ -108,15 +108,6 @@ final class ShipItSyncPhase extends ShipItPhase {
           return $this->shouldDoSubmodules;
         },
       ),
-      shape(
-        'long_name' => 'native-renames',
-        'description' =>
-          'Use native renames instead of deleting and adding files',
-        'write' => $_ ==> {
-          $this->nativeRenames = true;
-          return $this->nativeRenames;
-        },
-      ),
     ];
   }
 

@@ -382,11 +382,6 @@ class ShipItRepoHG extends ShipItRepo {
     //
     // If we have any matching files, re-create their diffs using git, which
     // will do full diffs for both sides of the copy/rename.
-    $matches = Regex\every_match(
-      $patch,
-      re"/^(?:rename|copy) (?:from|to) (?<files>.+)$/m",
-    );
-    $has_rename_or_copy = Keyset\map($matches, $m ==> $m['files']);
     $has_mode_change = $changeset->getDiffs()
       |> Vec\filter(
         $$,
@@ -394,7 +389,17 @@ class ShipItRepoHG extends ShipItRepo {
       )
       |> Keyset\map($$, $diff ==> $diff['path']);
 
-    $needs_git = Keyset\union($has_rename_or_copy, $has_mode_change);
+    if ($this->useNativeRenames) {
+      $needs_git = $has_mode_change;
+    } else {
+      // unsupported rename or copy
+      $matches = Regex\every_match(
+        $patch,
+        re"/^(?:rename|copy) (?:from|to) (?<files>.+)$/m",
+      );
+      $has_rename_or_copy = Keyset\map($matches, $m ==> $m['files']);
+      $needs_git = Keyset\union($has_rename_or_copy, $has_mode_change);
+    }
 
     if ($needs_git) {
       $diffs = Vec\filter(

@@ -70,4 +70,50 @@ final class RenameFileTest extends ShellTest {
       ->toContainSubstring('deleted file mode 100644');
     \expect($diffs['moved.txt'])->toContainSubstring('new file mode 100755');
   }
+
+  public async function testNativeRenameFile(): Awaitable<void> {
+    $temp_dir = new ShipItTempDir('native-rename-file-test');
+    \Filesystem::writeFile(
+      $temp_dir->getPath().'/initial.txt',
+      'my content here',
+    );
+
+    await self::genExecSteps($temp_dir->getPath(), vec['hg', 'init']);
+    self::configureHg($temp_dir);
+
+    await self::genExecSteps(
+      $temp_dir->getPath(),
+      vec['hg', 'commit', '-Am', 'initial commit'],
+    );
+
+    \Filesystem::appendFile(
+      $temp_dir->getPath().'/initial.txt',
+      ' and not over there',
+    );
+
+    await self::genExecSteps(
+      $temp_dir->getPath(),
+      vec['hg', 'mv', 'initial.txt', 'moved.txt'],
+      vec['hg', 'commit', '-Am', 'moved file'],
+    );
+
+    $repo = new ShipItRepoHG(new ShipItDummyLock(), $temp_dir->getPath());
+    $repo->setUseNativeRenames(true);
+    $changeset = await $repo->genChangesetFromID('.');
+    $changeset = \expect($changeset)->toNotBeNull();
+    await \gen_execx(
+      \ExecCallsite::HSL_OPEN_SOURCE_TEST,
+      'rm -rf %s',
+      $temp_dir->getPath(),
+    );
+    \expect($changeset->getSubject())->toEqual('moved file');
+    $diffs = $changeset->getDiffs();
+    \expect(C\count($diffs))->toEqual(1);
+    \expect($diffs[0]['path'])->toEqual('initial.txt');
+    \expect(Shapes::idx($diffs[0], 'new_path'))->toNotBeNull();
+    \expect(Shapes::idx($diffs[0], 'new_path') as nonnull)->toEqual(
+      'moved.txt',
+    );
+    \expect($diffs[0]['body'])->toContainSubstring(' and not over there');
+  }
 }
