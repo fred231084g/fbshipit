@@ -25,8 +25,8 @@ final class ShipItTempDir {
   private ShipItTempDirMode $mode = ShipItTempDirMode::AUTO_REMOVE;
 
   public static function randomHex(int $length): string {
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     return PHP\bin2hex(\random_bytes($length));
   }
 

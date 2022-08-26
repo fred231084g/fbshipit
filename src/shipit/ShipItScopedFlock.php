@@ -114,8 +114,8 @@ final class ShipItScopedFlock implements IShipItLock {
     if ($this->destructBehavior === ShipItScopedFlockOperation::RELEASE) {
       try {
         PHP\fclose($this->fp);
-        /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-        /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+        /* HH_FIXME[2049] __PHPStdLib */
+        /* HH_FIXME[4107] __PHPStdLib */
         \unlink($this->path);
       } catch (\Exception $_e) {
         // if these files already don't exist do nothing

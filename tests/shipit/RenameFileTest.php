@@ -49,8 +49,8 @@ final class RenameFileTest extends ShellTest {
     await $repo->genSetBranch('master');
     $changeset = await $repo->genChangesetFromID('.');
     $changeset = \expect($changeset)->toNotBeNull();
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \shell_exec('rm -rf '.PHP\escapeshellarg($temp_dir->getPath()));
 
     \expect($changeset->getSubject())->toEqual('moved file');
@@ -101,8 +101,8 @@ final class RenameFileTest extends ShellTest {
     $repo->setUseNativeRenames(true);
     $changeset = await $repo->genChangesetFromID('.');
     $changeset = \expect($changeset)->toNotBeNull();
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \shell_exec('rm -rf '.$temp_dir->getPath());
     \expect($changeset->getSubject())->toEqual('moved file');
     $diffs = $changeset->getDiffs();

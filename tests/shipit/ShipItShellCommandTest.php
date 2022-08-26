@@ -148,23 +148,23 @@ final class ShipItShellCommandTest extends ShellTest {
 
   public async function testNoRetriesByDefault(): Awaitable<void> {
     $file = PHP\tempnam(PHP\sys_get_temp_dir(), __CLASS__) as string;
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \unlink($file);
     $result = await (new ShipItShellCommand('/', 'test', '-e', $file))
       ->setFailureHandler(async $_ ==> PHP\touch($file))
       ->setNoExceptions()
       ->genRun();
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \unlink($file);
     \expect($result->getExitCode())->toEqual(1);
   }
 
   public async function testRetries(): Awaitable<void> {
     $file = PHP\tempnam(PHP\sys_get_temp_dir(), __CLASS__) as string;
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     \unlink($file);
     $result = await (new ShipItShellCommand('/', 'test', '-e', $file))
       ->setFailureHandler(async $_ ==> PHP\touch($file))
@@ -172,8 +172,8 @@ final class ShipItShellCommandTest extends ShellTest {
       ->setRetries(1)
       ->genRun();
     if (PHP\file_exists($file)) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \unlink($file);
     }
     \expect($result->getExitCode())->toEqual(0);
@@ -195,8 +195,8 @@ final class ShipItShellCommandTest extends ShellTest {
         ->genRun();
     }
     if (PHP\file_exists($file)) {
-      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      /* HH_FIXME[2049] __PHPStdLib */
+      /* HH_FIXME[4107] __PHPStdLib */
       \unlink($file);
     }
     \expect($result->getExitCode())->toEqual(0);

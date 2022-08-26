@@ -131,8 +131,8 @@ final class ShipItShellCommand {
       );
     }
     $pipes = vec[];
-    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    /* HH_FIXME[2049] __PHPStdLib */
+    /* HH_FIXME[4107] __PHPStdLib */
     $fp = \proc_open($command, $fds, inout $pipes, $this->path, $env_vars);
     if (!$fp || !\HH\is_any_array($pipes)) {
       throw new \Exception("Failed executing $command");
@@ -177,8 +177,8 @@ final class ShipItShellCommand {
       } while (
         $result === false &&
         /* This **MUST NOT** be a PHP\ wrapper because `errno` is extremely volatile */
-        /* HH_IGNORE_ERROR[2049] __PHPStdLib */
-        /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+        /* HH_FIXME[2049] __PHPStdLib */
+        /* HH_FIXME[4107] __PHPStdLib */
         \posix_get_last_error() === 4 // \HH\Lib\OS\__Private\Errno::EINTR
       );
       if ($result === false) {

@@ -35,7 +35,7 @@ abstract final class ShipItLogger {
   public static function out(Str\SprintfFormatString $f, mixed ...$args): void {
     $out_func = self::$outFunc;
     if ($out_func is nonnull) {
-      /* HH_IGNORE_ERROR[4027] Passing in a format string */
+      /* HH_FIXME[4027] Passing in a format string */
       $out_func($f, ...$args);
       return;
     }
@@ -49,7 +49,7 @@ abstract final class ShipItLogger {
   public static function err(Str\SprintfFormatString $f, mixed ...$args): void {
     $err_func = self::$errFunc;
     if ($err_func is nonnull) {
-      /* HH_IGNORE_ERROR[4027] Passing in a format string */
+      /* HH_FIXME[4027] Passing in a format string */
       $err_func($f, ...$args);
       return;
     }
