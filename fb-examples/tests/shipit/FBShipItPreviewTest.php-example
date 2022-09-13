@@ -73,15 +73,11 @@ final class FBShipItPreviewTest extends FBBaseTest {
     $result = await (new FBShipItPreview())
       ->genHandleChangeset('facebook-www', 'master', $changeset, $patch);
     \expect($result[0]['patch'])
-      ->toEqual(
-        \file_get_contents(__DIR__.'/example_fbshipit_git_diff.patch'),
-      );
+      ->toEqual(\file_get_contents(__DIR__.'/example_fbshipit_git_diff.patch'));
     $diffs = $result[0]['changeset']->getDiffs();
     \expect(C\count($diffs))->toEqual(2);
     \expect($diffs[0]['path'])
-      ->toEqual(
-        'fb-examples/tests/shipit/FBCommonFiltersTest.php-example',
-      );
+      ->toEqual('fb-examples/tests/shipit/FBCommonFiltersTest.php-example');
     \expect($diffs[1]['path'])
       ->toEqual('fb-examples/lib/shipit/FBCommonFilters.php-example');
     \expect(null)->toEqual($result[0]['error']);

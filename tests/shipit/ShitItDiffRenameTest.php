@@ -20,9 +20,7 @@ final class ShitItDiffRenameTest extends ShellTest {
     \expect($diff)->toNotBeNull();
     \expect($diff as nonnull['path'])->toEqual('a.txt');
     \expect(Shapes::idx($diff, 'new_path'))->toNotBeNull();
-    \expect(Shapes::idx($diff, 'new_path') as nonnull)->toEqual(
-      'a_rename.txt',
-    );
+    \expect(Shapes::idx($diff, 'new_path') as nonnull)->toEqual('a_rename.txt');
   }
 
   public async function testShipItDiffRenamePathMapping(): Awaitable<void> {

@@ -165,10 +165,7 @@ final class SymlinkTest extends ShellTest {
     );
 
     \expect(Vec\map($changeset->getDiffs(), $diff ==> $diff['path']))
-      ->toEqual(
-        vec['foo', 'foo'],
-        'Expected chunks to affect the same file',
-      );
+      ->toEqual(vec['foo', 'foo'], 'Expected chunks to affect the same file');
 
     // Order is important: the old thing needs to be deleted before the new one
     // is created.

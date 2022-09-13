@@ -34,7 +34,7 @@ abstract class BaseTest extends \Facebook\HackTest\HackTest { // @oss-enable
 
   <<__Override>> // @oss-enable
   public static async function beforeFirstTestAsync(): Awaitable<void> { // @oss-enable
-    await static::createData(); // @oss-enable
+  await static::createData(); // @oss-enable
   } // @oss-enable
 
   protected static function diffsFromMap(

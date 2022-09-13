@@ -20,9 +20,6 @@ final class ShipItRepoTest extends BaseTest {
   public function testDiffofDiffs(): void {
     $patch = \file_get_contents(__DIR__.'/git-diffs/diff-in-diff.patch');
     $sections = vec(ShipItRepo::parsePatch($patch));
-    \expect(C\count($sections))->toEqual(
-      1,
-      'Should only get one section!',
-    );
+    \expect(C\count($sections))->toEqual(1, 'Should only get one section!');
   }
 }
