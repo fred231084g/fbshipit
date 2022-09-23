@@ -13,7 +13,6 @@
  */
 namespace Facebook\ShipIt;
 
-
 final class ShipItVerifyRepoPhase extends ShipItPhase {
   private bool $createPatch = false;
   private bool $useLatestSourceCommit = false;

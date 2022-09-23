@@ -15,7 +15,6 @@ namespace Facebook\ShipIt;
 
 use namespace HH\Lib\{Str, C, Vec}; // @oss-enable
 
-
 <<\Oncalls('open_source')>>
 final class SubmoduleTest extends ShellTest {
   public function testSubmoduleCommitFile(): void {

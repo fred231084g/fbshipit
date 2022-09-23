@@ -17,7 +17,6 @@ use namespace HH\Lib\{C, Vec}; // @oss-enable
 use type Facebook\HackTest\DataProvider; // @oss-enable
 // @oss-disable: use type DataProvider;
 
-
 enum SymlinkTestOperation: string {
   DELETE_FILE = 'deleted file mode 100644';
   DELETE_SYMLINK = 'deleted file mode 120000';

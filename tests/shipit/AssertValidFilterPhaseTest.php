@@ -17,7 +17,6 @@ use namespace HH\Lib\{Str, Vec}; // @oss-enable
 use type Facebook\HackTest\DataProvider; // @oss-enable
 // @oss-disable: use type DataProvider;
 
-
 <<\Oncalls('open_source')>>
 final class AssertValidFilterPhaseTest extends BaseTest {
   public async function testAllowsValidCombination(): Awaitable<void> {

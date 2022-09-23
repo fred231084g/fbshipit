@@ -11,7 +11,6 @@ final class ShipItRepoHGTest extends BaseTest {
 
   <<__LateInit>> private static ShipItChangeset $testChangeset;
 
-
   private static string $expectedHgPatch = <<< 'HGPATCH'
 # HG changeset patch
 # User Tester McTesterson <tester@example.com>
