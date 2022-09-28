@@ -13,7 +13,6 @@
  */
 namespace Facebook\ShipIt;
 
-
 <<\Oncalls('open_source')>>
 final class SyncTrackingTest extends ShellTest {
 

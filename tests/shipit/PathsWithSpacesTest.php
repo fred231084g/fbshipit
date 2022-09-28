@@ -17,7 +17,6 @@ use namespace HH\Lib\Vec; // @oss-enable
 use type Facebook\HackTest\DataProvider; // @oss-enable
 // @oss-disable: use type DataProvider;
 
-
 <<\Oncalls('open_source')>>
 final class PathsWithSpacesTest extends ShellTest {
   const FILE_NAME = 'foo bar/herp derp.txt';

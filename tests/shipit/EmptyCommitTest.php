@@ -15,7 +15,6 @@ namespace Facebook\ShipIt;
 
 use namespace HH\Lib\Str; // @oss-enable
 
-
 <<\Oncalls('open_source')>>
 final class EmptyCommitTest extends ShellTest {
   public async function testSourceGitDestGit(): Awaitable<void> {
