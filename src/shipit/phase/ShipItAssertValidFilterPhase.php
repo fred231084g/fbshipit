@@ -17,6 +17,7 @@ use namespace HH\Lib\{C, Str}; // @oss-enable
 
 final class ShipItAssertValidFilterPhase extends ShipItPhase {
   const TEST_FILE_NAME = 'shipit_test_file.txt';
+  const CHANGESET_ID = 'fake changeset id';
 
   public function __construct(
     private (function(ShipItChangeset): Awaitable<ShipItChangeset>) $genFilter,
@@ -56,6 +57,7 @@ final class ShipItAssertValidFilterPhase extends ShipItPhase {
       $test_file = $root.'/'.self::TEST_FILE_NAME;
       $test_file = Str\replace($test_file, '//', '/');
       $changeset = (new ShipItChangeset())
+        ->withID(self::CHANGESET_ID)
         ->withDiffs(vec[
           shape('path' => $test_file, 'body' => 'junk'),
         ]);
