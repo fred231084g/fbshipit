@@ -16,12 +16,14 @@ namespace Facebook\ShipIt;
 use namespace HH\Lib\Str; // @oss-enable
 
 final class ShipItManifest {
+  const DEFAULT_COMMIT_MARKER = 'fbshipit-source-id';
+
   public function __construct(
     private string $baseDirectoryPath,
     private string $defaultSourceDirectoryName,
     private string $defaultDestinationDirectoryName,
     private keyset<string> $sourceRoots,
-    private string $commitMarker = 'fbshipit-source-id',
+    private string $commitMarker = self::DEFAULT_COMMIT_MARKER,
   ) {}
 
   public function getBaseDirectory(): string {
