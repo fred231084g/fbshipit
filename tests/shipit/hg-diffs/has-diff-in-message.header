@@ -1,4 +1,4 @@
-# User Lovro Puzar <lovro@fb.com>
+# User Lovro Puzar <lovro@meta.com>
 # Date 1490012408.025200
 # Node ID f46a27de6734d992f951a5b2453b08826ce28545
 -~-~-~
@@ -38,7 +38,7 @@ Reviewers: andrejs, adri
 
 Reviewed By: adri
 
-Subscribers: logdevice-diffs@fb.com, mcm
+Subscribers: logdevice-diffs@meta.com, mcm
 
 Differential Revision: https://phabricator.intern.facebook.com/D4605822
 

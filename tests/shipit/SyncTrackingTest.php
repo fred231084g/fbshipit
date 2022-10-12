@@ -189,10 +189,10 @@ final class SyncTrackingTest extends ShellTest {
 
   public function testCoAuthorLines(): void {
     $in = (new ShipItChangeset())
-      ->withCoAuthorLines("Co-authored-by: Jon Janzen <jonjanzen@fb.com>");
+      ->withCoAuthorLines("Co-authored-by: Jon Janzen <jonjanzen@meta.com>");
     $out = ShipItSync::addTrackingData($this->getManifest(), $in, "TEST");
     \expect($out->getMessage())->toEqual(
-      "fbshipit-source-id: TEST\n\nCo-authored-by: Jon Janzen <jonjanzen@fb.com>",
+      "fbshipit-source-id: TEST\n\nCo-authored-by: Jon Janzen <jonjanzen@meta.com>",
     );
   }
 }

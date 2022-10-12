@@ -1,5 +1,5 @@
 From 7d85d880ca1e51995863e9282ad90f2bdc844d89 Mon Sep 17 00:00:00 2001
-From: Joel Marcey <joelm@fb.com>
+From: Joel Marcey <joelm@meta.com>
 Date: Tue, 5 Jan 2016 12:55:44 -0800
 Subject: [PATCH] Update HHVM third-party submodule SHA after Squangle update
 
@@ -13,4 +13,3 @@ Reviewed By: drilibo
 Differential Revision: D2803830
 
 fb-gh-sync-id: f77188bb2a4f0ef67edbcb6ffc2443b680592f30
-

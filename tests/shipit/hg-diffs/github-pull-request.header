@@ -1,4 +1,4 @@
-# User androidtrunkagent <androidtrunkagent@fb.com>
+# User androidtrunkagent <androidtrunkagent@meta.com>
 # Date 1454628132.028800
 # Node ID c0193c3b1e36778d61aa9013f0c294f8c3475442
 -~-~-~
@@ -16,7 +16,7 @@ After:
 
 <img width="1440" alt="screen shot 2016-02-04 at 2 04 50 pm" src="https://cloud.githubusercontent.com/assets/197597/12831364/af1c16a0-cb48-11e5-949c-c470938f8b49.png">
 Closes https://github.com/facebook/react-native/pull/5767
-Github Author: Christopher Chedeau <vjeux@fb.com>
+Github Author: Christopher Chedeau <vjeux@meta.com>
 
 
 {sync, type="child", parent="github", parentrepo="facebook/react-native", parentprnum="5767", parentprfbid="1013841888688747"}

@@ -24,7 +24,7 @@ final class FBCommonFiltersTest extends FBBaseTest {
 
   public async function testFBAuthorWithoutGitHubAuthor(): Awaitable<void> {
     $in = (new ShipItChangeset())
-      ->withAuthor('Joel Marcey <joelm@fb.com>');
+      ->withAuthor('Joel Marcey <joelm@meta.com>');
     $out = await FBCommonFilters::genApplyAll(
       $in,
       shape(
@@ -37,8 +37,8 @@ final class FBCommonFiltersTest extends FBBaseTest {
 
   public async function testFBAuthorWithGitHubAuthor(): Awaitable<void> {
     $in = (new ShipItChangeset())
-      ->withAuthor('Joel Marcey <joelm@fb.com>')
-      ->withMessage('GitHub Author: Fred Emmott <fe@fb.com>');
+      ->withAuthor('Joel Marcey <joelm@meta.com>')
+      ->withMessage('GitHub Author: Fred Emmott <fe@meta.com>');
     $out = await FBCommonFilters::genApplyAll(
       $in,
       shape(
@@ -46,7 +46,7 @@ final class FBCommonFiltersTest extends FBBaseTest {
         'projectFullName' => '',
       ),
     );
-    \expect($out->getAuthor())->toEqual('Fred Emmott <fe@fb.com>');
+    \expect($out->getAuthor())->toEqual('Fred Emmott <fe@meta.com>');
     \expect($out->getMessage())->toEqual("Pulled By: JoelMarcey");
   }
 
@@ -242,7 +242,7 @@ Differential Revision: D1234567',
         "Summary:\nthe first\n".
         "Summary:\nthe second\n".
         "Closes https://github.com/facebook/fbshipit/pull/42\n".
-        "Github author: gh_author@fb.com\n".
+        "Github author: gh_author@meta.com\n".
         "Test plan: run all code paths\n",
       );
 
@@ -270,7 +270,7 @@ Differential Revision: D1234567',
       ->withMessage(
         "Summary: One line change\n".
         "Closes https://github.com/facebook/fbshipit/pull/42\n".
-        "Github author: gh_author@fb.com\n".
+        "Github author: gh_author@meta.com\n".
         "Test plan: run all code paths\n",
       );
 
@@ -318,7 +318,7 @@ Test Plan: run all code paths',
     $changeset = (new ShipItChangeset())
       ->withMessage(
         "Closes https://github.com/facebook/fbshipit/pull/42\n".
-        "Github author: gh_author@fb.com",
+        "Github author: gh_author@meta.com",
       );
 
     // use default section names
@@ -531,7 +531,7 @@ Name2';
   public async function testStrippingCoAuthoredBy(): Awaitable<void> {
     $in = (new ShipItChangeset())
       ->withMessage(
-        "Blah blah summary here\nCo-authored-by: Jon Janzen <jonjanzen@fb.com>",
+        "Blah blah summary here\nCo-authored-by: Jon Janzen <jonjanzen@meta.com>",
       );
     $out = await FBCommonFilters::genApplyAll(
       $in,
@@ -547,7 +547,7 @@ Name2';
     $changeset = (new ShipItChangeset())
       ->withMessage(
         "Closes https://github.com/facebook/fbshipit/pull/42\n".
-        "Github author: gh_author@fb.com",
+        "Github author: gh_author@meta.com",
       );
     \expect(await FBCommonFilters::genImportedFromPullRequest($changeset))
       ->toBeTrue();
@@ -558,7 +558,7 @@ Name2';
       ->toBeFalse();
 
     $changeset = (new ShipItChangeset())
-      ->withMessage('Github author: gh_author@fb.com');
+      ->withMessage('Github author: gh_author@meta.com');
     \expect(await FBCommonFilters::genImportedFromPullRequest($changeset))
       ->toBeFalse();
   }
