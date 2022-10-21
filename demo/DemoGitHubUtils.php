@@ -11,9 +11,9 @@ namespace Facebook\ShipIt;
 
 final class DemoGitHubUtils extends ShipItGitHubUtils {
 
-  static string $committerName = "FBShipIt Demo Committer";
-  static string $committerUser = 'CHANGEME';
-  static string $committerEmail = "demo@example.com";
+  public static string $committerName = "FBShipIt Demo Committer";
+  public static string $committerUser = 'CHANGEME';
+  public static string $committerEmail = "demo@example.com";
 
   <<__Override>>
   public static async function genCredentialsForProject(
