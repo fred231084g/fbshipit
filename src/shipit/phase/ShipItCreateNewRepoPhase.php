@@ -113,7 +113,7 @@ final class ShipItCreateNewRepoPhase extends ShipItPhase {
     throw new ShipItExitException(0);
   }
 
-  private static async function genInitGitRepo(
+  public static async function genInitGitRepo(
     string $path,
     shape('name' => string, 'email' => string) $committer,
   ): Awaitable<void> {
