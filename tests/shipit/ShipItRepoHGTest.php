@@ -14,7 +14,7 @@ final class ShipItRepoHGTest extends BaseTest {
   private static string $expectedHgPatch = <<< 'HGPATCH'
 # HG changeset patch
 # User Tester McTesterson <tester@example.com>
-# Date 1655755205 25200
+# Date 1655755205 %%DATE%%
 #      Mon, 20 Jun 2022 13:00:05 -0700
 # Node ID 730c1a3381881be0fc32d0b229e1b57ad4c3cb23
 # Parent  0000000000000000000000000000000000000000
@@ -58,10 +58,15 @@ HGPATCH;
 
     expect($patch_output)->toNotBeNull();
 
+    $expected_patch_no_daylight_savings =
+      Str\replace(self::$expectedHgPatch, '%%DATE%%', '25200');
+    $expected_patch_daylight_savings =
+      Str\replace(self::$expectedHgPatch, '%%DATE%%', '28800');
+
     // Verify we have an HG styled header
-    expect($patch_output)->toEqual(
-      self::$expectedHgPatch,
-      "Failed to generate an HG styled header in the patch",
-    );
+    expect(
+      Str\compare($patch_output, $expected_patch_no_daylight_savings) === 0 ||
+        Str\compare($patch_output, $expected_patch_daylight_savings) === 0,
+    )->toBeTrue("Failed to generate an HG styled header in the patch");
   }
 }
