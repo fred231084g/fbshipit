@@ -5,13 +5,12 @@
 FBShipIt is a library written in [Hack](http://hacklang.org) for
 copying commits from one repository to another.
 
-For example, Facebook uses it to:
+For example, Meta uses it to:
 
  - copy commits from our monolithic Mercurial repository to
    project-specific GitHub repositories
- - populate Buck's gh-pages branch with the contents of
-   [the docs folder](https://github.com/facebook/buck/tree/master/docs)
-    in the master branch.
+ - sync changes from project specific repos like CPython and the linux kernel
+ - Import changes from PyTorch into our Mercurial monorepo
 
 ## Major Features
 
