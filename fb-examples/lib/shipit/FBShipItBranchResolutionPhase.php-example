@@ -25,7 +25,6 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
     private FBShipItConfig $configObject,
     protected ?string $externalBranch = null,
     private ?IShipItArgumentParser $argumentParser = null,
-    private bool $allowCustomExportBranch = false,
   ) {}
 
   <<__Override>>
@@ -44,15 +43,6 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
           return $this->externalBranch;
         },
       ),
-      shape(
-        'long_name' => 'allow-custom-export-branch',
-        'description' => 'For configs with custom export branches, '.
-          'allow them to be used by --external-branch',
-        'write' => $_ ==> {
-          $this->allowCustomExportBranch = true;
-          return $this->allowCustomExportBranch;
-        },
-      ),
     ];
   }
 
@@ -66,17 +56,10 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
     ?IShipItArgumentParser $argument_parser = null,
   ): ShipItPhaseRunner {
     return new ShipItPhaseRunner(
-      $config_object->getManifest(
-        $branch_config,
-        $this->shouldUseCustomExportBranch(),
-      ),
+      $config_object->getManifest($branch_config),
       $config_object->getPhases($branch_config),
       $argument_parser,
     );
-  }
-
-  protected function shouldUseCustomExportBranch(): bool {
-    return $this->externalBranch is nonnull && $this->allowCustomExportBranch;
   }
 
   public async function genBranchConfigs(
@@ -86,14 +69,8 @@ class FBShipItBranchResolutionPhase extends ShipItPhase {
     if ($this->externalBranch !== null) {
       $branch_configs = Vec\filter(
         $branch_configs,
-        $branch_config ==> {
-          if ($branch_config->getExternalBranch() === $this->externalBranch) {
-            return true;
-          }
-
-          return $this->allowCustomExportBranch &&
-            $branch_config->getCustomExportBranch() === $this->externalBranch;
-        },
+        $branch_config ==>
+          $branch_config->getExternalBranch() === $this->externalBranch,
       );
       invariant(
         !C\is_empty($branch_configs),

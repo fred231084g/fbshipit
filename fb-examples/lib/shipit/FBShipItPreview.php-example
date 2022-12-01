@@ -143,7 +143,7 @@ pull request in order to preview the full patch.';
               'githubOrg' => $repo_config['githubOrg'],
               'githubProject' => $repo_config['githubProject'],
               'commitMessage' => $commit_message,
-              'externalBranch' => $branch_config->getExternalBranchForExport(),
+              'externalBranch' => $branch_config->getExternalBranch(),
               'patch' => $transformed_patch,
               'error' => $error,
             );
