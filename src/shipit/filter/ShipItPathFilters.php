@@ -19,6 +19,7 @@ abstract final class ShipItPathFilters {
   // Skip debug messages on very large changesets, as that can cause
   // excessive delays in runtime.
   const int LARGE_CHANGESET = 3000;
+  const int SINGLE_FILE_MINIMUM_DEPTH = 3;
 
   public static function stripPaths(
     ShipItChangeset $changeset,
@@ -206,6 +207,43 @@ abstract final class ShipItPathFilters {
       }
     }
     return $changeset->withDiffs($diffs);
+  }
+
+  public static function getSourceRoots(
+    dict<string, string> $path_mappings,
+  ): keyset<string> {
+    $paths = Keyset\keys($path_mappings);
+
+    if (C\contains($paths, '')) {
+      // All paths are included.
+      return keyset[];
+    }
+    // Sort least specific to most specific.
+    $paths = Vec\sort($paths);
+    $roots = keyset[];
+    foreach ($paths as $path) {
+      // If this is a single file, use its parent,
+      // but only if it's deep enough to mitigate risk of over-coverage.
+      if (!Str\ends_with($path, '/')) {
+        $parts = Str\split($path, '/');
+        if (C\count($parts) >= self::SINGLE_FILE_MINIMUM_DEPTH) {
+          $path = Vec\take($parts, C\count($parts) - 1)
+            |> Str\join($$, '/')
+            |> $$.'/';
+        }
+      }
+      // If this path starts with any elements in the set of roots we have
+      // already computed, we do not need to add this as it would be redundant.
+      $root_match = false;
+      foreach ($roots as $root) {
+        $root_match = $root_match || Str\starts_with($path, $root);
+      }
+      if ($root_match) {
+        continue;
+      }
+      $roots[] = $path;
+    }
+    return $roots;
   }
 
   public static function stripExceptSourceRoots(
