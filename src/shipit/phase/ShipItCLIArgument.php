@@ -16,10 +16,7 @@ namespace Facebook\ShipIt;
 type ShipItCLIArgument = shape(
   ?'short_name' => string,
   'long_name' => string,
-  // If null, the function is considered deprecated
-  ?'description' => string,
-  // Set non-null if deprecated with a replacement
-  ?'replacement' => string,
+  'description' => string,
   // Handler function for when the option is set
   ?'write' => (function(string): mixed),
 );

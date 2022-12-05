@@ -121,28 +121,6 @@ class ShipItPhaseRunner {
       $args = Vec\concat($args, $phase->getCLIArguments());
     }
 
-    // Check for correctness
-    foreach ($args as $arg) {
-      $description = Shapes::idx($arg, 'description');
-      $replacement = Shapes::idx($arg, 'replacement');
-      $handler = Shapes::idx($arg, 'write');
-      $name = $arg['long_name'];
-
-      invariant(
-        !($description !== null && $replacement !== null),
-        '--%s is documented and deprecated',
-        $name,
-      );
-
-      invariant(
-        !(
-          $handler !== null && !($description !== null || $replacement !== null)
-        ),
-        '--%s does something, and is undocumented',
-        $name,
-      );
-    }
-
     return $args;
   }
 
@@ -183,30 +161,8 @@ class ShipItPhaseRunner {
         continue;
       }
 
-      $description = Shapes::idx($opt, 'description');
-      if ($description !== null && $description !== '') {
+      if ($opt['description'] !== '') {
         continue;
-      }
-
-      $replacement = Shapes::idx($opt, 'replacement');
-      if ($replacement !== null) {
-        ShipItLogger::err(
-          "%s %s, use %s instead\n",
-          $key,
-          $handler ? 'is deprecated' : 'has been removed',
-          $replacement,
-        );
-        if ($handler === null) {
-          throw new ShipItExitException(1);
-        }
-      } else {
-        invariant(
-          $handler === null,
-          "Option '%s' is not a no-op, is undocumented, and doesn't have a ".
-          'documented replacement.',
-          $key,
-        );
-        ShipItLogger::err("%s is deprecated and a no-op\n", $key);
       }
     }
   }
@@ -227,20 +183,7 @@ class ShipItPhaseRunner {
     $max_left = 0;
     $rows = dict[];
     foreach ($config as $opt) {
-      $description = Shapes::idx($opt, 'description');
-      if ($description === null) {
-        $replacement = Shapes::idx($opt, 'replacement');
-        if ($replacement !== null) {
-          continue;
-        } else {
-          invariant(
-            !Shapes::idx($opt, 'write'),
-            '--%s is undocumented, does something, and has no replacement',
-            $opt['long_name'],
-          );
-          $description = 'deprecated, no-op';
-        }
-      }
+      $description = $opt['description'];
 
       $short = Shapes::idx($opt, 'short_name');
       $long = $opt['long_name'];

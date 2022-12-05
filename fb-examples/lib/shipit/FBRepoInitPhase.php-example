@@ -33,12 +33,6 @@ final class FBRepoInitPhase extends ShipItPhase {
         'description' => "Don't initialize the repository",
         'write' => $_ ==> $this->skip(),
       ),
-      shape( // Removed; specified in code instead.
-        'long_name' => $this->side.'-repo::',
-      ),
-      shape( // Removed; specified in code instead.
-        'long_name' => 'src-repo::',
-      ),
     ];
   }
 
