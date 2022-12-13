@@ -13,7 +13,7 @@
  */
 namespace Facebook\ShipIt;
 
-use namespace HH\Lib\{C, Dict, Keyset, Regex, Str}; // @oss-enable
+use namespace HH\Lib\{C, Dict, Keyset, Regex, Str, Vec}; // @oss-enable
 
 abstract final class ShipItPathFilters {
   // Skip debug messages on very large changesets, as that can cause

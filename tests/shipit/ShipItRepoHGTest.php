@@ -4,6 +4,7 @@
 use Facebook\ShipIt;
 use Facebook\ShipIt\{ShipItRepoHG, ShipItEnv, ShipItChangeset, BaseTest};
 use type Facebook\HackTest\DataProvider; // @oss-enable
+use namespace HH\Lib\Str; // @oss-enable
 // @oss-disable: use type DataProvider;
 
 <<\Oncalls('open_source')>>
