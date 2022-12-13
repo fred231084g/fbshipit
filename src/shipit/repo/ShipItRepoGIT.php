@@ -88,6 +88,7 @@ class ShipItRepoGIT extends ShipItRepo {
       '--ancestry-path',
       '--no-merges',
       '--format=%H',
+      '--',
       ...$roots
     );
 
