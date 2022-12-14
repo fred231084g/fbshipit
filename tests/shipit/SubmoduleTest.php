@@ -50,7 +50,7 @@ final class SubmoduleTest extends ShellTest {
 
   public async function testCommitPatchWithSubmodule(): Awaitable<void> {
     // This test does not work on GitHub Actions:
-    return; // @oss-enable
+    if (false) return; // @oss-enable
     // First create a repo that we'll use as our submodule.
     $submodule_dir = new ShipItTempDir('submodule');
     await (new ShipItShellCommand($submodule_dir->getPath(), 'git', 'init'))
