@@ -60,6 +60,7 @@ final class SubmoduleTest extends \Facebook\ShipIt\ShellTest {
   }
 
   public async function testImportCommitPatchWithSubmodule(): Awaitable<void> {
+    static::markAsSkipped('broken on GitHub Actions'); // @oss-enable
     // First create a repo that we'll use as our submodule.
     $submodule_dir = new ShipItTempDir('submodule');
     await (new ShipItShellCommand($submodule_dir->getPath(), 'git', 'init'))
